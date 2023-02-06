@@ -1,14 +1,3 @@
--- project information
-set_project("horus")
-set_description("cross-platform application development framework")
-
--- project version
-set_version("0.1.0", { build = "%Y%m%d%H%M" })
-
--- default rules
-add_rules("mode.debug", "mode.check", "mode.releasedbg", "mode.release")
-
-
 -- linux dependencies
 if is_plat("linux") then
     add_requires("pthread", { system = true, configs = { shared = true } })
@@ -40,9 +29,4 @@ target("horus")
 
         -- platform dependencies
         add_packages("pthread")
-    end
-
-    -- linux toolchain
-    if is_plat("linux") then
-        set_toolchains("clang")
     end

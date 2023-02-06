@@ -1,7 +1,7 @@
 /**
- * @file horus.h
+ * @file sandbox.h
  * @author Thiago Rezende (thiago.manoel.rezende@gmail.com)
- * @brief horus public include file
+ * @brief sandbox public include file
  *
  */
 
