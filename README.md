@@ -15,7 +15,7 @@
 
 <!-- Description -->
 
-This project was developed to be the simplest cross-platform application development framework using the [C][c-url] programming language and [XMake][xmake-url] bulid system.
+This project is being developed to be the simplest cross-platform application development framework using the [C][c-url] programming language and [XMake][xmake-url] bulid system.
 
 <!-- Links -->
 
