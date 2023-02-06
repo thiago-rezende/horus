@@ -1,9 +1,10 @@
-# XMake
+# Meson
 build
-.xmake
+builddir
 
 # VS Code
 .vscode/*
+!.vscode/c_cpp_properties.json
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json

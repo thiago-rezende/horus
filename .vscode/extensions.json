@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "mesonbuild.mesonbuild",
+        "ms-vscode.cpptools"
+    ]
+}

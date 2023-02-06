@@ -7,7 +7,7 @@
 
 # Horus
 
-[![license-badge]][license-url] [![c-badge]][c-url] [![xmake-badge]][xmake-url]
+[![license-badge]][license-url] [![c-badge]][c-url] [![meson-badge]][meson-url]
 
 <!-- Short Description -->
 
@@ -15,16 +15,16 @@
 
 <!-- Description -->
 
-This project is being developed to be the simplest cross-platform application development framework using the [C][c-url] programming language and [XMake][xmake-url] bulid system.
+This project is being developed to be the simplest cross-platform application development framework using the [C][c-url] programming language and [Meson][meson-url] bulid system.
 
 <!-- Links -->
 
 [license-url]: https://opensource.org/licenses/BSD-3-Clause
 [c-url]: https://en.cppreference.com/w/c
-[xmake-url]: https://xmake.io/
+[meson-url]: https://mesonbuild.com/
 
 <!-- Badges -->
 
-[license-badge]: https://img.shields.io/badge/license-BSD_3_Clause-blue.svg?style=flat-square
-[xmake-badge]: https://img.shields.io/badge/XMake-2.7-42b983.svg?style=flat-square
-[c-badge]: https://img.shields.io/badge/C-99-orange.svg?style=flat-square
+[license-badge]: https://img.shields.io/badge/license-BSD_3_Clause-green.svg?style=flat-square
+[meson-badge]: https://img.shields.io/badge/Meson-1.0-39207c.svg?style=flat-square
+[c-badge]: https://img.shields.io/badge/C-99-blue.svg?style=flat-square
