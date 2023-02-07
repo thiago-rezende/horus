@@ -9,6 +9,7 @@ horus_headers = [
 
     # platform layer headers
     'horus/platform/console.h',
+    'horus/platform/detection.h',
     'horus/platform/entrypoint.h',
 
     # linux platform headers
