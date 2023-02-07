@@ -1,11 +1,15 @@
 # horus header files
 horus_headers = [
+    # horus global header
     'horus/horus.h',
 
-    # platform layer
+    # horus core headers
+    'horus/core/types.h',
+
+    # platform layer headers
     'horus/platform/entrypoint.h',
 
-    # linux platform
+    # linux platform headers
     'horus/platform/linux/entrypoint.h'
 ]
 
