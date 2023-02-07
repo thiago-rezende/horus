@@ -1,18 +1,23 @@
+# project description
 project('horus',
   ['c'],
   version : '0.1.0',
   license : 'BSD-3-Clause',
   default_options : ['c_std=c99'])
 
+# horus target
 subdir('horus')
 
+# sandbox target
 if get_option('build_sandbox')
   subdir('sandbox')
 endif
 
+# project options summary
 summary({'build_sandbox' : get_option('build_sandbox'),
         }, section : 'Options')
 
+# project directories summary
 summary({'bindir' : get_option('bindir'),
          'libdir' : get_option('libdir'),
          'datadir' : get_option('datadir'),
