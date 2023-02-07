@@ -13,11 +13,23 @@ jobs:
     steps:
       - name: Setup Repository
         uses: actions/checkout@v3
+      
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
 
       - name: Setup Meson
         run: pip install meson ninja
@@ -39,10 +51,22 @@ jobs:
       - name: Setup Repository
         uses: actions/checkout@v3
 
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
 
       - name: Setup Meson
         run: pip install meson ninja
@@ -64,10 +88,22 @@ jobs:
       - name: Setup Repository
         uses: actions/checkout@v3
 
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
 
       - name: Setup Meson
         run: pip install meson ninja
@@ -89,10 +125,22 @@ jobs:
       - name: Setup Repository
         uses: actions/checkout@v3
 
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
 
       - name: Setup Meson
         run: pip install meson ninja
