@@ -3,7 +3,9 @@ horus_sources = []
 
 # horus source files [ linux ]
 if host_machine.system() == 'linux'
-    horus_sources += []
+    horus_sources += [
+        'src/platform/linux/console.c'
+    ]
 endif
 
 # horus include directories

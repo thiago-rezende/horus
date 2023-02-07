@@ -8,6 +8,7 @@ horus_headers = [
     'horus/core/macros.h',
 
     # platform layer headers
+    'horus/platform/console.h',
     'horus/platform/entrypoint.h',
 
     # linux platform headers
