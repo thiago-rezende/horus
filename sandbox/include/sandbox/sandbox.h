@@ -6,5 +6,3 @@
  */
 
 #pragma once
-
-void* application_create();

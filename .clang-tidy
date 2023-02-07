@@ -1,0 +1,4 @@
+---
+Checks:                 'clang-diagnostic-*,clang-analyzer-*,cert-*,performance-*,portability-*,readability-'
+WarningsAsErrors:       true
+FormatStyle:            Chromium
