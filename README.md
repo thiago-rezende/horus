@@ -27,6 +27,6 @@ This project is being developed to be the simplest cross-platform application de
 <!-- Badges -->
 
 [ci-badge]: https://img.shields.io/github/actions/workflow/status/thiago-rezende/horus/ci.yml?style=flat-square
-[license-badge]: https://img.shields.io/badge/license-BSD_3_Clause-green.svg?style=flat-square
-[meson-badge]: https://img.shields.io/badge/Meson-1.0-39207c.svg?style=flat-square
+[license-badge]: https://img.shields.io/badge/license-BSD_3_Clause-yellowgreen.svg?style=flat-square
+[meson-badge]: https://img.shields.io/badge/meson-1.0-39207c.svg?style=flat-square
 [c-badge]: https://img.shields.io/badge/C-99-blue.svg?style=flat-square
