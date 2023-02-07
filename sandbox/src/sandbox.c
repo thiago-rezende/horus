@@ -2,8 +2,6 @@
 
 #include <sandbox/sandbox.h>
 
-void* sandbox_create() {
+void* application_create() {
   return (void*)0;
 }
-
-HORUS_ENTRYPOINT(sandbox_create);

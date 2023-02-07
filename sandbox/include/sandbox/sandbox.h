@@ -1,3 +1,3 @@
 #pragma once
 
-void* sandbox_create();
+void* application_reate();
