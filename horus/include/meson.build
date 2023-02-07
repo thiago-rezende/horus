@@ -5,6 +5,7 @@ horus_headers = [
 
     # horus core headers
     'horus/core/types.h',
+    'horus/core/macros.h',
 
     # platform layer headers
     'horus/platform/entrypoint.h',
