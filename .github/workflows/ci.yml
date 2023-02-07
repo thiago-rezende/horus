@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Meson
+        run: pip install meson ninja
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+      
+      - name: Compile Project
+        run: meson compile -C build
+
+  test:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Meson
+        run: pip install meson ninja
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+      
+      - name: Execute Tests
+        run: meson test -C build -v
+
+  analysis:
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Meson
+        run: pip install meson ninja
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+      
+      - name: Code Analysis
+        run: ninja -C build scan-build
+
+  lint:
+    needs: analysis
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Meson
+        run: pip install meson ninja
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+      
+      - name: Lint Check
+        run: ninja -C build clang-format-check
