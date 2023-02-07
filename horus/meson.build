@@ -25,3 +25,6 @@ horus_lib = shared_library('horus',
 horus_dep = declare_dependency(
     link_with : horus_lib,
     include_directories : horus_includes)
+
+# horus headers target
+subdir('include')
