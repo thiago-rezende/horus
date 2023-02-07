@@ -2,7 +2,7 @@
 horus_sources = []
 
 # horus source files [ linux ]
-if target_machine.system() == 'linux'
+if host_machine.system() == 'linux'
     horus_sources += [
         'src/platform/linux/entrypoint.c'
     ]
