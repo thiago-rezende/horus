@@ -3,9 +3,7 @@ horus_sources = []
 
 # horus source files [ linux ]
 if host_machine.system() == 'linux'
-    horus_sources += [
-        'src/platform/linux/entrypoint.c'
-    ]
+    horus_sources += []
 endif
 
 # horus include directories

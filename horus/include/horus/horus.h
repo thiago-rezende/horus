@@ -6,3 +6,6 @@
  */
 
 #pragma once
+
+/* platform layer */
+#include <horus/platform/entrypoint.h>
