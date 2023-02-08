@@ -10,12 +10,12 @@
 #define expand_macro(x) x
 
 static const char* logger_levels[LOGGER_LEVEL_COUNT] = {
-    "[ " ansi_red "critical" ansi_reset " ] ",
-    "[ " ansi_magenta "error" ansi_reset "    ] ",
+    "[ " ansi_magenta "critical" ansi_reset " ] ",
+    "[ " ansi_red "error" ansi_reset "    ] ",
     "[ " ansi_yellow "warning" ansi_reset "  ] ",
     "[ " ansi_green "info" ansi_reset "     ] ",
     "[ " ansi_blue "debug" ansi_reset "    ] ",
-    "[ " ansi_white "trace" ansi_reset "    ] ",
+    "[ " ansi_grey "trace" ansi_reset "    ] ",
 };
 
 static const u8 level_size = 13 + ansi_size * 2;
@@ -32,9 +32,13 @@ void logger(logger_level level, const char* message, ...) {
 
   va_start(args, message);
 
-  vsnprintf(buffer + level_size, buffer_size, message, args);
+  i64 written = vsnprintf(buffer + level_size, buffer_size, message, args);
 
   va_end(args);
+
+  written += level_size;
+
+  buffer[written < total_buffer_size ? written : total_buffer_size - 1] = '\n';
 
   if (level <= LOGGER_LEVEL_ERROR) {
     platform_console_write_error(buffer);
