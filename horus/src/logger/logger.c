@@ -19,7 +19,7 @@ void logger(logger_level level, const char* message, ...) {
   va_list args;
 
   char buffer[total_buffer_size];
-  platform_memory_zero(buffer, total_buffer_size);
+  platform_memory_clear(buffer, total_buffer_size);
 
   strncpy(buffer, logger_levels[level], level_size);
 
