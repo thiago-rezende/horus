@@ -8,6 +8,7 @@ horus_headers = [
   'horus/core/macros.h',
 
   # horus logger headers
+  'horus/logger/ansi.h',
   'horus/logger/logger.h',
 
   # platform layer headers

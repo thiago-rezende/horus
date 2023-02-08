@@ -2,16 +2,23 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <horus/logger/ansi.h>
 #include <horus/logger/logger.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
 
+#define expand_macro(x) x
+
 static const char* logger_levels[LOGGER_LEVEL_COUNT] = {
-    "[ critical ] ", "[ error    ] ", "[ warning  ] ",
-    "[ info     ] ", "[ debug    ] ", "[ trace    ] ",
+    "[ " ansi_red "critical" ansi_reset " ] ",
+    "[ " ansi_magenta "error" ansi_reset "    ] ",
+    "[ " ansi_yellow "warning" ansi_reset "  ] ",
+    "[ " ansi_green "info" ansi_reset "     ] ",
+    "[ " ansi_blue "debug" ansi_reset "    ] ",
+    "[ " ansi_white "trace" ansi_reset "    ] ",
 };
 
-static const u8 level_size = 13;
+static const u8 level_size = 13 + ansi_size * 2;
 static const u16 buffer_size = 1024;
 static const u32 total_buffer_size = level_size + buffer_size;
 
