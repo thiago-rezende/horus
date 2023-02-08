@@ -1,6 +1,7 @@
 {
-    "recommendations": [
-        "mesonbuild.mesonbuild",
-        "ms-vscode.cpptools"
-    ]
+  "recommendations": [
+    "ms-vscode.cpptools",
+    "mesonbuild.mesonbuild",
+    "EditorConfig.EditorConfig"
+  ]
 }

@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Setup Repository
         uses: actions/checkout@v3
-      
+
       - name: Cache Build Directory
         uses: actions/cache@v3
         env:
@@ -37,7 +37,7 @@ jobs:
         run: meson setup build
         env:
           CC: clang
-      
+
       - name: Compile Project
         run: meson compile -C build
 
@@ -73,7 +73,7 @@ jobs:
         run: meson setup build
         env:
           CC: clang
-      
+
       - name: Execute Tests
         run: meson test -C build -v
 
@@ -109,7 +109,7 @@ jobs:
         run: meson setup build
         env:
           CC: clang
-      
+
       - name: Code Analysis
         run: ninja -C build scan-build
 
@@ -145,6 +145,6 @@ jobs:
         run: meson setup build
         env:
           CC: clang
-      
+
       - name: Lint Check
         run: ninja -C build clang-format-check
