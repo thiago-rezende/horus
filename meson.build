@@ -11,10 +11,10 @@ subdir('horus')
 # horus pkg-config file generation
 pkg_mod = import ('pkgconfig')
 pkg_mod.generate(libraries : horus_lib,
-    version : meson.project_version(),
-    name : 'lib' + meson.project_name(),
-    filebase : meson.project_name(),
-    description : 'A simple closs-platform application development framework')
+  version : meson.project_version(),
+  name : 'lib' + meson.project_name(),
+  filebase : meson.project_name(),
+  description : 'A simple closs-platform application development framework')
 
 # sandbox target
 if get_option('build_sandbox')
