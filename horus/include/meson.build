@@ -7,6 +7,9 @@ horus_headers = [
   'horus/core/types.h',
   'horus/core/macros.h',
 
+  # horus logger headers
+  'horus/logger/logger.h',
+
   # platform layer headers
   'horus/platform/memory.h',
   'horus/platform/console.h',

@@ -1,17 +1,19 @@
 #pragma once
 
-#include <horus/platform/console.h>
+#include <horus/logger/logger.h>
 
 extern void* application_create();
 
 int main(int argc, char** argv, char** envp) {
-  platform_console_write("[ horus ] <linux> v0.1.0\n");
+  HINFO("<horus:%s> <platform:%s> initializing\n", "v0.1.0", "linux");
 
   void* application = application_create();
 
   (void)application; /* unused */
 
-  platform_console_write("[ application ] created\n");
+  HDEBUG("<application:%p> created\n", application);
+
+  HINFO("<horus> terminating\n");
 
   return 0;
 }

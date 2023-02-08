@@ -1,5 +1,7 @@
 # horus source files
-horus_sources = []
+horus_sources = [
+  'src/logger/logger.c'
+]
 
 # horus source files [ linux ]
 if host_machine.system() == 'linux'

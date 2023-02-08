@@ -8,7 +8,7 @@ b8 platform_console_write(char* message) {
   return written < 0 ? false : true;
 }
 
-b8 platform_console_error(char* message) {
+b8 platform_console_write_error(char* message) {
   u32 written = fprintf(stderr, "%s", message);
 
   return written < 0 ? false : true;
