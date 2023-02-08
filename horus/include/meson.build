@@ -1,19 +1,20 @@
 # horus header files
 horus_headers = [
-    # horus global header
-    'horus/horus.h',
+  # horus global header
+  'horus/horus.h',
 
-    # horus core headers
-    'horus/core/types.h',
-    'horus/core/macros.h',
+  # horus core headers
+  'horus/core/types.h',
+  'horus/core/macros.h',
 
-    # platform layer headers
-    'horus/platform/console.h',
-    'horus/platform/detection.h',
-    'horus/platform/entrypoint.h',
+  # platform layer headers
+  'horus/platform/memory.h',
+  'horus/platform/console.h',
+  'horus/platform/detection.h',
+  'horus/platform/entrypoint.h',
 
-    # linux platform headers
-    'horus/platform/linux/entrypoint.h'
+  # linux platform headers
+  'horus/platform/linux/entrypoint.h'
 ]
 
 # horus headers installation

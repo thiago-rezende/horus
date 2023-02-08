@@ -8,4 +8,6 @@
 #include <horus/core/macros.h>
 
 /* horus platform layer */
+#include <horus/platform/memory.h>
+#include <horus/platform/console.h>
 #include <horus/platform/entrypoint.h>
