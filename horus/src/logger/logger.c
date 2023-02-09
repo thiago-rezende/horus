@@ -8,12 +8,12 @@
 #include <horus/platform/console.h>
 
 static const char* logger_levels[LOGGER_LEVEL_COUNT] = {
-    "[ " ansi_magenta "critical" ansi_reset " ] ",
-    "[ " ansi_red "error" ansi_reset "    ] ",
-    "[ " ansi_yellow "warning" ansi_reset "  ] ",
-    "[ " ansi_green "info" ansi_reset "     ] ",
-    "[ " ansi_blue "debug" ansi_reset "    ] ",
-    "[ " ansi_white "trace" ansi_reset "    ] ",
+    "[ " ansi_magenta "critical" ansi_reset " ] ", /* */
+    "[ " ansi_red "error" ansi_reset "    ] ",     /* */
+    "[ " ansi_yellow "warning" ansi_reset "  ] ",  /* */
+    "[ " ansi_green "info" ansi_reset "     ] ",   /* */
+    "[ " ansi_blue "debug" ansi_reset "    ] ",    /* */
+    "[ " ansi_white "trace" ansi_reset "    ] ",   /* */
 };
 
 static const u8 level_size = 13 + ansi_size * 2;

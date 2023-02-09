@@ -13,6 +13,7 @@ horus_headers = [
 
   # platform layer headers
   'horus/platform/memory.h',
+  'horus/platform/window.h',
   'horus/platform/console.h',
   'horus/platform/detection.h',
   'horus/platform/entrypoint.h',
