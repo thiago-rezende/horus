@@ -19,6 +19,7 @@ typedef struct __platform_window {
   u16 width;
   u16 height;
 
+  b8 has_focus;
   b8 should_close;
 } platform_window_t;
 
@@ -172,12 +173,20 @@ void platform_window_process_events(platform_window_t* window) {
         xcb_focus_in_event_t* focus_in_event = (xcb_focus_in_event_t*)event;
         (void)focus_in_event;
 
+        window->has_focus = true;
+
+        HDEBUG("<platform:linux> <window:%p> <focus_event> gained focus", window);
+
         break;
       }
 
       case XCB_FOCUS_OUT: {
         xcb_focus_out_event_t* focus_out_event = (xcb_focus_out_event_t*)event;
         (void)focus_out_event;
+
+        window->has_focus = false;
+
+        HDEBUG("<platform:linux> <window:%p> <focus_event> lost focus", window);
 
         break;
       }
@@ -210,4 +219,8 @@ void platform_window_process_events(platform_window_t* window) {
 
 b8 platform_window_should_close(platform_window_t* window) {
   return window->should_close;
+}
+
+b8 platform_window_has_focus(platform_window_t* window) {
+  return window->has_focus;
 }
