@@ -3,7 +3,9 @@ project('horus',
   ['c'],
   version : '0.1.0',
   license : 'BSD-3-Clause',
-  default_options : ['c_std=c11'])
+  default_options : ['c_std=c11',
+                     'b_sanitize=leak',
+                     'buildtype=debug'])
 
 # horus target
 subdir('horus')

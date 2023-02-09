@@ -13,6 +13,7 @@ typedef struct __platform_window {
   xcb_window_t window;
 
   xcb_intern_atom_reply_t* close_client_reply;
+  xcb_intern_atom_reply_t* protocols_reply;
 
   i32 screen_number;
 
@@ -65,11 +66,10 @@ platform_window_t* platform_window_create(char* title, u16 width, u16 height) {
   xcb_map_window(window->connection, window->window);
 
   xcb_intern_atom_cookie_t protocols_cookie;
-  xcb_intern_atom_reply_t* protocols_reply;
 
   protocols_cookie = xcb_intern_atom(window->connection, 1, 12, "WM_PROTOCOLS");
 
-  protocols_reply = xcb_intern_atom_reply(window->connection, protocols_cookie, 0);
+  window->protocols_reply = xcb_intern_atom_reply(window->connection, protocols_cookie, 0);
 
   xcb_intern_atom_cookie_t close_client_cookie;
 
@@ -77,8 +77,8 @@ platform_window_t* platform_window_create(char* title, u16 width, u16 height) {
 
   window->close_client_reply = xcb_intern_atom_reply(window->connection, close_client_cookie, 0);
 
-  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, (*protocols_reply).atom, 4, 32, 1,
-                      &(*window->close_client_reply).atom);
+  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, (*window->protocols_reply).atom, 4, 32,
+                      1, &(*window->close_client_reply).atom);
 
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                       strlen(title), title);
@@ -95,6 +95,9 @@ platform_window_t* platform_window_create(char* title, u16 width, u16 height) {
 }
 
 void platform_window_destroy(platform_window_t* window) {
+  platform_memory_deallocate(window->protocols_reply);
+  platform_memory_deallocate(window->close_client_reply);
+
   xcb_destroy_window(window->connection, window->window);
 
   HDEBUG("<platform:linux> <window:%p> destroyed", window, window->window);
