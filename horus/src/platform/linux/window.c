@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <xcb/xcb.h>
@@ -95,8 +96,8 @@ platform_window_t* platform_window_create(char* title, u16 width, u16 height) {
 }
 
 void platform_window_destroy(platform_window_t* window) {
-  platform_memory_deallocate(window->protocols_reply);
-  platform_memory_deallocate(window->close_client_reply);
+  free(window->protocols_reply);
+  free(window->close_client_reply);
 
   xcb_destroy_window(window->connection, window->window);
 
@@ -216,7 +217,7 @@ void platform_window_process_events(platform_window_t* window) {
       }
     }
 
-    platform_memory_deallocate(event);
+    free(event);
   }
 }
 
