@@ -7,8 +7,6 @@
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
 
-#define expand_macro(x) x
-
 static const char* logger_levels[LOGGER_LEVEL_COUNT] = {
     "[ " ansi_magenta "critical" ansi_reset " ] ",
     "[ " ansi_red "error" ansi_reset "    ] ",
