@@ -13,7 +13,7 @@ static const char* logger_levels[LOGGER_LEVEL_COUNT] = {
     "[ " ansi_yellow "warning" ansi_reset "  ] ",
     "[ " ansi_green "info" ansi_reset "     ] ",
     "[ " ansi_blue "debug" ansi_reset "    ] ",
-    "[ " ansi_grey "trace" ansi_reset "    ] ",
+    "[ " ansi_white "trace" ansi_reset "    ] ",
 };
 
 static const u8 level_size = 13 + ansi_size * 2;
