@@ -1,3 +1,3 @@
 #pragma once
 
-void* application_reate();
+void *application_reate();

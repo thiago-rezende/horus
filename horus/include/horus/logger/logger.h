@@ -10,7 +10,7 @@ typedef enum {
   LOGGER_LEVEL_COUNT
 } logger_level;
 
-void logger(logger_level level, const char* message, ...);
+void logger(logger_level level, const char *message, ...);
 
 #define HCRITICAL(message, ...) logger(LOGGER_LEVEL_CRITICAL, message __VA_OPT__(, ) __VA_ARGS__)
 

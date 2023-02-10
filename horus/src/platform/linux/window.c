@@ -9,12 +9,12 @@
 #include <horus/platform/window.h>
 
 typedef struct __platform_window {
-  xcb_connection_t* connection;
-  xcb_screen_t* screen;
+  xcb_connection_t *connection;
+  xcb_screen_t *screen;
   xcb_window_t window;
 
-  xcb_intern_atom_reply_t* close_client_reply;
-  xcb_intern_atom_reply_t* protocols_reply;
+  xcb_intern_atom_reply_t *close_client_reply;
+  xcb_intern_atom_reply_t *protocols_reply;
 
   i32 screen_number;
 
@@ -25,8 +25,8 @@ typedef struct __platform_window {
   b8 should_close;
 } platform_window_t;
 
-platform_window_t* platform_window_create(char* title, u16 width, u16 height) {
-  platform_window_t* window = platform_memory_allocate(sizeof(platform_window_t));
+platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
+  platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
 
   HDEBUG("<platform:linux> <window:%p> allocated %lu bytes", window, sizeof(platform_window_t));
 
@@ -34,7 +34,7 @@ platform_window_t* platform_window_create(char* title, u16 width, u16 height) {
 
   HDEBUG("<platform:linux> <window:%p> <xcb_connection:%p> connected", window, window->connection);
 
-  const xcb_setup_t* screen_setup = xcb_get_setup(window->connection);
+  const xcb_setup_t *screen_setup = xcb_get_setup(window->connection);
   xcb_screen_iterator_t screen_iterator = xcb_setup_roots_iterator(screen_setup);
 
   window->screen = screen_iterator.data;
@@ -95,7 +95,7 @@ platform_window_t* platform_window_create(char* title, u16 width, u16 height) {
   return window;
 }
 
-void platform_window_destroy(platform_window_t* window) {
+void platform_window_destroy(platform_window_t *window) {
   free(window->protocols_reply);
   free(window->close_client_reply);
 
@@ -112,69 +112,69 @@ void platform_window_destroy(platform_window_t* window) {
   HDEBUG("<platform:linux> <window:%p> deallocated %lu bytes", window, sizeof(platform_window_t));
 }
 
-void platform_window_process_events(platform_window_t* window) {
-  xcb_generic_event_t* event = NULL;
+void platform_window_process_events(platform_window_t *window) {
+  xcb_generic_event_t *event = NULL;
 
   while ((event = xcb_poll_for_event(window->connection))) {
     switch (event->response_type & ~0x80) {
       case XCB_EXPOSE: {
-        xcb_expose_event_t* expose_event = (xcb_expose_event_t*)event;
+        xcb_expose_event_t *expose_event = (xcb_expose_event_t *)event;
         (void)expose_event;
 
         break;
       }
 
       case XCB_BUTTON_PRESS: {
-        xcb_button_press_event_t* button_press_event = (xcb_button_press_event_t*)event;
+        xcb_button_press_event_t *button_press_event = (xcb_button_press_event_t *)event;
         (void)button_press_event;
 
         break;
       }
 
       case XCB_BUTTON_RELEASE: {
-        xcb_button_release_event_t* button_release_event = (xcb_button_release_event_t*)event;
+        xcb_button_release_event_t *button_release_event = (xcb_button_release_event_t *)event;
         (void)button_release_event;
 
         break;
       }
 
       case XCB_KEY_PRESS: {
-        xcb_key_press_event_t* key_press_event = (xcb_key_press_event_t*)event;
+        xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)event;
         (void)key_press_event;
 
         break;
       }
 
       case XCB_KEY_RELEASE: {
-        xcb_key_release_event_t* key_release_event = (xcb_key_release_event_t*)event;
+        xcb_key_release_event_t *key_release_event = (xcb_key_release_event_t *)event;
         (void)key_release_event;
 
         break;
       }
 
       case XCB_ENTER_NOTIFY: {
-        xcb_enter_notify_event_t* enter_notify_event = (xcb_enter_notify_event_t*)event;
+        xcb_enter_notify_event_t *enter_notify_event = (xcb_enter_notify_event_t *)event;
         (void)enter_notify_event;
 
         break;
       }
 
       case XCB_LEAVE_NOTIFY: {
-        xcb_leave_notify_event_t* leave_notify_event = (xcb_leave_notify_event_t*)event;
+        xcb_leave_notify_event_t *leave_notify_event = (xcb_leave_notify_event_t *)event;
         (void)leave_notify_event;
 
         break;
       }
 
       case XCB_MOTION_NOTIFY: {
-        xcb_motion_notify_event_t* motion_notify_event = (xcb_motion_notify_event_t*)event;
+        xcb_motion_notify_event_t *motion_notify_event = (xcb_motion_notify_event_t *)event;
         (void)motion_notify_event;
 
         break;
       }
 
       case XCB_FOCUS_IN: {
-        xcb_focus_in_event_t* focus_in_event = (xcb_focus_in_event_t*)event;
+        xcb_focus_in_event_t *focus_in_event = (xcb_focus_in_event_t *)event;
         (void)focus_in_event;
 
         window->has_focus = true;
@@ -185,7 +185,7 @@ void platform_window_process_events(platform_window_t* window) {
       }
 
       case XCB_FOCUS_OUT: {
-        xcb_focus_out_event_t* focus_out_event = (xcb_focus_out_event_t*)event;
+        xcb_focus_out_event_t *focus_out_event = (xcb_focus_out_event_t *)event;
         (void)focus_out_event;
 
         window->has_focus = false;
@@ -196,7 +196,7 @@ void platform_window_process_events(platform_window_t* window) {
       }
 
       case XCB_CONFIGURE_NOTIFY: {
-        xcb_configure_notify_event_t* configure_notify_event = (xcb_configure_notify_event_t*)event;
+        xcb_configure_notify_event_t *configure_notify_event = (xcb_configure_notify_event_t *)event;
 
         if (configure_notify_event->width != window->width || configure_notify_event->height != window->height) {
           window->width = configure_notify_event->width;
@@ -207,7 +207,7 @@ void platform_window_process_events(platform_window_t* window) {
       }
 
       case XCB_CLIENT_MESSAGE: {
-        xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
+        xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *)event;
 
         if (client_message_event->data.data32[0] == (*window->close_client_reply).atom) {
           window->should_close = true;
@@ -221,10 +221,10 @@ void platform_window_process_events(platform_window_t* window) {
   }
 }
 
-b8 platform_window_should_close(platform_window_t* window) {
+b8 platform_window_should_close(platform_window_t *window) {
   return window->should_close;
 }
 
-b8 platform_window_has_focus(platform_window_t* window) {
+b8 platform_window_has_focus(platform_window_t *window) {
   return window->has_focus;
 }

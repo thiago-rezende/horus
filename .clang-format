@@ -1,6 +1,7 @@
 ---
-BasedOnStyle: Chromium
-ColumnLimit:  120
-IndentWidth:  2
-TabWidth:     2
-SortIncludes: Never
+BasedOnStyle:     Chromium
+ColumnLimit:      120
+IndentWidth:      2
+TabWidth:         2
+SortIncludes:     Never
+PointerAlignment: Right
