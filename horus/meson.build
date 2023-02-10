@@ -17,12 +17,19 @@ horus_includes = include_directories('include')
 
 # horus dependencies
 threads_dep = dependency('threads')
-xcb_dep = dependency('xcb')
 
 horus_dependencies = [
-  threads_dep,
-  xcb_dep
+  threads_dep
 ]
+
+# horus dependencies [ linux ]
+if host_machine.system() == 'linux'
+  xcb_dep = dependency('xcb')
+
+  horus_dependencies += [
+    xcb_dep
+  ]
+endif
 
 # horus library
 horus_lib = shared_library('horus',
