@@ -8,7 +8,7 @@
 #include <horus/platform/memory.h>
 #include <horus/platform/window.h>
 
-typedef struct __platform_window {
+struct __platform_window {
   xcb_connection_t *connection;
   xcb_screen_t *screen;
   xcb_window_t window;
@@ -23,7 +23,7 @@ typedef struct __platform_window {
 
   b8 has_focus;
   b8 should_close;
-} platform_window_t;
+};
 
 platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));

@@ -7,7 +7,7 @@
       ],
       "defines": [],
       "compilerPath": "/usr/bin/clang",
-      "cStandard": "c11",
+      "cStandard": "c99",
       "intelliSenseMode": "linux-clang-x64",
       "compileCommands": "${workspaceFolder}/build/compile_commands.json"
     }
