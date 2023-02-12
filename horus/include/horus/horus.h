@@ -10,6 +10,9 @@
 /* horus logger */
 #include <horus/logger/logger.h>
 
+/* horus application layer */
+#include <horus/application/application.h>
+
 /* horus platform layer */
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>

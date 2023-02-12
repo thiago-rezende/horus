@@ -2,7 +2,7 @@
 
 #include <sandbox/sandbox.h>
 
-void *application_create() {
+application_t *application_create() {
   HCRITICAL("that is a critical logger message");
   HERROR("that is an error logger message");
   HWARNING("that is a warning logger message");
@@ -19,5 +19,10 @@ void *application_create() {
   platform_memory_deallocate(data);
   HDEBUG("<memory:%p> deallocated 512 bytes", data);
 
-  return (void *)0;
+  application_t *application = platform_memory_allocate(sizeof(application_t));
+  platform_memory_clear(application, sizeof(application_t));
+
+  application->name = "Sandbox Application";
+
+  return application;
 }
