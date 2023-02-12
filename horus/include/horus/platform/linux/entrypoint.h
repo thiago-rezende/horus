@@ -5,6 +5,7 @@
 #include <horus/application/application.h>
 
 extern application_t *application_create();
+extern void application_destroy(application_t *application);
 
 int main(int argc, char **argv, char **envp) {
   HINFO("<horus:%s> <platform:%s> initializing", "v0.1.0", "linux");
@@ -25,7 +26,7 @@ int main(int argc, char **argv, char **envp) {
 
   HDEBUG("<window:%p> destroyed", window);
 
-  platform_memory_deallocate(application);
+  application_destroy(application);
 
   HDEBUG("<application:%p> <name:%s> destroyed", application, application->name);
 

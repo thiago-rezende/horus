@@ -19,10 +19,18 @@ application_t *application_create() {
   platform_memory_deallocate(data);
   HDEBUG("<memory:%p> deallocated 512 bytes", data);
 
-  application_t *application = platform_memory_allocate(sizeof(application_t));
-  platform_memory_clear(application, sizeof(application_t));
+  sandbox_application_t *application = platform_memory_allocate(sizeof(sandbox_application_t));
+  platform_memory_clear(application, sizeof(sandbox_application_t));
 
-  application->name = "Sandbox Application";
+  ((application_t *)application)->name = "Sandbox Application";
 
-  return application;
+  application->data = platform_memory_allocate(sizeof(u64) * 256);
+
+  return (application_t *)application;
+}
+
+void application_destroy(application_t *application) {
+  platform_memory_deallocate(((sandbox_application_t *)application)->data);
+
+  platform_memory_deallocate((sandbox_application_t *)application);
 }
