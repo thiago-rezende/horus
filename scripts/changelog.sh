@@ -57,14 +57,72 @@ usage() {
 
 # invalid argument message
 invalid_argument() {
-  echo -e "[$ansi_green_bold $script_name $ansi_reset] <$ansi_red_bold error $ansi_reset> invalid argument $(if [[ $1 ]]; then echo -e \'$ansi_magenta_bold $1 $ansi_reset\'; fi)"
+  echo -e "[$ansi_green_bold $script_name $ansi_reset] <$ansi_red_bold error $ansi_reset> invalid argument" \
+          "$(if [[ $1 ]]; then echo -e \'$ansi_magenta_bold $1 $ansi_reset\'; fi)"
   echo -e "|> use '$ansi_yellow_bold $script_name help $ansi_reset' to check the available arguments"
 
   exit 1
 }
 
+# git utilities
+function __log_between_tags() {
+  if [[ $2 == "HEAD" ]]; then
+    git log $1..$2 --pretty=" - [%h] %s (%an)" >> $file
+  elif [[ -z $2 ]]; then
+    echo "## [$1]" >> $file
+    git log $1 --pretty=" - [%h] %s (%an)" >> $file
+  else
+    echo "## [$2]" >> $file
+    git log $1..$2 --pretty=" - [%h] %s (%an)" >> $file
+  fi
+  echo "" >> $file
+}
+
+# markdown generator
+markdown() {
+  local file=CHANGELOG.md
+  local tags=$(git tag --sort=-v:refname)
+
+  header="# CHANGELOG
+> This changelog is automaticaly generated.
+> If you find any issues with this file, please report to the developers.
+
+## [Unreleased]
+"
+
+  echo "$header" > $file
+
+  if [[ -z ${tags[*]} ]]; then
+    echo -e "[$ansi_yellow_bold warn $ansi_reset] repository doesn't have any$ansi_cyan_bold git tags$ansi_reset"
+    echo -e "|> [$ansi_white_bold generating $ansi_reset] plain changelog"
+
+    git log "HEAD" --pretty=" - [%h] %s (%an)" >> $file
+
+    exit 0
+  else
+    echo -e "[$ansi_green_bold warn $ansi_reset] repository have$ansi_cyan_bold git tags$ansi_reset"
+    echo -e "|> [$ansi_white_bold generating $ansi_reset] tagged changelog"
+
+    tag=("HEAD")
+    prev=""
+
+    for p in ${tags[@]}; do
+      prev=$p
+
+      __log_between_tags $prev $tag
+
+      tag=$prev
+    done
+
+    __log_between_tags $prev
+
+    exit 0
+  fi
+}
+
 # argument handler
 case $1 in
   help) usage;;
+  markdown) markdown;;
   *) invalid_argument $1;;
 esac
