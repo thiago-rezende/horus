@@ -15,7 +15,9 @@ int main(int argc, char **argv, char **envp) {
 
   HDEBUG("<application:%p> <name:%s> created", application, application->name);
 
-  platform_window_t *window = platform_window_create(application->name, 1280, 720);
+  resolution_t *resolution = &application->configuration.resolution;
+
+  platform_window_t *window = platform_window_create(application->name, resolution->width, resolution->height);
 
   HDEBUG("<window:%p> created", window);
 

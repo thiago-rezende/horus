@@ -12,6 +12,7 @@
 
 /* horus application layer */
 #include <horus/application/application.h>
+#include <horus/application/configuration.h>
 
 /* horus platform layer */
 #include <horus/platform/memory.h>

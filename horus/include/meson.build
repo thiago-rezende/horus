@@ -12,6 +12,7 @@ horus_headers = [
 
   # horus application headers
   'horus/application/application.h',
+  'horus/application/configuration.h',
 
   # horus logger headers
   'horus/logger/ansi.h',

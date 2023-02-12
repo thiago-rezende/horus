@@ -1,7 +1,8 @@
 #pragma once
 
-#include <horus/core/types.h>
-
+#include <horus/application/configuration.h>
 typedef struct __application {
   char *name;
+
+  configuration_t configuration;
 } application_t;
