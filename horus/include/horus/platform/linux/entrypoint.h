@@ -1,5 +1,6 @@
 #pragma once
 
+#include <horus/definitions.h>
 #include <horus/logger/logger.h>
 #include <horus/platform/window.h>
 #include <horus/application/application.h>
@@ -8,7 +9,7 @@ extern application_t *application_create();
 extern void application_destroy(application_t *application);
 
 int main(int argc, char **argv, char **envp) {
-  HINFO("<horus:%s> <platform:%s> initializing", "v0.1.0", "linux");
+  HINFO("<%s:v%s> <platform:%s> initializing", horus_project_name(), horus_project_version(), horus_platform());
 
   application_t *application = application_create();
 
@@ -30,7 +31,7 @@ int main(int argc, char **argv, char **envp) {
 
   HDEBUG("<application:%p> <name:%s> destroyed", application, application->name);
 
-  HINFO("<horus> terminating");
+  HINFO("<%s> terminating", horus_project_name());
 
   return 0;
 }

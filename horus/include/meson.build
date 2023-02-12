@@ -3,6 +3,9 @@ horus_headers = [
   # horus global header
   'horus/horus.h',
 
+  # horus compile time definitions
+  'horus/definitions.h',
+
   # horus core headers
   'horus/core/types.h',
   'horus/core/macros.h',

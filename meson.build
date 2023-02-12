@@ -7,6 +7,8 @@ project('horus',
                      'b_sanitize=leak',
                      'buildtype=debug'])
 
+project_description = 'A simple closs-platform application development framework'
+
 # horus target
 subdir('horus')
 
@@ -16,7 +18,7 @@ pkg_mod.generate(libraries : horus_lib,
   version : meson.project_version(),
   name : 'lib' + meson.project_name(),
   filebase : meson.project_name(),
-  description : 'A simple closs-platform application development framework')
+  description : project_description)
 
 # sandbox target
 if get_option('build_sandbox')

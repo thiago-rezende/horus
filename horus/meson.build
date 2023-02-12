@@ -1,5 +1,6 @@
 # horus source files
 horus_sources = [
+  'src/definitions.c',
   'src/logger/logger.c'
 ]
 
@@ -30,6 +31,29 @@ if host_machine.system() == 'linux'
     xcb_dep
   ]
 endif
+
+# horus configuration file
+horus_configuration = configuration_data({
+  'HORUS_PROJECT_NAME'        : meson.project_name(),
+  'HORUS_PROJECT_VERSION'     : meson.project_version(),
+  'HORUS_PROJECT_DESCRIPTION' : project_description,
+  'HORUS_PROJECT_LICENSE'     : meson.project_license()[0],
+  'HORUS_PLATFORM'            : host_machine.system(),
+  'HORUS_GETTEXT_PACKAGE'     : meson.project_name(),
+  'HORUS_BINDIR'              : get_option('bindir'),
+  'HORUS_LIBDIR'              : get_option('libdir'),
+  'HORUS_DATADIR'             : get_option('datadir'),
+  'HORUS_INCLUDEDIR'          : get_option('includedir'),
+  'HORUS_LOCALEDIR'           : get_option('localedir'),
+  'HORUS_LOCALSTATEDIR'       : get_option('localstatedir'),
+  'HORUS_MANDIR'              : get_option('mandir'),
+  'HORUS_SYSCONFDIR'          : get_option('sysconfdir'),
+  'HORUS_PREFIX'              : get_option('prefix')
+})
+
+configure_file(input : 'include/horus/config.h.in',
+  output : 'config.h',
+  configuration : horus_configuration)
 
 # horus library
 horus_lib = shared_library('horus',
