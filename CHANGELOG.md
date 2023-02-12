@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+ - [4f140eb] feat(window|linux): add initial full-screen configuration (Thiago Rezende)
+ - [66a16f2] feat(application): add initial resolution configuration (Thiago Rezende)
+ - [f9a15d3] refactor(window): simplify debug logger calls (Thiago Rezende)
+ - [7709b35] feat(horus): add compile time definitions (Thiago Rezende)
+ - [3f85c3a] chore: add initial setup.sh script (Thiago Rezende)
+ - [49bb655] docs(changelog): add initial markdown changelog generation (Thiago Rezende)
  - [7f315c9] refactor(logger): update the level order and make the level prefix indice more consistent (Thiago Rezende)
  - [75321c2] feat(application): move the application instance ownership to the client (Thiago Rezende)
  - [df5682f] feat(application): add initial application layer definition (Thiago Rezende)
