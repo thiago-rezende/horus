@@ -14,21 +14,24 @@ struct __platform_window {
   xcb_screen_t *screen;
   xcb_window_t window;
 
-  xcb_intern_atom_reply_t *close_client_reply;
   xcb_intern_atom_reply_t *protocols_reply;
+  xcb_intern_atom_reply_t *close_client_reply;
+
+  xcb_intern_atom_reply_t *state_cookie_reply;
+
+  xcb_intern_atom_reply_t *fullscreen_cookie_reply;
 
   i32 screen_number;
 
   u16 width;
   u16 height;
 
+  b8 windowed;
   b8 has_focus;
   b8 should_close;
 };
 
-platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
-  HDEBUG("<window:%p> testing the custom logger macro", NULL);
-
+platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 windowed) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
 
   HDEBUG("<window:%p> allocated %lu bytes", window, sizeof(platform_window_t));
@@ -49,10 +52,10 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
   int value_list[2];
 
   value_list[0] = window->screen->black_pixel;
-  value_list[1] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_BUTTON_PRESS |
-                  XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW |
-                  XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
-                  XCB_EVENT_MASK_FOCUS_CHANGE;
+  value_list[1] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_STRUCTURE_NOTIFY |
+                  XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_ENTER_WINDOW |
+                  XCB_EVENT_MASK_LEAVE_WINDOW | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE |
+                  XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_FOCUS_CHANGE | XCB_EVENT_MASK_PROPERTY_CHANGE;
 
   xcb_create_window(window->connection,            /* connection */
                     XCB_COPY_FROM_PARENT,          /* depth */
@@ -67,19 +70,20 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
                     value_list                     /* masks */
   );
 
-  xcb_map_window(window->connection, window->window);
-
-  xcb_intern_atom_cookie_t protocols_cookie;
-
-  protocols_cookie = xcb_intern_atom(window->connection, 1, 12, "WM_PROTOCOLS");
+  xcb_intern_atom_cookie_t protocols_cookie = xcb_intern_atom(window->connection, 0, 12, "WM_PROTOCOLS");
 
   window->protocols_reply = xcb_intern_atom_reply(window->connection, protocols_cookie, 0);
 
-  xcb_intern_atom_cookie_t close_client_cookie;
-
-  close_client_cookie = xcb_intern_atom(window->connection, 0, 16, "WM_DELETE_WINDOW");
+  xcb_intern_atom_cookie_t close_client_cookie = xcb_intern_atom(window->connection, 0, 16, "WM_DELETE_WINDOW");
 
   window->close_client_reply = xcb_intern_atom_reply(window->connection, close_client_cookie, 0);
+
+  xcb_intern_atom_cookie_t window_state_cookie = xcb_intern_atom(window->connection, 0, 13, "_NET_WM_STATE");
+  window->state_cookie_reply = xcb_intern_atom_reply(window->connection, window_state_cookie, NULL);
+
+  xcb_intern_atom_cookie_t window_fullscreen_cookie =
+      xcb_intern_atom(window->connection, 0, 24, "_NET_WM_STATE_FULLSCREEN");
+  window->fullscreen_cookie_reply = xcb_intern_atom_reply(window->connection, window_fullscreen_cookie, NULL);
 
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, (*window->protocols_reply).atom, 4, 32,
                       1, &(*window->close_client_reply).atom);
@@ -87,13 +91,22 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                       strlen(title), title);
 
+  if (!windowed) {
+    xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, window->state_cookie_reply->atom,
+                        XCB_ATOM_ATOM, 32, 1, &(window->fullscreen_cookie_reply->atom));
+  }
+
+  xcb_map_window(window->connection, window->window);
+
   xcb_flush(window->connection);
 
   window->width = width;
   window->height = height;
+  window->windowed = windowed;
+  window->has_focus = false;
   window->should_close = false;
 
-  HDEBUG("<window:%lu> created", window->window);
+  HDEBUG("<window:%p> <xcb_window:%lu> created", window, window->window);
 
   return window;
 }
@@ -102,9 +115,13 @@ void platform_window_destroy(platform_window_t *window) {
   free(window->protocols_reply);
   free(window->close_client_reply);
 
+  free(window->state_cookie_reply);
+
+  free(window->fullscreen_cookie_reply);
+
   xcb_destroy_window(window->connection, window->window);
 
-  HDEBUG("<window:%p> destroyed", window, window->window);
+  HDEBUG("<window:%p> <xcb_window:%lu> destroyed", window, window->window);
 
   xcb_disconnect(window->connection);
 

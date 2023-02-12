@@ -4,7 +4,7 @@
 
 typedef struct __platform_window platform_window_t;
 
-platform_window_t *platform_window_create(char *title, u16 width, u16 height);
+platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 windowed);
 
 void platform_window_destroy(platform_window_t *window);
 
