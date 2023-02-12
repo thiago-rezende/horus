@@ -31,7 +31,7 @@ int main(int argc, char **argv, char **envp) {
 
   HDEBUG("<application:%p> <name:%s> destroyed", application, application->name);
 
-  HINFO("<%s> terminating", horus_project_name());
+  HINFO("<%s:v%s> <platform:%s> terminating", horus_project_name(), horus_project_version(), horus_platform());
 
   return 0;
 }

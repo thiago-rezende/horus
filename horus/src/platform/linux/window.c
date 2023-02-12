@@ -4,6 +4,7 @@
 
 #include <xcb/xcb.h>
 
+#include <horus/definitions.h>
 #include <horus/logger/logger.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/window.h>
@@ -26,13 +27,15 @@ struct __platform_window {
 };
 
 platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
+  HDEBUG("<window:%p> testing the custom logger macro", NULL);
+
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
 
-  HDEBUG("<platform:linux> <window:%p> allocated %lu bytes", window, sizeof(platform_window_t));
+  HDEBUG("<window:%p> allocated %lu bytes", window, sizeof(platform_window_t));
 
   window->connection = xcb_connect(NULL, &window->screen_number);
 
-  HDEBUG("<platform:linux> <window:%p> <xcb_connection:%p> connected", window, window->connection);
+  HDEBUG("<window:%p> <xcb_connection:%p> connected", window, window->connection);
 
   const xcb_setup_t *screen_setup = xcb_get_setup(window->connection);
   xcb_screen_iterator_t screen_iterator = xcb_setup_roots_iterator(screen_setup);
@@ -90,7 +93,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height) {
   window->height = height;
   window->should_close = false;
 
-  HDEBUG("<platform:linux> <window:%lu> created", window->window);
+  HDEBUG("<window:%lu> created", window->window);
 
   return window;
 }
@@ -101,15 +104,15 @@ void platform_window_destroy(platform_window_t *window) {
 
   xcb_destroy_window(window->connection, window->window);
 
-  HDEBUG("<platform:linux> <window:%p> destroyed", window, window->window);
+  HDEBUG("<window:%p> destroyed", window, window->window);
 
   xcb_disconnect(window->connection);
 
-  HDEBUG("<platform:linux> <window:%p> <xcb_connection:%p> disconnected", window, window->connection);
+  HDEBUG("<window:%p> <xcb_connection:%p> disconnected", window, window->connection);
 
   platform_memory_deallocate(window);
 
-  HDEBUG("<platform:linux> <window:%p> deallocated %lu bytes", window, sizeof(platform_window_t));
+  HDEBUG("<window:%p> deallocated %lu bytes", window, sizeof(platform_window_t));
 }
 
 void platform_window_process_events(platform_window_t *window) {
@@ -179,7 +182,7 @@ void platform_window_process_events(platform_window_t *window) {
 
         window->has_focus = true;
 
-        HDEBUG("<platform:linux> <window:%p> <focus_event> gained focus", window);
+        HDEBUG("<window:%p> <focus_event> gained focus", window);
 
         break;
       }
@@ -190,7 +193,7 @@ void platform_window_process_events(platform_window_t *window) {
 
         window->has_focus = false;
 
-        HDEBUG("<platform:linux> <window:%p> <focus_event> lost focus", window);
+        HDEBUG("<window:%p> <focus_event> lost focus", window);
 
         break;
       }
