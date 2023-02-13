@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xcb_util.h>
 
 #include <horus/definitions.h>
 #include <horus/logger/logger.h>
@@ -21,8 +22,6 @@ struct __platform_window {
 
   xcb_intern_atom_reply_t *fullscreen_cookie_reply;
 
-  i32 screen_number;
-
   u16 width;
   u16 height;
 
@@ -36,7 +35,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
 
   HDEBUG("<window:%p> allocated %lu bytes", window, sizeof(platform_window_t));
 
-  window->connection = xcb_connect(NULL, &window->screen_number);
+  window->connection = xcb_connect(NULL, NULL);
 
   HDEBUG("<window:%p> <xcb_connection:%p> connected", window, window->connection);
 
@@ -135,7 +134,7 @@ void platform_window_process_events(platform_window_t *window) {
   xcb_generic_event_t *event = NULL;
 
   while ((event = xcb_poll_for_event(window->connection))) {
-    switch (event->response_type & ~0x80) {
+    switch (XCB_EVENT_RESPONSE_TYPE(event)) {
       case XCB_EXPOSE: {
         xcb_expose_event_t *expose_event = (xcb_expose_event_t *)event;
         (void)expose_event;
