@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include <xcb/xcb.h>
-#include <xcb/xcb_util.h>
 
 #include <horus/definitions.h>
 #include <horus/logger/logger.h>
@@ -134,7 +133,7 @@ void platform_window_process_events(platform_window_t *window) {
   xcb_generic_event_t *event = NULL;
 
   while ((event = xcb_poll_for_event(window->connection))) {
-    switch (XCB_EVENT_RESPONSE_TYPE(event)) {
+    switch (event->response_type & ~0x80) {
       case XCB_EXPOSE: {
         xcb_expose_event_t *expose_event = (xcb_expose_event_t *)event;
         (void)expose_event;

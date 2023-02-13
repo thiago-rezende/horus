@@ -26,17 +26,9 @@ horus_dependencies = [
 # horus dependencies [ linux ]
 if host_machine.system() == 'linux'
   xcb_dep = dependency('xcb')
-  xcb_aux_dep = dependency('xcb-aux')
-  xcb_util_dep = dependency('xcb-util')
-  xcb_icccm_dep = dependency('xcb-icccm')
-  xcb_keysyms_dep = dependency('xcb-keysyms')
 
   horus_dependencies += [
-    xcb_dep,
-    xcb_aux_dep,
-    xcb_util_dep,
-    xcb_icccm_dep,
-    xcb_keysyms_dep
+    xcb_dep
   ]
 endif
 
