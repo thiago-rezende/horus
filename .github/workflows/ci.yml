@@ -64,6 +64,9 @@ jobs:
             ${{ runner.os }}-${{ env.cache-name }}-
             ${{ runner.os }}-
 
+      - name: Setup System Dependencies
+        run: sudo apt install libxcb1-dev libxcb-util-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -100,6 +103,9 @@ jobs:
             ${{ runner.os }}-${{ env.cache-name }}-
             ${{ runner.os }}-
 
+      - name: Setup System Dependencies
+        run: sudo apt install libxcb1-dev libxcb-util-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -135,6 +141,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-
             ${{ runner.os }}-
+
+      - name: Setup System Dependencies
+        run: sudo apt install libxcb1-dev libxcb-util-dev libxcb-icccm4-dev libxcb-keysyms1-dev
 
       - name: Setup Python
         uses: actions/setup-python@v4
