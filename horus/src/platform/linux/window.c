@@ -14,8 +14,9 @@ struct __platform_window {
   xcb_screen_t *screen;
   xcb_window_t window;
 
-  xcb_intern_atom_reply_t *protocols_reply;
-  xcb_intern_atom_reply_t *close_client_reply;
+  xcb_intern_atom_reply_t *protocols_cookie_reply;
+
+  xcb_intern_atom_reply_t *close_client_cookie_reply;
 
   xcb_intern_atom_reply_t *state_cookie_reply;
 
@@ -69,11 +70,11 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
 
   xcb_intern_atom_cookie_t protocols_cookie = xcb_intern_atom(window->connection, 0, 12, "WM_PROTOCOLS");
 
-  window->protocols_reply = xcb_intern_atom_reply(window->connection, protocols_cookie, 0);
+  window->protocols_cookie_reply = xcb_intern_atom_reply(window->connection, protocols_cookie, 0);
 
   xcb_intern_atom_cookie_t close_client_cookie = xcb_intern_atom(window->connection, 0, 16, "WM_DELETE_WINDOW");
 
-  window->close_client_reply = xcb_intern_atom_reply(window->connection, close_client_cookie, 0);
+  window->close_client_cookie_reply = xcb_intern_atom_reply(window->connection, close_client_cookie, 0);
 
   xcb_intern_atom_cookie_t window_state_cookie = xcb_intern_atom(window->connection, 0, 13, "_NET_WM_STATE");
   window->state_cookie_reply = xcb_intern_atom_reply(window->connection, window_state_cookie, NULL);
@@ -82,8 +83,8 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
       xcb_intern_atom(window->connection, 0, 24, "_NET_WM_STATE_FULLSCREEN");
   window->fullscreen_cookie_reply = xcb_intern_atom_reply(window->connection, window_fullscreen_cookie, NULL);
 
-  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, (*window->protocols_reply).atom, 4, 32,
-                      1, &(*window->close_client_reply).atom);
+  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, (*window->protocols_cookie_reply).atom,
+                      4, 32, 1, &(*window->close_client_cookie_reply).atom);
 
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                       strlen(title), title);
@@ -109,8 +110,9 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
 }
 
 void platform_window_destroy(platform_window_t *window) {
-  free(window->protocols_reply);
-  free(window->close_client_reply);
+  free(window->protocols_cookie_reply);
+
+  free(window->close_client_cookie_reply);
 
   free(window->state_cookie_reply);
 
@@ -226,7 +228,7 @@ void platform_window_process_events(platform_window_t *window) {
       case XCB_CLIENT_MESSAGE: {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *)event;
 
-        if (client_message_event->data.data32[0] == (*window->close_client_reply).atom) {
+        if (client_message_event->data.data32[0] == (*window->close_client_cookie_reply).atom) {
           window->should_close = true;
         }
 
