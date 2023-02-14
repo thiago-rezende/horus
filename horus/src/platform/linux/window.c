@@ -198,8 +198,6 @@ void platform_window_process_events(platform_window_t *window) {
 
         window->has_focus = true;
 
-        HDEBUG("<window:%p> <focus_event> gained focus", window);
-
         break;
       }
 
@@ -208,8 +206,6 @@ void platform_window_process_events(platform_window_t *window) {
         (void)focus_out_event;
 
         window->has_focus = false;
-
-        HDEBUG("<window:%p> <focus_event> lost focus", window);
 
         break;
       }
