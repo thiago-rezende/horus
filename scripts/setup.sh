@@ -62,8 +62,36 @@ invalid_argument() {
   exit 1
 }
 
+# configure git hooks
+hooks() {
+  echo -e "[$ansi_green_bold hooks $ansi_reset] setting up git hooks"
+
+  echo -e "|> [$ansi_white_bold mkdir $ansi_reset] creating the '$ansi_cyan_bold .git/hooks $ansi_reset' directory"
+  mkdir -p .git/hooks
+
+  echo -e "|> [$ansi_white_bold copy $ansi_reset] copying the hooks from '$ansi_yellow_bold scripts/hooks $ansi_reset' to '$ansi_cyan_bold .git/hooks $ansi_reset'"
+  find "scripts/hooks" -follow -type f -print | while read -r f; do
+    case "$f" in
+      *.sh)
+        if [ -r "$f" ]; then
+          hook="${f##*/}"
+
+          output="${hook%.*}"
+
+          echo -e "|--|> '$ansi_magenta_bold $f $ansi_reset' -> '$ansi_cyan_bold .git/hooks/$output $ansi_reset'";
+
+          cp "$f" ".git/hooks/$output"
+          chmod 755 ".git/hooks/$output"
+        fi
+      ;;
+      *) echo -e "[$ansi_green_bold hooks $ansi_reset] <$ansi_blue_bold ignored $ansi_reset> ignoring '$ansi_magenta $f $ansi_reset', not a .sh file";;
+    esac
+  done
+}
+
 # argument handler
 case $1 in
   help) usage;;
+  hooks) hooks;;
   *) invalid_argument $1;;
 esac
