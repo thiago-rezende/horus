@@ -248,3 +248,17 @@ void platform_window_size(platform_window_t *window, u16 *width, u16 *height) {
   *width = window->width;
   *height = window->height;
 }
+
+b8 platform_window_set_size(platform_window_t *window, u16 width, u16 height) {
+  u16 mask = 0;
+
+  mask |= XCB_CONFIG_WINDOW_WIDTH;
+  mask |= XCB_CONFIG_WINDOW_HEIGHT;
+
+  u32 values[] = {width, height};
+
+  xcb_configure_window(window->connection, window->window, mask, values);
+  xcb_flush(window->connection);
+
+  return true;
+}
