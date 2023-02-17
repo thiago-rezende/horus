@@ -262,3 +262,12 @@ b8 platform_window_set_size(platform_window_t *window, u16 width, u16 height) {
 
   return true;
 }
+
+b8 platform_window_set_title(platform_window_t *window, char *title) {
+  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
+                      strlen(title), title);
+
+  xcb_flush(window->connection);
+
+  return true;
+}
