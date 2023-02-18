@@ -1,6 +1,7 @@
 #pragma once
 
 #include <horus/application/configuration.h>
+
 typedef struct __application {
   char *name;
 
