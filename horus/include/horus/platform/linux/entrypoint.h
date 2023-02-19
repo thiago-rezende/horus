@@ -24,6 +24,18 @@ int main(int argc, char **argv, char **envp) {
   HDEBUG("<window:%p> created", window);
 
   while (!platform_window_should_close(window)) {
+    if (application->on_update) {
+      if (!application->on_update((u64)0)) {
+        HERROR("<application:%p> <on_update> failed", application);
+      }
+    }
+
+    if (application->on_render) {
+      if (!application->on_render()) {
+        HERROR("<application:%p> <on_render> failed", application);
+      }
+    }
+
     platform_window_process_events(window);
   }
 
