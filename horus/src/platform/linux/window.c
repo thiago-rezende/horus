@@ -33,8 +33,6 @@ struct __platform_window {
 platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 windowed) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
 
-  HDEBUG("<window:%p> allocated %lu bytes", window, sizeof(platform_window_t));
-
   window->connection = xcb_connect(NULL, NULL);
 
   HDEBUG("<window:%p> <xcb_connection:%p> connected", window, window->connection);
@@ -127,8 +125,6 @@ void platform_window_destroy(platform_window_t *window) {
   HDEBUG("<window:%p> <xcb_connection:%p> disconnected", window, window->connection);
 
   platform_memory_deallocate(window);
-
-  HDEBUG("<window:%p> deallocated %lu bytes", window, sizeof(platform_window_t));
 }
 
 void platform_window_process_events(platform_window_t *window) {

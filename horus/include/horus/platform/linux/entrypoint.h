@@ -14,7 +14,7 @@ int main(int argc, char **argv, char **envp) {
 
   application_t *application = application_create();
 
-  HDEBUG("<application:%p> <name:%s> created", application, application->name);
+  HINFO("<application:%p> <name:%s> created", application, application->name);
 
   configuration_t *configuration = &application->configuration;
   resolution_t *resolution = &configuration->resolution;
@@ -22,7 +22,8 @@ int main(int argc, char **argv, char **envp) {
   platform_window_t *window =
       platform_window_create(application->name, resolution->width, resolution->height, configuration->windowed);
 
-  HDEBUG("<window:%p> created", window);
+  HINFO("<window:%p> <title:%s> <width:%u> <height:%u> <windowed:%u> created", window, application->name,
+        resolution->width, resolution->height, configuration->windowed);
 
   f64 timestep = 0;
   f64 current_absolute_time = platform_absolute_time();
@@ -51,11 +52,11 @@ int main(int argc, char **argv, char **envp) {
 
   platform_window_destroy(window);
 
-  HDEBUG("<window:%p> destroyed", window);
+  HINFO("<window:%p> destroyed", window);
 
   application_destroy(application);
 
-  HDEBUG("<application:%p> <name:%s> destroyed", application, application->name);
+  HINFO("<application:%p> destroyed", application);
 
   HINFO("<%s:v%s> <platform:%s> terminating", horus_project_name(), horus_project_version(), horus_platform());
 
