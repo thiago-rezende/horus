@@ -15,6 +15,8 @@
 #include <horus/application/configuration.h>
 
 /* horus platform layer */
+#include <horus/platform/time.h>
+#include <horus/platform/window.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
 #include <horus/platform/entrypoint.h>
