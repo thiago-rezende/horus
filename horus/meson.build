@@ -7,6 +7,7 @@ horus_sources = [
 # horus source files [ linux ]
 if host_machine.system() == 'linux'
   horus_sources += [
+    'src/platform/linux/time.c',
     'src/platform/linux/memory.c',
     'src/platform/linux/window.c',
     'src/platform/linux/console.c'

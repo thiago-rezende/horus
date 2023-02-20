@@ -2,6 +2,7 @@
 
 #include <horus/definitions.h>
 #include <horus/logger/logger.h>
+#include <horus/platform/time.h>
 #include <horus/platform/window.h>
 #include <horus/application/application.h>
 
@@ -23,9 +24,18 @@ int main(int argc, char **argv, char **envp) {
 
   HDEBUG("<window:%p> created", window);
 
+  f64 timestep = 0;
+  f64 current_absolute_time = platform_absolute_time();
+  f64 previous_absolute_time = platform_absolute_time();
+
   while (!platform_window_should_close(window)) {
+    previous_absolute_time = current_absolute_time;
+    current_absolute_time = platform_absolute_time();
+
+    timestep = current_absolute_time - previous_absolute_time;
+
     if (application->on_update) {
-      if (!application->on_update((u64)0)) {
+      if (!application->on_update(timestep)) {
         HERROR("<application:%p> <on_update> failed", application);
       }
     }

@@ -44,6 +44,6 @@ b8 on_render(void) {
   return true;
 }
 
-b8 on_update(u64 timestep) {
+b8 on_update(f64 timestep) {
   return true;
 }

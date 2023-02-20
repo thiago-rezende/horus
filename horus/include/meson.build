@@ -19,6 +19,7 @@ horus_headers = [
   'horus/logger/logger.h',
 
   # platform layer headers
+  'horus/platform/time.h',
   'horus/platform/memory.h',
   'horus/platform/window.h',
   'horus/platform/console.h',

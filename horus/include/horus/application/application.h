@@ -9,5 +9,5 @@ typedef struct __application {
   configuration_t configuration;
 
   b8 (*on_render)(void);
-  b8 (*on_update)(u64 timestep);
+  b8 (*on_update)(f64 timestep);
 } application_t;
