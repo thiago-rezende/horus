@@ -6,6 +6,7 @@
 /* horus core layer */
 #include <horus/core/types.h>
 #include <horus/core/macros.h>
+#include <horus/core/strings.h>
 
 /* horus logger */
 #include <horus/logger/logger.h>

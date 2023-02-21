@@ -9,6 +9,7 @@ horus_headers = [
   # horus core headers
   'horus/core/types.h',
   'horus/core/macros.h',
+  'horus/core/strings.h',
 
   # horus application headers
   'horus/application/application.h',

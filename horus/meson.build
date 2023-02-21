@@ -1,6 +1,7 @@
 # horus source files
 horus_sources = [
   'src/definitions.c',
+  'src/core/strings.c',
   'src/logger/logger.c'
 ]
 
