@@ -29,8 +29,11 @@ horus_dependencies = [
 if host_machine.system() == 'linux'
   xcb_dep = dependency('xcb')
 
+  vulkan_dep = dependency('vulkan')
+
   horus_dependencies += [
-    xcb_dep
+    xcb_dep,
+    vulkan_dep
   ]
 endif
 
