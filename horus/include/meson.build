@@ -8,6 +8,7 @@ horus_headers = [
 
   # horus core headers
   'horus/core/types.h',
+  'horus/core/assert.h',
   'horus/core/macros.h',
   'horus/core/strings.h',
 
