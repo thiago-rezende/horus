@@ -35,7 +35,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
 
   window->connection = xcb_connect(NULL, NULL);
 
-  HDEBUG("<window:%p> <xcb_connection:%p> connected", window, window->connection);
+  logger_debug("<window:%p> <xcb_connection:%p> connected", window, window->connection);
 
   const xcb_setup_t *screen_setup = xcb_get_setup(window->connection);
   xcb_screen_iterator_t screen_iterator = xcb_setup_roots_iterator(screen_setup);
@@ -102,7 +102,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
   window->has_focus = false;
   window->should_close = false;
 
-  HDEBUG("<window:%p> <xcb_window:%lu> created", window, window->window);
+  logger_debug("<window:%p> <xcb_window:%lu> created", window, window->window);
 
   return window;
 }
@@ -118,11 +118,11 @@ void platform_window_destroy(platform_window_t *window) {
 
   xcb_destroy_window(window->connection, window->window);
 
-  HDEBUG("<window:%p> <xcb_window:%lu> destroyed", window, window->window);
+  logger_debug("<window:%p> <xcb_window:%lu> destroyed", window, window->window);
 
   xcb_disconnect(window->connection);
 
-  HDEBUG("<window:%p> <xcb_connection:%p> disconnected", window, window->connection);
+  logger_debug("<window:%p> <xcb_connection:%p> disconnected", window, window->connection);
 
   platform_memory_deallocate(window);
 }

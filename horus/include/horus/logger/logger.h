@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum {
+typedef enum __logger_level {
   LOGGER_LEVEL_CRITICAL = 0,
   LOGGER_LEVEL_ERROR,
   LOGGER_LEVEL_WARNING,
@@ -8,18 +8,18 @@ typedef enum {
   LOGGER_LEVEL_TRACE,
   LOGGER_LEVEL_DEBUG,
   LOGGER_LEVEL_COUNT
-} logger_level;
+} logger_level_t;
 
-void logger(logger_level level, const char *message, ...);
+void __logger_general(logger_level_t level, const char *message, ...);
 
-#define HCRITICAL(message, ...) logger(LOGGER_LEVEL_CRITICAL, message __VA_OPT__(, ) __VA_ARGS__)
+#define logger_critical(message, ...) __logger_general(LOGGER_LEVEL_CRITICAL, message __VA_OPT__(, ) __VA_ARGS__)
 
-#define HERROR(message, ...) logger(LOGGER_LEVEL_ERROR, message __VA_OPT__(, ) __VA_ARGS__)
+#define logger_error(message, ...) __logger_general(LOGGER_LEVEL_ERROR, message __VA_OPT__(, ) __VA_ARGS__)
 
-#define HWARNING(message, ...) logger(LOGGER_LEVEL_WARNING, message __VA_OPT__(, ) __VA_ARGS__)
+#define logger_warning(message, ...) __logger_general(LOGGER_LEVEL_WARNING, message __VA_OPT__(, ) __VA_ARGS__)
 
-#define HINFO(message, ...) logger(LOGGER_LEVEL_INFO, message __VA_OPT__(, ) __VA_ARGS__)
+#define logger_info(message, ...) __logger_general(LOGGER_LEVEL_INFO, message __VA_OPT__(, ) __VA_ARGS__)
 
-#define HDEBUG(message, ...) logger(LOGGER_LEVEL_DEBUG, message __VA_OPT__(, ) __VA_ARGS__)
+#define logger_debug(message, ...) __logger_general(LOGGER_LEVEL_DEBUG, message __VA_OPT__(, ) __VA_ARGS__)
 
-#define HTRACE(message, ...) logger(LOGGER_LEVEL_TRACE, message __VA_OPT__(, ) __VA_ARGS__)
+#define logger_trace(message, ...) __logger_general(LOGGER_LEVEL_TRACE, message __VA_OPT__(, ) __VA_ARGS__)

@@ -10,11 +10,11 @@ extern application_t *application_create();
 extern void application_destroy(application_t *application);
 
 int main(int argc, char **argv, char **envp) {
-  HINFO("<%s:v%s> <platform:%s> initializing", horus_project_name(), horus_project_version(), horus_platform());
+  logger_info("<%s:v%s> <platform:%s> initializing", horus_project_name(), horus_project_version(), horus_platform());
 
   application_t *application = application_create();
 
-  HINFO("<application:%p> <name:%s> created", application, application->name);
+  logger_info("<application:%p> <name:%s> created", application, application->name);
 
   configuration_t *configuration = &application->configuration;
   resolution_t *resolution = &configuration->resolution;
@@ -22,7 +22,7 @@ int main(int argc, char **argv, char **envp) {
   platform_window_t *window =
       platform_window_create(application->name, resolution->width, resolution->height, configuration->windowed);
 
-  HINFO("<window:%p> <title:%s> <width:%u> <height:%u> <windowed:%u> created", window, application->name,
+  logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <windowed:%u> created", window, application->name,
         resolution->width, resolution->height, configuration->windowed);
 
   f64 timestep = 0;
@@ -37,13 +37,13 @@ int main(int argc, char **argv, char **envp) {
 
     if (application->on_update) {
       if (!application->on_update(timestep)) {
-        HERROR("<application:%p> <on_update> failed", application);
+        logger_error("<application:%p> <on_update> failed", application);
       }
     }
 
     if (application->on_render) {
       if (!application->on_render()) {
-        HERROR("<application:%p> <on_render> failed", application);
+        logger_error("<application:%p> <on_render> failed", application);
       }
     }
 
@@ -52,13 +52,13 @@ int main(int argc, char **argv, char **envp) {
 
   platform_window_destroy(window);
 
-  HINFO("<window:%p> destroyed", window);
+  logger_info("<window:%p> destroyed", window);
 
   application_destroy(application);
 
-  HINFO("<application:%p> destroyed", application);
+  logger_info("<application:%p> destroyed", application);
 
-  HINFO("<%s:v%s> <platform:%s> terminating", horus_project_name(), horus_project_version(), horus_platform());
+  logger_info("<%s:v%s> <platform:%s> terminating", horus_project_name(), horus_project_version(), horus_platform());
 
   return 0;
 }
