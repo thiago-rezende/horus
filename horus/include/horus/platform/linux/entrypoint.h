@@ -23,7 +23,7 @@ int main(int argc, char **argv, char **envp) {
       platform_window_create(application->name, resolution->width, resolution->height, configuration->windowed);
 
   logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <windowed:%u> created", window, application->name,
-        resolution->width, resolution->height, configuration->windowed);
+              resolution->width, resolution->height, configuration->windowed);
 
   f64 timestep = 0;
   f64 current_absolute_time = platform_absolute_time();
