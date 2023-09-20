@@ -100,7 +100,7 @@ markdown() {
 
     exit 0
   else
-    echo -e "[$ansi_green_bold warn $ansi_reset] repository have$ansi_cyan_bold git tags$ansi_reset"
+    echo -e "[$ansi_green_bold info $ansi_reset] repository have$ansi_cyan_bold git tags$ansi_reset"
     echo -e "|> [$ansi_white_bold generating $ansi_reset] tagged changelog"
 
     tag=("HEAD")
