@@ -67,12 +67,12 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
   net_wm_state_fullscreen_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_fullscreen_cookie, NULL);
 
   global_platform_window_atoms = (platform_window_atoms_t){
-      .WM_PROTOCOLS = wm_protocols_cookie_reply->atom,                        /* */
-      .WM_DELETE_WINDOW = wm_delete_window_cookie_reply->atom,                /* */
-      ._NET_WM_STATE = net_wm_state_cookie_reply->atom,                       /* */
-      ._NET_WM_STATE_ADD = 1,                                                 /* */
-      ._NET_WM_STATE_REMOVE = 0,                                              /* */
-      ._NET_WM_STATE_FULLSCREEN = net_wm_state_fullscreen_cookie_reply->atom, /* */
+      .WM_PROTOCOLS = wm_protocols_cookie_reply->atom,
+      .WM_DELETE_WINDOW = wm_delete_window_cookie_reply->atom,
+      ._NET_WM_STATE = net_wm_state_cookie_reply->atom,
+      ._NET_WM_STATE_ADD = 1,
+      ._NET_WM_STATE_REMOVE = 0,
+      ._NET_WM_STATE_FULLSCREEN = net_wm_state_fullscreen_cookie_reply->atom,
   };
 
   free(wm_protocols_cookie_reply);
