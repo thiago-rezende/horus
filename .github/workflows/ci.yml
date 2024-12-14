@@ -26,7 +26,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Setup System Dependencies
-        run: sudo apt install libxcb1-dev libvulkan-dev vulkan-validationlayers-dev
+        run: sudo apt install libxcb1-dev libvulkan-dev vulkan-validationlayers
 
       - name: Setup Python
         uses: actions/setup-python@v4
