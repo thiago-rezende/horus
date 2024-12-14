@@ -8,7 +8,7 @@ typedef struct __resolution {
 } resolution_t;
 
 typedef struct __configuration {
-  b8 windowed;
+  b8 fullscreen;
 
   resolution_t resolution;
 } configuration_t;

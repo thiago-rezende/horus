@@ -5,32 +5,85 @@
 #include <xcb/xcb.h>
 
 #include <horus/definitions.h>
+#include <horus/core/strings.h>
 #include <horus/logger/logger.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/window.h>
+
+typedef struct __platform_window_atoms {
+  xcb_atom_t WM_PROTOCOLS;
+  xcb_atom_t WM_DELETE_WINDOW;
+  xcb_atom_t _NET_WM_STATE;
+  xcb_atom_t _NET_WM_STATE_ADD;
+  xcb_atom_t _NET_WM_STATE_REMOVE;
+  xcb_atom_t _NET_WM_STATE_FULLSCREEN;
+} platform_window_atoms_t;
+
+static platform_window_atoms_t global_platform_window_atoms = {0};
 
 struct __platform_window {
   xcb_connection_t *connection;
   xcb_screen_t *screen;
   xcb_window_t window;
 
-  xcb_intern_atom_reply_t *protocols_cookie_reply;
-
-  xcb_intern_atom_reply_t *close_client_cookie_reply;
-
-  xcb_intern_atom_reply_t *state_cookie_reply;
-
-  xcb_intern_atom_reply_t *fullscreen_cookie_reply;
-
   u16 width;
   u16 height;
 
-  b8 windowed;
+  b8 fullscreen;
   b8 has_focus;
   b8 should_close;
 };
 
-platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 windowed) {
+b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
+  xcb_intern_atom_cookie_t wm_protocols_cookie;
+  xcb_intern_atom_cookie_t wm_delete_window_cookie;
+  xcb_intern_atom_cookie_t net_wm_state_cookie;
+  xcb_intern_atom_cookie_t net_wm_state_fullscreen_cookie;
+
+  xcb_intern_atom_reply_t *wm_protocols_cookie_reply;
+  xcb_intern_atom_reply_t *wm_delete_window_cookie_reply;
+  xcb_intern_atom_reply_t *net_wm_state_cookie_reply;
+  xcb_intern_atom_reply_t *net_wm_state_fullscreen_cookie_reply;
+
+  const char *wm_protocols_name = "WM_PROTOCOLS";
+  const char *wm_delete_window_name = "WM_DELETE_WINDOW";
+  const char *net_wm_state_name = "_NET_WM_STATE";
+  const char *net_wm_state_fullscreen_name = "_NET_WM_STATE_FULLSCREEN";
+
+  u64 wm_protocols_name_length = string_length((char *)wm_protocols_name);
+  u64 wm_delete_window_name_length = string_length((char *)wm_delete_window_name);
+  u64 net_wm_state_name_length = string_length((char *)net_wm_state_name);
+  u64 net_wm_state_fullscreen_name_length = string_length((char *)net_wm_state_fullscreen_name);
+
+  wm_protocols_cookie = xcb_intern_atom(connection, 0, wm_protocols_name_length, wm_protocols_name);
+  wm_delete_window_cookie = xcb_intern_atom(connection, 0, wm_delete_window_name_length, wm_delete_window_name);
+  net_wm_state_cookie = xcb_intern_atom(connection, 0, net_wm_state_name_length, net_wm_state_name);
+  net_wm_state_fullscreen_cookie =
+      xcb_intern_atom(connection, 0, net_wm_state_fullscreen_name_length, net_wm_state_fullscreen_name);
+
+  wm_protocols_cookie_reply = xcb_intern_atom_reply(connection, wm_protocols_cookie, NULL);
+  wm_delete_window_cookie_reply = xcb_intern_atom_reply(connection, wm_delete_window_cookie, NULL);
+  net_wm_state_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_cookie, NULL);
+  net_wm_state_fullscreen_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_fullscreen_cookie, NULL);
+
+  global_platform_window_atoms = (platform_window_atoms_t){
+      .WM_PROTOCOLS = wm_protocols_cookie_reply->atom,                        /* */
+      .WM_DELETE_WINDOW = wm_delete_window_cookie_reply->atom,                /* */
+      ._NET_WM_STATE = net_wm_state_cookie_reply->atom,                       /* */
+      ._NET_WM_STATE_ADD = 1,                                                 /* */
+      ._NET_WM_STATE_REMOVE = 0,                                              /* */
+      ._NET_WM_STATE_FULLSCREEN = net_wm_state_fullscreen_cookie_reply->atom, /* */
+  };
+
+  free(wm_protocols_cookie_reply);
+  free(wm_delete_window_cookie_reply);
+  free(net_wm_state_cookie_reply);
+  free(net_wm_state_fullscreen_cookie_reply);
+
+  return true;
+}
+
+platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 fullscreen) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
 
   window->connection = xcb_connect(NULL, NULL);
@@ -66,30 +119,19 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
                     value_list                     /* masks */
   );
 
-  xcb_intern_atom_cookie_t protocols_cookie = xcb_intern_atom(window->connection, 0, 12, "WM_PROTOCOLS");
+  __platform_window_fetch_atoms(window->connection);
 
-  window->protocols_cookie_reply = xcb_intern_atom_reply(window->connection, protocols_cookie, 0);
-
-  xcb_intern_atom_cookie_t close_client_cookie = xcb_intern_atom(window->connection, 0, 16, "WM_DELETE_WINDOW");
-
-  window->close_client_cookie_reply = xcb_intern_atom_reply(window->connection, close_client_cookie, 0);
-
-  xcb_intern_atom_cookie_t window_state_cookie = xcb_intern_atom(window->connection, 0, 13, "_NET_WM_STATE");
-  window->state_cookie_reply = xcb_intern_atom_reply(window->connection, window_state_cookie, NULL);
-
-  xcb_intern_atom_cookie_t window_fullscreen_cookie =
-      xcb_intern_atom(window->connection, 0, 24, "_NET_WM_STATE_FULLSCREEN");
-  window->fullscreen_cookie_reply = xcb_intern_atom_reply(window->connection, window_fullscreen_cookie, NULL);
-
-  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, (*window->protocols_cookie_reply).atom,
-                      4, 32, 1, &(*window->close_client_cookie_reply).atom);
+  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window,
+                      global_platform_window_atoms.WM_PROTOCOLS, 4, 32, 1,
+                      &global_platform_window_atoms.WM_DELETE_WINDOW);
 
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                       strlen(title), title);
 
-  if (!windowed) {
-    xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, window->state_cookie_reply->atom,
-                        XCB_ATOM_ATOM, 32, 1, &(window->fullscreen_cookie_reply->atom));
+  if (fullscreen) {
+    xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window,
+                        global_platform_window_atoms._NET_WM_STATE, XCB_ATOM_ATOM, 32, 1,
+                        &global_platform_window_atoms._NET_WM_STATE_FULLSCREEN);
   }
 
   xcb_map_window(window->connection, window->window);
@@ -98,7 +140,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
 
   window->width = width;
   window->height = height;
-  window->windowed = windowed;
+  window->fullscreen = fullscreen;
   window->has_focus = false;
   window->should_close = false;
 
@@ -108,14 +150,6 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
 }
 
 void platform_window_destroy(platform_window_t *window) {
-  free(window->protocols_cookie_reply);
-
-  free(window->close_client_cookie_reply);
-
-  free(window->state_cookie_reply);
-
-  free(window->fullscreen_cookie_reply);
-
   xcb_destroy_window(window->connection, window->window);
 
   logger_debug("<window:%p> <xcb_window:%lu> destroyed", window, window->window);
@@ -220,7 +254,7 @@ void platform_window_process_events(platform_window_t *window) {
       case XCB_CLIENT_MESSAGE: {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *)event;
 
-        if (client_message_event->data.data32[0] == (*window->close_client_cookie_reply).atom) {
+        if (client_message_event->data.data32[0] == global_platform_window_atoms.WM_DELETE_WINDOW) {
           window->should_close = true;
         }
 
@@ -262,6 +296,27 @@ b8 platform_window_set_size(platform_window_t *window, u16 width, u16 height) {
 b8 platform_window_set_title(platform_window_t *window, char *title) {
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                       strlen(title), title);
+
+  xcb_flush(window->connection);
+
+  return true;
+}
+
+b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
+  xcb_client_message_event_t event = {0};
+
+  event.response_type = XCB_CLIENT_MESSAGE;
+  event.window = window->window;
+  event.type = global_platform_window_atoms._NET_WM_STATE;
+  event.format = 32;
+
+  event.data.data32[0] =
+      fullscreen ? global_platform_window_atoms._NET_WM_STATE_ADD : global_platform_window_atoms._NET_WM_STATE_REMOVE;
+  event.data.data32[1] = global_platform_window_atoms._NET_WM_STATE_FULLSCREEN;
+  event.data.data32[2] = XCB_ATOM_NONE;
+
+  xcb_send_event(window->connection, 1, window->screen->root,
+                 XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY, (const char *)&event);
 
   xcb_flush(window->connection);
 

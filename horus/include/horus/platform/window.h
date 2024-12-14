@@ -19,3 +19,5 @@ void platform_window_size(platform_window_t *window, u16 *width, u16 *height);
 b8 platform_window_set_size(platform_window_t *window, u16 width, u16 height);
 
 b8 platform_window_set_title(platform_window_t *window, char *title);
+
+b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen);

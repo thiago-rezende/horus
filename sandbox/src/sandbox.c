@@ -11,10 +11,10 @@ application_t *application_create() {
   application->on_update = on_update;
   application->on_render = on_render;
 
-  application->configuration = (configuration_t){.windowed = true, /* */
+  application->configuration = (configuration_t){.fullscreen = false,
                                                  .resolution = (resolution_t){
-                                                     .width = 1280, /* */
-                                                     .height = 720  /* */
+                                                     .width = 1280,
+                                                     .height = 720,
                                                  }};
 
   return application;

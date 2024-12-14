@@ -20,10 +20,10 @@ int main(int argc, char **argv, char **envp) {
   resolution_t *resolution = &configuration->resolution;
 
   platform_window_t *window =
-      platform_window_create(application->name, resolution->width, resolution->height, configuration->windowed);
+      platform_window_create(application->name, resolution->width, resolution->height, configuration->fullscreen);
 
-  logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <windowed:%u> created", window, application->name,
-              resolution->width, resolution->height, configuration->windowed);
+  logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", window, application->name,
+              resolution->width, resolution->height, configuration->fullscreen);
 
   f64 timestep = 0;
   f64 current_absolute_time = platform_absolute_time();
