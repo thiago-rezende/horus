@@ -302,6 +302,10 @@ b8 platform_window_set_title(platform_window_t *window, char *title) {
   return true;
 }
 
+b8 platform_window_is_fullscreen(platform_window_t *window) {
+  return window->fullscreen;
+}
+
 b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
   xcb_client_message_event_t event = {0};
 
@@ -319,6 +323,8 @@ b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
                  XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY, (const char *)&event);
 
   xcb_flush(window->connection);
+
+  window->fullscreen = fullscreen;
 
   return true;
 }
