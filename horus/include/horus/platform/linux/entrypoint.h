@@ -25,6 +25,12 @@ int main(int argc, char **argv, char **envp) {
   logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", window, application->name,
               resolution->width, resolution->height, configuration->fullscreen);
 
+  if (application->on_event) {
+    if (!platform_window_set_event_callback(window, application->on_event)) {
+      logger_error("<application:%p> <on_event> failed", application);
+    }
+  }
+
   f64 timestep = 0;
   f64 current_absolute_time = platform_absolute_time();
   f64 previous_absolute_time = platform_absolute_time();

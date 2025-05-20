@@ -5,6 +5,7 @@
 
 #include <horus/definitions.h>
 #include <horus/core/strings.h>
+#include <horus/events/events.h>
 #include <horus/logger/logger.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/window.h>
@@ -31,6 +32,8 @@ struct __platform_window {
   b8 fullscreen;
   b8 has_focus;
   b8 should_close;
+
+  platform_window_event_callback_t on_event;
 };
 
 b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
@@ -84,6 +87,8 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
 
 platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 fullscreen) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
+
+  window->on_event = NULL;
 
   window->connection = xcb_connect(NULL, NULL);
 
@@ -218,6 +223,18 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_motion_notify_event_t *motion_notify_event = (xcb_motion_notify_event_t *)event;
         (void)motion_notify_event;
 
+        if (window->on_event) {
+          mouse_move_event_t mouse_move_event = {0};
+
+          mouse_move_event.type = EVENT_TYPE_MOUSE_MOVE;
+          mouse_move_event.position.x = motion_notify_event->event_x;
+          mouse_move_event.position.y = motion_notify_event->event_y;
+
+          if (!window->on_event((event_t *)&mouse_move_event)) {
+            logger_error("<window:%p> <on_event> failed", window, window->on_event);
+          }
+        }
+
         break;
       }
 
@@ -324,6 +341,12 @@ b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
   xcb_flush(window->connection);
 
   window->fullscreen = fullscreen;
+
+  return true;
+}
+
+b8 platform_window_set_event_callback(platform_window_t *window, platform_window_event_callback_t callback) {
+  window->on_event = callback;
 
   return true;
 }

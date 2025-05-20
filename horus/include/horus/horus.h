@@ -9,9 +9,6 @@
 #include <horus/core/macros.h>
 #include <horus/core/strings.h>
 
-/* horus logger */
-#include <horus/logger/logger.h>
-
 /* horus application layer */
 #include <horus/application/application.h>
 #include <horus/application/configuration.h>
@@ -22,3 +19,9 @@
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
 #include <horus/platform/entrypoint.h>
+
+/* horus logger layer */
+#include <horus/logger/logger.h>
+
+/* horus events layer */
+#include <horus/events/events.h>

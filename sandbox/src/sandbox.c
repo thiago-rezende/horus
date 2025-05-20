@@ -8,6 +8,7 @@ application_t *application_create() {
 
   application->name = "Sandbox Application";
 
+  application->on_event = on_event;
   application->on_update = on_update;
   application->on_render = on_render;
 
@@ -22,6 +23,17 @@ application_t *application_create() {
 
 void application_destroy(application_t *application) {
   platform_memory_deallocate(application);
+}
+
+b8 on_event(event_t *event) {
+  if (event->type == EVENT_TYPE_MOUSE_MOVE) {
+    mouse_move_event_t *mouse_move_event = (mouse_move_event_t *)event;
+
+    logger_debug("<event:%p> <type:%s> <x:%u> <y:%u>", mouse_move_event, event_type_string(mouse_move_event->type),
+                 mouse_move_event->position.x, mouse_move_event->position.y);
+  }
+
+  return true;
 }
 
 b8 on_render(void) {
