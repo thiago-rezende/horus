@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include <xcb/xcb.h>
 
@@ -126,7 +125,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
                       &global_platform_window_atoms.WM_DELETE_WINDOW);
 
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                      strlen(title), title);
+                      string_length(title), title);
 
   if (fullscreen) {
     xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window,
@@ -295,7 +294,7 @@ b8 platform_window_set_size(platform_window_t *window, u16 width, u16 height) {
 
 b8 platform_window_set_title(platform_window_t *window, char *title) {
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                      strlen(title), title);
+                      string_length(title), title);
 
   xcb_flush(window->connection);
 
