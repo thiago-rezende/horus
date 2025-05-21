@@ -33,6 +33,24 @@ b8 on_event(event_t *event) {
                  mouse_move_event->position.x, mouse_move_event->position.y);
   }
 
+  if (event->type == EVENT_TYPE_MOUSE_BUTTON_PRESS) {
+    mouse_button_press_event_t *mouse_button_press_event = (mouse_button_press_event_t *)event;
+
+    logger_debug("<event:%p> <type:%s> <button:%s> <x:%u> <y:%u>", mouse_button_press_event,
+                 event_type_string(mouse_button_press_event->type),
+                 mouse_button_string(mouse_button_press_event->button), mouse_button_press_event->position.x,
+                 mouse_button_press_event->position.y);
+  }
+
+  if (event->type == EVENT_TYPE_MOUSE_BUTTON_RELEASE) {
+    mouse_button_release_event_t *mouse_button_release_event = (mouse_button_release_event_t *)event;
+
+    logger_debug("<event:%p> <type:%s> <button:%s> <x:%u> <y:%u>", mouse_button_release_event,
+                 event_type_string(mouse_button_release_event->type),
+                 mouse_button_string(mouse_button_release_event->button), mouse_button_release_event->position.x,
+                 mouse_button_release_event->position.y);
+  }
+
   return true;
 }
 

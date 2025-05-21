@@ -4,6 +4,7 @@ horus_sources = [
   'src/core/strings.c',
   'src/logger/logger.c',
   'src/events/base.c',
+  'src/events/mouse.c',
 ]
 
 # horus source files [ linux ]

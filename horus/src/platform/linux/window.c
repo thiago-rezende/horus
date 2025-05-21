@@ -181,12 +181,45 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_button_press_event_t *button_press_event = (xcb_button_press_event_t *)event;
         (void)button_press_event;
 
+        if (window->on_event) {
+          mouse_button_press_event_t mouse_button_press_event = {0};
+
+          mouse_button_press_event.type = EVENT_TYPE_MOUSE_BUTTON_PRESS;
+          mouse_button_press_event.button = button_press_event->detail == 1   ? MOUSE_BUTTON_LEFT
+                                            : button_press_event->detail == 2 ? MOUSE_BUTTON_MIDDLE
+                                            : button_press_event->detail == 3 ? MOUSE_BUTTON_RIGHT
+                                                                              : MOUSE_BUTTON_NONE;
+          mouse_button_press_event.position.x = button_press_event->event_x;
+          mouse_button_press_event.position.y = button_press_event->event_y;
+
+          if (!window->on_event((event_t *)&mouse_button_press_event)) {
+            logger_error("<window:%p> <on_event> failed", window, window->on_event);
+          }
+        }
+
         break;
       }
 
       case XCB_BUTTON_RELEASE: {
         xcb_button_release_event_t *button_release_event = (xcb_button_release_event_t *)event;
         (void)button_release_event;
+
+        if (window->on_event) {
+          mouse_button_release_event_t mouse_button_release_event = {0};
+
+          mouse_button_release_event.type = EVENT_TYPE_MOUSE_BUTTON_RELEASE;
+          mouse_button_release_event.button = button_release_event->detail == 1   ? MOUSE_BUTTON_LEFT
+                                              : button_release_event->detail == 2 ? MOUSE_BUTTON_MIDDLE
+                                              : button_release_event->detail == 3 ? MOUSE_BUTTON_RIGHT
+                                                                                  : MOUSE_BUTTON_NONE;
+
+          mouse_button_release_event.position.x = button_release_event->event_x;
+          mouse_button_release_event.position.y = button_release_event->event_y;
+
+          if (!window->on_event((event_t *)&mouse_button_release_event)) {
+            logger_error("<window:%p> <on_event> failed", window, window->on_event);
+          }
+        }
 
         break;
       }
