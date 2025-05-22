@@ -1,9 +1,16 @@
 #pragma once
 
+/* horus base layer */
 #include <horus/definitions.h>
+
+/* horus logger layer */
 #include <horus/logger/logger.h>
+
+/* horus platform layer */
 #include <horus/platform/time.h>
 #include <horus/platform/window.h>
+
+/* horus application layer */
 #include <horus/application/application.h>
 
 extern application_t *application_create();

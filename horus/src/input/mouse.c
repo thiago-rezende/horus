@@ -1,4 +1,5 @@
-#include <horus/events/mouse.h>
+/* horus input layer */
+#include <horus/input/mouse.h>
 
 static const char *mouse_button_strings[MOUSE_BUTTON_COUNT] = {
     [MOUSE_BUTTON_NONE] = "none",

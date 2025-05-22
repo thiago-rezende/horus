@@ -1,6 +1,9 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
+
+/* horus application layer */
 #include <horus/application/application.h>
 
 application_t *application_create();

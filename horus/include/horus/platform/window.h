@@ -1,6 +1,9 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
+
+/* horus events layer */
 #include <horus/events/base.h>
 
 typedef struct __platform_window platform_window_t;

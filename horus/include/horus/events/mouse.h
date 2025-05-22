@@ -1,15 +1,13 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
-#include <horus/events/base.h>
 
-typedef enum __mouse_button {
-  MOUSE_BUTTON_NONE = 0,
-  MOUSE_BUTTON_LEFT,
-  MOUSE_BUTTON_RIGHT,
-  MOUSE_BUTTON_MIDDLE,
-  MOUSE_BUTTON_COUNT,
-} mouse_button_t;
+/* horus input layer */
+#include <horus/input/mouse.h>
+
+/* horus events layer */
+#include <horus/events/base.h>
 
 typedef struct __mouse_position {
   u32 x;
@@ -35,5 +33,3 @@ typedef struct __mouse_move_event {
 
   mouse_position_t position;
 } mouse_move_event_t;
-
-const char *mouse_button_string(mouse_button_t button);

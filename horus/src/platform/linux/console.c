@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+/* horus platform layer */
 #include <horus/platform/console.h>
 
 b8 platform_console_write(char *message) {

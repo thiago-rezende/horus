@@ -1,5 +1,8 @@
 #pragma once
 
+/* horus base layer */
+#include <horus/definitions.h>
+
 /* platform detection */
 #include <horus/platform/detection.h>
 
@@ -23,5 +26,9 @@
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
+/* horus input layer */
+#include <horus/input/mouse.h>
+
 /* horus events layer */
-#include <horus/events/events.h>
+#include <horus/events/base.h>
+#include <horus/events/mouse.h>

@@ -3,7 +3,7 @@ horus_headers = [
   # horus global header
   'horus/horus.h',
 
-  # horus compile time definitions
+  # horus base headers
   'horus/definitions.h',
 
   # horus core headers
@@ -20,7 +20,7 @@ horus_headers = [
   'horus/logger/ansi.h',
   'horus/logger/logger.h',
 
-  # platform layer headers
+  # horus platform headers
   'horus/platform/time.h',
   'horus/platform/memory.h',
   'horus/platform/window.h',
@@ -28,9 +28,9 @@ horus_headers = [
   'horus/platform/detection.h',
   'horus/platform/entrypoint.h',
 
-  # linux platform headers
-  'horus/platform/linux/entrypoint.h'
+  # horus platform headers [ linux ]
+  'horus/platform/linux/entrypoint.h',
 ]
 
 # horus headers installation
-install_headers(horus_headers, preserve_path : true)
+install_headers(horus_headers, preserve_path: true)

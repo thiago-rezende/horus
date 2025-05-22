@@ -1,5 +1,6 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
 
 u64 string_length(char *string);

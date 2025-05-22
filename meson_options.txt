@@ -1,5 +1,7 @@
 # project options
-option('build_sandbox',
-	    value : true,
-	    type : 'boolean',
-	    description : 'build the sandbox application')
+option(
+  'build_sandbox',
+  value: true,
+  type: 'boolean',
+  description: 'build the sandbox application',
+)

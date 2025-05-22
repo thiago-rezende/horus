@@ -1,7 +1,12 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
+
+/* horus events layer */
 #include <horus/events/base.h>
+
+/* horus application layer */
 #include <horus/application/configuration.h>
 
 typedef struct __application {

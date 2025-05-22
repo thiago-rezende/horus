@@ -3,10 +3,20 @@
 
 #include <xcb/xcb.h>
 
+/* horus base layer */
 #include <horus/definitions.h>
+
+/* horus core layer */
 #include <horus/core/strings.h>
-#include <horus/events/events.h>
+
+/* horus events layer */
+#include <horus/events/base.h>
+#include <horus/events/mouse.h>
+
+/* horus logger layer */
 #include <horus/logger/logger.h>
+
+/* horus platform layer */
 #include <horus/platform/memory.h>
 #include <horus/platform/window.h>
 

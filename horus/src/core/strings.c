@@ -1,3 +1,4 @@
+/* horus core layer */
 #include <horus/core/strings.h>
 
 u64 string_length(char *string) {

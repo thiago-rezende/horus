@@ -1,5 +1,6 @@
 #include <config.h>
 
+/* horus base layer */
 #include <horus/definitions.h>
 
 const char *horus_project_name() {

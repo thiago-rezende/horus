@@ -1,6 +1,9 @@
 #pragma once
 
+/* horus logger layer */
 #include <horus/logger/logger.h>
+
+/* horus platform layer */
 #include <horus/platform/debugger.h>
 
 #define assert(expression)                                                                                      \

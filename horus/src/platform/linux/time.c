@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 199309L
 #include <time.h>
 
+/* horus platform layer */
 #include <horus/platform/time.h>
 
 f64 platform_absolute_time() {

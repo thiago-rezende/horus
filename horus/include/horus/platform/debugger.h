@@ -1,6 +1,9 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
+
+/* horus platform layer */
 #include <horus/platform/detection.h>
 
 #if defined(HORUS_PLATFORM_LINUX)

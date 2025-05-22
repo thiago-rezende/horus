@@ -1,3 +1,4 @@
+/* horus events layer */
 #include <horus/events/base.h>
 
 static const char *event_type_strings[EVENT_TYPE_COUNT] = {

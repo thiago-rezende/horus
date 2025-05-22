@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* horus platform layer */
 #include <horus/platform/memory.h>
 
 void *platform_memory_allocate(u64 size) {

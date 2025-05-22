@@ -1,5 +1,6 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
 
 static const u8 ansi_size = 5;

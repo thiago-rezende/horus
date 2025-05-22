@@ -1,5 +1,6 @@
 #pragma once
 
+/* horus core layer */
 #include <horus/core/types.h>
 
 void *platform_memory_allocate(u64 size);

@@ -1,15 +1,21 @@
 # horus source files
 horus_sources = [
+  # horus base layer
   'src/definitions.c',
+  # horus core layer
   'src/core/strings.c',
+  # horus logger layer
   'src/logger/logger.c',
+  # horus input layer
+  'src/input/mouse.c',
+  # horus events layer
   'src/events/base.c',
-  'src/events/mouse.c',
 ]
 
 # horus source files [ linux ]
 if host_machine.system() == 'linux'
   horus_sources += [
+    # horus platform layer [ linux ]
     'src/platform/linux/time.c',
     'src/platform/linux/memory.c',
     'src/platform/linux/window.c',

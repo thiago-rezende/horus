@@ -2,8 +2,11 @@
 #include <stdarg.h>
 #include <string.h>
 
+/* horus logger layer */
 #include <horus/logger/ansi.h>
 #include <horus/logger/logger.h>
+
+/* horus platform layer */
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
 
