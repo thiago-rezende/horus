@@ -6,6 +6,9 @@
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
   "mesonbuild.buildFolder": "build",
+  "mesonbuild.configureOptions": [
+    "--buildtype=debug",
+  ],
   "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
   "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
 }
