@@ -2,13 +2,17 @@
 horus_sources = [
   # horus base layer
   'src/definitions.c',
+
   # horus core layer
   'src/core/strings.c',
+
   # horus logger layer
   'src/logger/logger.c',
+
   # horus input layer
   'src/input/mouse.c',
   'src/input/keyboard.c',
+
   # horus events layer
   'src/events/base.c',
 ]
@@ -21,6 +25,7 @@ if host_machine.system() == 'linux'
     'src/platform/linux/memory.c',
     'src/platform/linux/window.c',
     'src/platform/linux/console.c',
+
     # horus input layer [ linux ]
     'src/platform/linux/input/mouse.c',
     'src/platform/linux/input/keyboard.c',
@@ -50,6 +55,7 @@ if host_machine.system() == 'linux'
     # horus window dependencies [ linux ]
     xcb_dep,
     xcb_xkb_dep,
+
     # horus renderer dependencies [ linux ]
     vulkan_dep,
   ]
