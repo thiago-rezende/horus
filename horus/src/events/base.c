@@ -18,7 +18,7 @@ static const char *event_type_strings[EVENT_TYPE_COUNT] = {
     [EVENT_TYPE_MOUSE_BUTTON_RELEASE] = "mouse_button_release",
 };
 
-const char *event_type_string(event_type_t type) {
+const char *events_type_string(event_type_t type) {
   if (type < EVENT_TYPE_COUNT && type >= 0) {
     return event_type_strings[type];
   }

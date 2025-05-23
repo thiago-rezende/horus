@@ -18,14 +18,37 @@ typedef enum __mouse_button {
   MOUSE_BUTTON_COUNT,
 } mouse_button_t;
 
+typedef enum __mouse_button_state {
+  MOUSE_BUTTON_STATE_NONE = 0,
+  MOUSE_BUTTON_STATE_PRESSED,
+  MOUSE_BUTTON_STATE_RELEASED,
+  MOUSE_BUTTON_STATE_COUNT,
+} mouse_button_state_t;
+
 typedef enum __mouse_scroll_direction {
   MOUSE_SCROLL_DIRECTION_NONE = 0,
   MOUSE_SCROLL_DIRECTION_UP,
   MOUSE_SCROLL_DIRECTION_DOWN,
-  MOUSE_SCROLL_DIRECTION_LEFT,
-  MOUSE_SCROLL_DIRECTION_RIGHT,
   MOUSE_SCROLL_DIRECTION_COUNT,
 } mouse_scroll_direction_t;
 
-const char *mouse_button_string(mouse_button_t button);
-const char *mouse_scroll_direction_string(mouse_scroll_direction_t direction);
+typedef enum __mouse_scroll_state {
+  MOUSE_SCROLL_STATE_NONE = 0,
+  MOUSE_SCROLL_STATE_UP,
+  MOUSE_SCROLL_STATE_DOWN,
+  MOUSE_SCROLL_STATE_COUNT,
+} mouse_scroll_state_t;
+
+const char *input_mouse_button_string(mouse_button_t button);
+const char *input_mouse_button_state_string(mouse_button_state_t state);
+
+const char *input_mouse_scroll_state_string(mouse_scroll_state_t state);
+const char *input_mouse_scroll_direction_string(mouse_scroll_direction_t direction);
+
+b8 input_mouse_button_is_pressed(mouse_button_t button);
+b8 input_mouse_button_is_released(mouse_button_t button);
+mouse_button_state_t input_mouse_button_state(mouse_button_t button);
+
+b8 input_mouse_scroll_is_up();
+b8 input_mouse_scroll_is_down();
+mouse_scroll_state_t input_mouse_scroll_state();

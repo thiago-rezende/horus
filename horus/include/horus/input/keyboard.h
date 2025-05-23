@@ -135,5 +135,5 @@ typedef enum __keyboard_keysymbol {
   KEYBOARD_KEYSYMBOL_COUNT,
 } keyboard_keysymbol_t;
 
-const char *keyboard_keycode_string(keyboard_keycode_t keycode);
-const char *keyboard_keysymbol_string(keyboard_keysymbol_t keysymbol);
+const char *input_keyboard_keycode_string(keyboard_keycode_t keycode);
+const char *input_keyboard_keysymbol_string(keyboard_keysymbol_t keysymbol);

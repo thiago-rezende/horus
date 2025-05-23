@@ -23,4 +23,4 @@ typedef struct __event {
   event_type_t type;
 } event_t;
 
-const char *event_type_string(event_type_t type);
+const char *events_type_string(event_type_t type);

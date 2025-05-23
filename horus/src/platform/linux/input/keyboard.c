@@ -1,9 +1,9 @@
 /* horus input layer [ linux ] */
 #include <horus/platform/linux/input/keyboard.h>
 
-#define PLATFORM_KEYBOARD_KEYCODE_COUNT 256
+#define PLATFORM_INPUT_KEYBOARD_KEYCODE_COUNT 256
 
-static const keyboard_keycode_t platform_keyboard_keycode_mapping[PLATFORM_KEYBOARD_KEYCODE_COUNT] = {
+static const keyboard_keycode_t platform_input_keyboard_keycode_mapping[PLATFORM_INPUT_KEYBOARD_KEYCODE_COUNT] = {
     [0] = KEYBOARD_KEYCODE_NONE,            /* Reserved */
     [1] = KEYBOARD_KEYCODE_NONE,            /* Reserved */
     [2] = KEYBOARD_KEYCODE_NONE,            /* Reserved */
@@ -262,10 +262,10 @@ static const keyboard_keycode_t platform_keyboard_keycode_mapping[PLATFORM_KEYBO
     [255] = KEYBOARD_KEYCODE_NONE,          /* NoSymbol */
 };
 
-keyboard_keycode_t platform_keyboard_keycode(xcb_keycode_t keycode) {
-  return platform_keyboard_keycode_mapping[keycode];
+keyboard_keycode_t platform_input_keyboard_keycode(xcb_keycode_t keycode) {
+  return platform_input_keyboard_keycode_mapping[keycode];
 }
 
-keyboard_keysymbol_t platform_keyboard_keysymbol(xcb_keysym_t keysymbol) {
+keyboard_keysymbol_t platform_input_keyboard_keysymbol(xcb_keysym_t keysymbol) {
   return KEYBOARD_KEYSYMBOL_NONE;
 }

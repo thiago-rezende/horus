@@ -126,16 +126,16 @@ static const char *keyboard_keysymbol_strings[KEYBOARD_KEYSYMBOL_COUNT] = {
     [KEYBOARD_KEYSYMBOL_B] = "b",
 };
 
-const char *keyboard_keycode_string(keyboard_keycode_t keycode) {
-  if (keycode < KEYBOARD_KEYCODE_COUNT && keycode >= 0) {
+const char *input_keyboard_keycode_string(keyboard_keycode_t keycode) {
+  if (keycode < KEYBOARD_KEYCODE_COUNT && keycode >= KEYBOARD_KEYCODE_NONE) {
     return keyboard_keycode_strings[keycode];
   }
 
   return "unknown";
 }
 
-const char *keyboard_keysymbol_string(keyboard_keysymbol_t keysymbol) {
-  if (keysymbol < KEYBOARD_KEYSYMBOL_COUNT && keysymbol >= 0) {
+const char *input_keyboard_keysymbol_string(keyboard_keysymbol_t keysymbol) {
+  if (keysymbol < KEYBOARD_KEYSYMBOL_COUNT && keysymbol >= KEYBOARD_KEYSYMBOL_NONE) {
     return keyboard_keysymbol_strings[keysymbol];
   }
 

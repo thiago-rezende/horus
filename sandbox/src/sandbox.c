@@ -29,7 +29,7 @@ b8 on_event(event_t *event) {
   if (event->type == EVENT_TYPE_MOUSE_MOVE) {
     mouse_move_event_t *mouse_move_event = (mouse_move_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <x:%u> <y:%u>", mouse_move_event, event_type_string(event->type),
+    logger_debug("<event:%p> <type:%s> <x:%u> <y:%u>", mouse_move_event, events_type_string(event->type),
                  mouse_move_event->position.x, mouse_move_event->position.y);
   }
 
@@ -37,7 +37,7 @@ b8 on_event(event_t *event) {
     mouse_scroll_event_t *mouse_scroll_event = (mouse_scroll_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <direction:%s> <x:%u> <y:%u> ", mouse_scroll_event,
-                 event_type_string(event->type), mouse_scroll_direction_string(mouse_scroll_event->direction),
+                 events_type_string(event->type), input_mouse_scroll_direction_string(mouse_scroll_event->direction),
                  mouse_scroll_event->position.x, mouse_scroll_event->position.y);
   }
 
@@ -45,7 +45,7 @@ b8 on_event(event_t *event) {
     mouse_button_press_event_t *mouse_button_press_event = (mouse_button_press_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <button:%s> <x:%u> <y:%u>", mouse_button_press_event,
-                 event_type_string(event->type), mouse_button_string(mouse_button_press_event->button),
+                 events_type_string(event->type), input_mouse_button_string(mouse_button_press_event->button),
                  mouse_button_press_event->position.x, mouse_button_press_event->position.y);
   }
 
@@ -53,7 +53,7 @@ b8 on_event(event_t *event) {
     mouse_button_release_event_t *mouse_button_release_event = (mouse_button_release_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <button:%s> <x:%u> <y:%u>", mouse_button_release_event,
-                 event_type_string(event->type), mouse_button_string(mouse_button_release_event->button),
+                 events_type_string(event->type), input_mouse_button_string(mouse_button_release_event->button),
                  mouse_button_release_event->position.x, mouse_button_release_event->position.y);
   }
 
@@ -61,34 +61,74 @@ b8 on_event(event_t *event) {
     keyboard_press_event_t *keyboard_press_event = (keyboard_press_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_press_event,
-                 event_type_string(event->type), keyboard_keycode_string(keyboard_press_event->keycode),
-                 keyboard_keysymbol_string(keyboard_press_event->keysymbol));
+                 events_type_string(event->type), input_keyboard_keycode_string(keyboard_press_event->keycode),
+                 input_keyboard_keysymbol_string(keyboard_press_event->keysymbol));
   }
 
   if (event->type == EVENT_TYPE_KEYBOARD_RELEASE) {
     keyboard_release_event_t *keyboard_release_event = (keyboard_release_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_release_event,
-                 event_type_string(event->type), keyboard_keycode_string(keyboard_release_event->keycode),
-                 keyboard_keysymbol_string(keyboard_release_event->keysymbol));
+                 events_type_string(event->type), input_keyboard_keycode_string(keyboard_release_event->keycode),
+                 input_keyboard_keysymbol_string(keyboard_release_event->keysymbol));
   }
 
   if (event->type == EVENT_TYPE_KEYBOARD_HOLD) {
     keyboard_hold_event_t *keyboard_hold_event = (keyboard_hold_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_hold_event,
-                 event_type_string(event->type), keyboard_hold_event->keycode,
-                 keyboard_keycode_string(keyboard_hold_event->keycode),
-                 keyboard_keysymbol_string(keyboard_hold_event->keysymbol));
+                 events_type_string(event->type), keyboard_hold_event->keycode,
+                 input_keyboard_keycode_string(keyboard_hold_event->keycode),
+                 input_keyboard_keysymbol_string(keyboard_hold_event->keysymbol));
+  }
+
+  return true;
+}
+
+b8 on_update(f64 timestep) {
+  if (input_mouse_button_is_pressed(MOUSE_BUTTON_LEFT)) {
+    logger_debug("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
+                 input_mouse_button_string(MOUSE_BUTTON_LEFT));
+  }
+
+  if (input_mouse_button_is_released(MOUSE_BUTTON_LEFT)) {
+    logger_debug("<on_update> <timestep:%f> <mouse_button:%s> is released", timestep,
+                 input_mouse_button_string(MOUSE_BUTTON_LEFT));
+  }
+
+  if (input_mouse_button_is_pressed(MOUSE_BUTTON_MIDDLE)) {
+    logger_debug("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
+                 input_mouse_button_string(MOUSE_BUTTON_MIDDLE));
+  }
+
+  if (input_mouse_button_is_released(MOUSE_BUTTON_MIDDLE)) {
+    logger_debug("<on_update> <timestep:%f> <mouse_button:%s> is released", timestep,
+                 input_mouse_button_string(MOUSE_BUTTON_MIDDLE));
+  }
+
+  if (input_mouse_button_is_pressed(MOUSE_BUTTON_RIGHT)) {
+    logger_debug("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
+                 input_mouse_button_string(MOUSE_BUTTON_RIGHT));
+  }
+
+  if (input_mouse_button_is_released(MOUSE_BUTTON_RIGHT)) {
+    logger_debug("<on_update> <timestep:%f> <mouse_button:%s> is released", timestep,
+                 input_mouse_button_string(MOUSE_BUTTON_RIGHT));
+  }
+
+  if (input_mouse_scroll_is_up()) {
+    logger_debug("<on_update> <timestep:%f> <scroll:%s> is up", timestep,
+                 input_mouse_scroll_direction_string(MOUSE_SCROLL_DIRECTION_UP));
+  }
+
+  if (input_mouse_scroll_is_down()) {
+    logger_debug("<on_update> <timestep:%f> <scroll:%s> is down", timestep,
+                 input_mouse_scroll_direction_string(MOUSE_SCROLL_DIRECTION_DOWN));
   }
 
   return true;
 }
 
 b8 on_render(void) {
-  return true;
-}
-
-b8 on_update(f64 timestep) {
   return true;
 }

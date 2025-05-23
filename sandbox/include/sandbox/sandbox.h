@@ -10,5 +10,5 @@ application_t *application_create();
 void application_destroy(application_t *application);
 
 b8 on_event(event_t *event);
-b8 on_render(void);
 b8 on_update(f64 timestep);
+b8 on_render(void);
