@@ -22,6 +22,7 @@ if host_machine.system() == 'linux'
     'src/platform/linux/window.c',
     'src/platform/linux/console.c',
     # horus input layer [ linux ]
+    'src/platform/linux/input/mouse.c',
     'src/platform/linux/input/keyboard.c',
   ]
 endif

@@ -33,6 +33,14 @@ b8 on_event(event_t *event) {
                  mouse_move_event->position.x, mouse_move_event->position.y);
   }
 
+  if (event->type == EVENT_TYPE_MOUSE_SCROLL) {
+    mouse_scroll_event_t *mouse_scroll_event = (mouse_scroll_event_t *)event;
+
+    logger_debug("<event:%p> <type:%s> <direction:%s> <x:%u> <y:%u> ", mouse_scroll_event,
+                 event_type_string(event->type), mouse_scroll_direction_string(mouse_scroll_event->direction),
+                 mouse_scroll_event->position.x, mouse_scroll_event->position.y);
+  }
+
   if (event->type == EVENT_TYPE_MOUSE_BUTTON_PRESS) {
     mouse_button_press_event_t *mouse_button_press_event = (mouse_button_press_event_t *)event;
 

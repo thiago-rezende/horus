@@ -13,6 +13,7 @@ static const char *event_type_strings[EVENT_TYPE_COUNT] = {
     [EVENT_TYPE_KEYBOARD_RELEASE] = "keyboard_release",
     /* mouse events */
     [EVENT_TYPE_MOUSE_MOVE] = "mouse_move",
+    [EVENT_TYPE_MOUSE_SCROLL] = "mouse_scroll",
     [EVENT_TYPE_MOUSE_BUTTON_PRESS] = "mouse_button_press",
     [EVENT_TYPE_MOUSE_BUTTON_RELEASE] = "mouse_button_release",
 };

@@ -25,3 +25,10 @@ typedef struct __mouse_move_event {
 
   mouse_position_t position;
 } mouse_move_event_t;
+
+typedef struct __mouse_scroll_event {
+  event_t base;
+
+  mouse_position_t position;
+  mouse_scroll_direction_t direction;
+} mouse_scroll_event_t;

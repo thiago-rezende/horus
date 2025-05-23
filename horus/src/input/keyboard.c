@@ -118,8 +118,6 @@ static const char *keyboard_keycode_strings[KEYBOARD_KEYCODE_COUNT] = {
     [KEYBOARD_KEYCODE_BACKSLASH] = "backslash",
     [KEYBOARD_KEYCODE_SEMICOLON] = "semicolon",
     [KEYBOARD_KEYCODE_APOSTROPHE] = "apostrophe",
-    [KEYBOARD_KEYCODE_LEFTBRACKET] = "leftbracket",
-    [KEYBOARD_KEYCODE_RIGHTBRACKET] = "rightbracket",
 };
 
 static const char *keyboard_keysymbol_strings[KEYBOARD_KEYSYMBOL_COUNT] = {

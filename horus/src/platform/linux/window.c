@@ -24,7 +24,13 @@
 #include <horus/platform/window.h>
 
 /* horus input layer [ linux ] */
+#include <horus/platform/linux/input/mouse.h>
 #include <horus/platform/linux/input/keyboard.h>
+
+#define PLATFORM_MOUSE_SCROLL_UP_BUTTON 4
+#define PLATFORM_MOUSE_SCROLL_DOWN_BUTTON 5
+#define PLATFORM_MOUSE_SCROLL_LEFT_BUTTON 6
+#define PLATFORM_MOUSE_SCROLL_RIGHT_BUTTON 7
 
 typedef struct __platform_window_atoms {
   xcb_atom_t WM_PROTOCOLS;
@@ -56,6 +62,8 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection);
 
 b8 __platform_window_setup_extensions(xcb_connection_t *connection);
 b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection);
+
+b8 __platform_window_is_mouse_button_scroll(xcb_button_t button);
 
 platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 fullscreen) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
@@ -156,16 +164,34 @@ void platform_window_process_events(platform_window_t *window) {
         (void)button_press_event;
 
         if (window->on_event) {
+          if (__platform_window_is_mouse_button_scroll(button_press_event->detail)) {
+            mouse_scroll_event_t mouse_scroll_event = {0};
+
+            mouse_scroll_event.base = (event_t){
+                .type = EVENT_TYPE_MOUSE_SCROLL,
+            };
+
+            mouse_scroll_event.direction = platform_mouse_scroll_direction(button_press_event->detail);
+
+            mouse_scroll_event.position.x = button_press_event->event_x;
+            mouse_scroll_event.position.y = button_press_event->event_y;
+
+            if (!window->on_event((event_t *)&mouse_scroll_event)) {
+              logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                           event_type_string(mouse_scroll_event.base.type));
+            }
+
+            break;
+          }
+
           mouse_button_press_event_t mouse_button_press_event = {0};
 
           mouse_button_press_event.base = (event_t){
               .type = EVENT_TYPE_MOUSE_BUTTON_PRESS,
           };
 
-          mouse_button_press_event.button = button_press_event->detail == 1   ? MOUSE_BUTTON_LEFT
-                                            : button_press_event->detail == 2 ? MOUSE_BUTTON_MIDDLE
-                                            : button_press_event->detail == 3 ? MOUSE_BUTTON_RIGHT
-                                                                              : MOUSE_BUTTON_NONE;
+          mouse_button_press_event.button = platform_mouse_button(button_press_event->detail);
+
           mouse_button_press_event.position.x = button_press_event->event_x;
           mouse_button_press_event.position.y = button_press_event->event_y;
 
@@ -183,16 +209,18 @@ void platform_window_process_events(platform_window_t *window) {
         (void)button_release_event;
 
         if (window->on_event) {
+          /* ignore release event for mouse scroll */
+          if (__platform_window_is_mouse_button_scroll(button_release_event->detail)) {
+            break;
+          }
+
           mouse_button_release_event_t mouse_button_release_event = {0};
 
           mouse_button_release_event.base = (event_t){
               .type = EVENT_TYPE_MOUSE_BUTTON_RELEASE,
           };
 
-          mouse_button_release_event.button = button_release_event->detail == 1   ? MOUSE_BUTTON_LEFT
-                                              : button_release_event->detail == 2 ? MOUSE_BUTTON_MIDDLE
-                                              : button_release_event->detail == 3 ? MOUSE_BUTTON_RIGHT
-                                                                                  : MOUSE_BUTTON_NONE;
+          mouse_button_release_event.button = platform_mouse_button(button_release_event->detail);
 
           mouse_button_release_event.position.x = button_release_event->event_x;
           mouse_button_release_event.position.y = button_release_event->event_y;
@@ -508,4 +536,8 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
   free(xkb_per_client_flags_reply_error);
 
   return true;
+}
+
+b8 __platform_window_is_mouse_button_scroll(xcb_button_t button) {
+  return button >= PLATFORM_MOUSE_SCROLL_UP_BUTTON && button <= PLATFORM_MOUSE_SCROLL_RIGHT_BUTTON;
 }
