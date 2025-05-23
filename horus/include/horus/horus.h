@@ -28,7 +28,9 @@
 
 /* horus input layer */
 #include <horus/input/mouse.h>
+#include <horus/input/keyboard.h>
 
 /* horus events layer */
 #include <horus/events/base.h>
 #include <horus/events/mouse.h>
+#include <horus/events/keyboard.h>

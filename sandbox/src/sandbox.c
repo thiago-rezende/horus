@@ -29,7 +29,7 @@ b8 on_event(event_t *event) {
   if (event->type == EVENT_TYPE_MOUSE_MOVE) {
     mouse_move_event_t *mouse_move_event = (mouse_move_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <x:%u> <y:%u>", mouse_move_event, event_type_string(mouse_move_event->type),
+    logger_debug("<event:%p> <type:%s> <x:%u> <y:%u>", mouse_move_event, event_type_string(event->type),
                  mouse_move_event->position.x, mouse_move_event->position.y);
   }
 
@@ -37,18 +37,41 @@ b8 on_event(event_t *event) {
     mouse_button_press_event_t *mouse_button_press_event = (mouse_button_press_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <button:%s> <x:%u> <y:%u>", mouse_button_press_event,
-                 event_type_string(mouse_button_press_event->type),
-                 mouse_button_string(mouse_button_press_event->button), mouse_button_press_event->position.x,
-                 mouse_button_press_event->position.y);
+                 event_type_string(event->type), mouse_button_string(mouse_button_press_event->button),
+                 mouse_button_press_event->position.x, mouse_button_press_event->position.y);
   }
 
   if (event->type == EVENT_TYPE_MOUSE_BUTTON_RELEASE) {
     mouse_button_release_event_t *mouse_button_release_event = (mouse_button_release_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <button:%s> <x:%u> <y:%u>", mouse_button_release_event,
-                 event_type_string(mouse_button_release_event->type),
-                 mouse_button_string(mouse_button_release_event->button), mouse_button_release_event->position.x,
-                 mouse_button_release_event->position.y);
+                 event_type_string(event->type), mouse_button_string(mouse_button_release_event->button),
+                 mouse_button_release_event->position.x, mouse_button_release_event->position.y);
+  }
+
+  if (event->type == EVENT_TYPE_KEYBOARD_PRESS) {
+    keyboard_press_event_t *keyboard_press_event = (keyboard_press_event_t *)event;
+
+    logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_press_event,
+                 event_type_string(event->type), keyboard_keycode_string(keyboard_press_event->keycode),
+                 keyboard_keysymbol_string(keyboard_press_event->keysymbol));
+  }
+
+  if (event->type == EVENT_TYPE_KEYBOARD_RELEASE) {
+    keyboard_release_event_t *keyboard_release_event = (keyboard_release_event_t *)event;
+
+    logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_release_event,
+                 event_type_string(event->type), keyboard_keycode_string(keyboard_release_event->keycode),
+                 keyboard_keysymbol_string(keyboard_release_event->keysymbol));
+  }
+
+  if (event->type == EVENT_TYPE_KEYBOARD_HOLD) {
+    keyboard_hold_event_t *keyboard_hold_event = (keyboard_hold_event_t *)event;
+
+    logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_hold_event,
+                 event_type_string(event->type), keyboard_hold_event->keycode,
+                 keyboard_keycode_string(keyboard_hold_event->keycode),
+                 keyboard_keysymbol_string(keyboard_hold_event->keysymbol));
   }
 
   return true;

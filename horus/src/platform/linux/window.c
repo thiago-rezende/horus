@@ -12,6 +12,7 @@
 /* horus events layer */
 #include <horus/events/base.h>
 #include <horus/events/mouse.h>
+#include <horus/events/keyboard.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
@@ -19,6 +20,9 @@
 /* horus platform layer */
 #include <horus/platform/memory.h>
 #include <horus/platform/window.h>
+
+/* horus input layer [ linux ] */
+#include <horus/platform/linux/input/keyboard.h>
 
 typedef struct __platform_window_atoms {
   xcb_atom_t WM_PROTOCOLS;
@@ -194,7 +198,10 @@ void platform_window_process_events(platform_window_t *window) {
         if (window->on_event) {
           mouse_button_press_event_t mouse_button_press_event = {0};
 
-          mouse_button_press_event.type = EVENT_TYPE_MOUSE_BUTTON_PRESS;
+          mouse_button_press_event.base = (event_t){
+              .type = EVENT_TYPE_MOUSE_BUTTON_PRESS,
+          };
+
           mouse_button_press_event.button = button_press_event->detail == 1   ? MOUSE_BUTTON_LEFT
                                             : button_press_event->detail == 2 ? MOUSE_BUTTON_MIDDLE
                                             : button_press_event->detail == 3 ? MOUSE_BUTTON_RIGHT
@@ -203,7 +210,8 @@ void platform_window_process_events(platform_window_t *window) {
           mouse_button_press_event.position.y = button_press_event->event_y;
 
           if (!window->on_event((event_t *)&mouse_button_press_event)) {
-            logger_error("<window:%p> <on_event> failed", window, window->on_event);
+            logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                         event_type_string(mouse_button_press_event.base.type));
           }
         }
 
@@ -217,7 +225,10 @@ void platform_window_process_events(platform_window_t *window) {
         if (window->on_event) {
           mouse_button_release_event_t mouse_button_release_event = {0};
 
-          mouse_button_release_event.type = EVENT_TYPE_MOUSE_BUTTON_RELEASE;
+          mouse_button_release_event.base = (event_t){
+              .type = EVENT_TYPE_MOUSE_BUTTON_RELEASE,
+          };
+
           mouse_button_release_event.button = button_release_event->detail == 1   ? MOUSE_BUTTON_LEFT
                                               : button_release_event->detail == 2 ? MOUSE_BUTTON_MIDDLE
                                               : button_release_event->detail == 3 ? MOUSE_BUTTON_RIGHT
@@ -227,7 +238,8 @@ void platform_window_process_events(platform_window_t *window) {
           mouse_button_release_event.position.y = button_release_event->event_y;
 
           if (!window->on_event((event_t *)&mouse_button_release_event)) {
-            logger_error("<window:%p> <on_event> failed", window, window->on_event);
+            logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                         event_type_string(mouse_button_release_event.base.type));
           }
         }
 
@@ -238,12 +250,42 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)event;
         (void)key_press_event;
 
+        if (window->on_event) {
+          keyboard_press_event_t keyboard_press_event = {0};
+
+          keyboard_press_event.base = (event_t){
+              .type = EVENT_TYPE_KEYBOARD_PRESS,
+          };
+
+          keyboard_press_event.keycode = platform_keyboard_keycode(key_press_event->detail);
+
+          if (!window->on_event((event_t *)&keyboard_press_event)) {
+            logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                         event_type_string(keyboard_press_event.base.type));
+          }
+        }
+
         break;
       }
 
       case XCB_KEY_RELEASE: {
         xcb_key_release_event_t *key_release_event = (xcb_key_release_event_t *)event;
         (void)key_release_event;
+
+        if (window->on_event) {
+          keyboard_release_event_t keyboard_release_event = {0};
+
+          keyboard_release_event.base = (event_t){
+              .type = EVENT_TYPE_KEYBOARD_RELEASE,
+          };
+
+          keyboard_release_event.keycode = platform_keyboard_keycode(key_release_event->detail);
+
+          if (!window->on_event((event_t *)&keyboard_release_event)) {
+            logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                         event_type_string(keyboard_release_event.base.type));
+          }
+        }
 
         break;
       }
@@ -269,12 +311,16 @@ void platform_window_process_events(platform_window_t *window) {
         if (window->on_event) {
           mouse_move_event_t mouse_move_event = {0};
 
-          mouse_move_event.type = EVENT_TYPE_MOUSE_MOVE;
+          mouse_move_event.base = (event_t){
+              .type = EVENT_TYPE_MOUSE_MOVE,
+          };
+
           mouse_move_event.position.x = motion_notify_event->event_x;
           mouse_move_event.position.y = motion_notify_event->event_y;
 
           if (!window->on_event((event_t *)&mouse_move_event)) {
-            logger_error("<window:%p> <on_event> failed", window, window->on_event);
+            logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                         event_type_string(mouse_move_event.base.type));
           }
         }
 

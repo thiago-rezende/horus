@@ -8,6 +8,7 @@ horus_sources = [
   'src/logger/logger.c',
   # horus input layer
   'src/input/mouse.c',
+  'src/input/keyboard.c',
   # horus events layer
   'src/events/base.c',
 ]
@@ -20,6 +21,8 @@ if host_machine.system() == 'linux'
     'src/platform/linux/memory.c',
     'src/platform/linux/window.c',
     'src/platform/linux/console.c',
+    # horus input layer [ linux ]
+    'src/platform/linux/input/keyboard.c',
   ]
 endif
 
