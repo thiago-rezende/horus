@@ -406,10 +406,10 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
   xcb_intern_atom_cookie_t net_wm_state_cookie;
   xcb_intern_atom_cookie_t net_wm_state_fullscreen_cookie;
 
-  xcb_intern_atom_reply_t *wm_protocols_cookie_reply;
-  xcb_intern_atom_reply_t *wm_delete_window_cookie_reply;
-  xcb_intern_atom_reply_t *net_wm_state_cookie_reply;
-  xcb_intern_atom_reply_t *net_wm_state_fullscreen_cookie_reply;
+  xcb_intern_atom_reply_t *wm_protocols_cookie_reply = NULL;
+  xcb_intern_atom_reply_t *wm_delete_window_cookie_reply = NULL;
+  xcb_intern_atom_reply_t *net_wm_state_cookie_reply = NULL;
+  xcb_intern_atom_reply_t *net_wm_state_fullscreen_cookie_reply = NULL;
 
   const char *wm_protocols_name = "WM_PROTOCOLS";
   const char *wm_delete_window_name = "WM_DELETE_WINDOW";
@@ -427,6 +427,7 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
   net_wm_state_fullscreen_cookie =
       xcb_intern_atom(connection, 0, net_wm_state_fullscreen_name_length, net_wm_state_fullscreen_name);
 
+  /* TODO: proper error handling */
   wm_protocols_cookie_reply = xcb_intern_atom_reply(connection, wm_protocols_cookie, NULL);
   wm_delete_window_cookie_reply = xcb_intern_atom_reply(connection, wm_delete_window_cookie, NULL);
   net_wm_state_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_cookie, NULL);
@@ -471,7 +472,11 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
   if (xkb_use_extension_reply == NULL || xkb_use_extension_reply_error != NULL) {
     logger_critical(
         "<xcb_connection:%p> <xkb_use_extension_reply:%p> <error:%p> <code:%u> xcb_xkb_use_extension failed",
-        connection, xkb_use_extension_reply, xkb_use_extension_reply_error, xkb_use_extension_reply_error->error_code);
+        connection, xkb_use_extension_reply, xkb_use_extension_reply_error,
+        xkb_use_extension_reply_error ? xkb_use_extension_reply_error->error_code : 0);
+
+    free(xkb_use_extension_reply);
+    free(xkb_use_extension_reply_error);
 
     return false;
   }
@@ -491,7 +496,10 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
     logger_critical(
         "<xcb_connection:%p> <xcb_xkb_per_client_flags_reply:%p> <error:%p> <code:%u> xcb_xkb_per_client_flags failed",
         connection, xkb_per_client_flags_reply, xkb_per_client_flags_reply_error,
-        xkb_per_client_flags_reply_error->error_code);
+        xkb_per_client_flags_reply_error ? xkb_per_client_flags_reply_error->error_code : 0);
+
+    free(xkb_per_client_flags_reply);
+    free(xkb_per_client_flags_reply_error);
 
     return false;
   }
