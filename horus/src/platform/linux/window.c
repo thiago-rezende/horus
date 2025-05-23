@@ -166,57 +166,59 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_button_press_event_t *button_press_event = (xcb_button_press_event_t *)event;
         (void)button_press_event;
 
-        if (window->on_event) {
-          /* ignore press event for left and right mouse scroll */
-          if (button_press_event->detail == PLATFORM_MOUSE_SCROLL_LEFT_BUTTON ||
-              button_press_event->detail == PLATFORM_MOUSE_SCROLL_RIGHT_BUTTON) {
-            break;
+        /* ignore press event for left and right mouse scroll */
+        if (button_press_event->detail == PLATFORM_MOUSE_SCROLL_LEFT_BUTTON ||
+            button_press_event->detail == PLATFORM_MOUSE_SCROLL_RIGHT_BUTTON) {
+          break;
+        }
+
+        if (__platform_window_is_mouse_button_scroll(button_press_event->detail)) {
+          mouse_scroll_event_t mouse_scroll_event = {0};
+
+          mouse_scroll_event.base = (event_t){
+              .type = EVENT_TYPE_MOUSE_SCROLL,
+          };
+
+          mouse_scroll_event.direction = platform_input_mouse_scroll_direction(button_press_event->detail);
+
+          mouse_scroll_event.position.x = button_press_event->event_x;
+          mouse_scroll_event.position.y = button_press_event->event_y;
+
+          mouse_scroll_state_t mouse_scroll_state =
+              __platform_input_mouse_scroll_direction_to_state(mouse_scroll_event.direction);
+
+          if (!__platform_input_mouse_scroll_set_state(mouse_scroll_state)) {
+            logger_error("<window:%p> <state:%s> __platform_input_mouse_scroll_set_state failed", window,
+                         input_mouse_scroll_state_string(mouse_scroll_state));
           }
 
-          if (__platform_window_is_mouse_button_scroll(button_press_event->detail)) {
-            mouse_scroll_event_t mouse_scroll_event = {0};
-
-            mouse_scroll_event.base = (event_t){
-                .type = EVENT_TYPE_MOUSE_SCROLL,
-            };
-
-            mouse_scroll_event.direction = platform_input_mouse_scroll_direction(button_press_event->detail);
-
-            mouse_scroll_event.position.x = button_press_event->event_x;
-            mouse_scroll_event.position.y = button_press_event->event_y;
-
-            mouse_scroll_state_t mouse_scroll_state =
-                __platform_input_mouse_scroll_direction_to_state(mouse_scroll_event.direction);
-
-            if (!__platform_input_mouse_scroll_set_state(mouse_scroll_state)) {
-              logger_error("<window:%p> <state:%s> __platform_input_mouse_scroll_set_state failed", window,
-                           input_mouse_scroll_state_string(mouse_scroll_state));
-            }
-
+          if (window->on_event) {
             if (!window->on_event((event_t *)&mouse_scroll_event)) {
               logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
                            events_type_string(mouse_scroll_event.base.type));
             }
-
-            break;
           }
 
-          mouse_button_press_event_t mouse_button_press_event = {0};
+          break;
+        }
 
-          mouse_button_press_event.base = (event_t){
-              .type = EVENT_TYPE_MOUSE_BUTTON_PRESS,
-          };
+        mouse_button_press_event_t mouse_button_press_event = {0};
 
-          mouse_button_press_event.button = platform_input_mouse_button(button_press_event->detail);
+        mouse_button_press_event.base = (event_t){
+            .type = EVENT_TYPE_MOUSE_BUTTON_PRESS,
+        };
 
-          mouse_button_press_event.position.x = button_press_event->event_x;
-          mouse_button_press_event.position.y = button_press_event->event_y;
+        mouse_button_press_event.button = platform_input_mouse_button(button_press_event->detail);
 
-          if (!__platform_input_mouse_button_set_state(mouse_button_press_event.button, MOUSE_BUTTON_STATE_PRESSED)) {
-            logger_error("<window:%p> <state:%s> __platform_input_mouse_button_set_state failed", window,
-                         input_mouse_button_state_string(MOUSE_BUTTON_STATE_PRESSED));
-          }
+        mouse_button_press_event.position.x = button_press_event->event_x;
+        mouse_button_press_event.position.y = button_press_event->event_y;
 
+        if (!__platform_input_mouse_button_set_state(mouse_button_press_event.button, MOUSE_BUTTON_STATE_PRESSED)) {
+          logger_error("<window:%p> <state:%s> __platform_input_mouse_button_set_state failed", window,
+                       input_mouse_button_state_string(MOUSE_BUTTON_STATE_PRESSED));
+        }
+
+        if (window->on_event) {
           if (!window->on_event((event_t *)&mouse_button_press_event)) {
             logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
                          events_type_string(mouse_button_press_event.base.type));
@@ -230,33 +232,32 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_button_release_event_t *button_release_event = (xcb_button_release_event_t *)event;
         (void)button_release_event;
 
+        if (__platform_window_is_mouse_button_scroll(button_release_event->detail)) {
+          if (!__platform_input_mouse_scroll_set_state(MOUSE_SCROLL_STATE_NONE)) {
+            logger_error("<window:%p> <state:%s> __platform_input_mouse_scroll_set_state failed", window,
+                         input_mouse_scroll_state_string(MOUSE_SCROLL_STATE_NONE));
+          }
+
+          break;
+        }
+
+        mouse_button_release_event_t mouse_button_release_event = {0};
+
+        mouse_button_release_event.base = (event_t){
+            .type = EVENT_TYPE_MOUSE_BUTTON_RELEASE,
+        };
+
+        mouse_button_release_event.button = platform_input_mouse_button(button_release_event->detail);
+
+        mouse_button_release_event.position.x = button_release_event->event_x;
+        mouse_button_release_event.position.y = button_release_event->event_y;
+
+        if (!__platform_input_mouse_button_set_state(mouse_button_release_event.button, MOUSE_BUTTON_STATE_RELEASED)) {
+          logger_error("<window:%p> <state:%s> __platform_input_mouse_button_set_state failed", window,
+                       input_mouse_button_state_string(MOUSE_BUTTON_STATE_RELEASED));
+        }
+
         if (window->on_event) {
-          if (__platform_window_is_mouse_button_scroll(button_release_event->detail)) {
-            if (!__platform_input_mouse_scroll_set_state(MOUSE_SCROLL_STATE_NONE)) {
-              logger_error("<window:%p> <state:%s> __platform_input_mouse_scroll_set_state failed", window,
-                           input_mouse_scroll_state_string(MOUSE_SCROLL_STATE_NONE));
-            }
-
-            break;
-          }
-
-          mouse_button_release_event_t mouse_button_release_event = {0};
-
-          mouse_button_release_event.base = (event_t){
-              .type = EVENT_TYPE_MOUSE_BUTTON_RELEASE,
-          };
-
-          mouse_button_release_event.button = platform_input_mouse_button(button_release_event->detail);
-
-          mouse_button_release_event.position.x = button_release_event->event_x;
-          mouse_button_release_event.position.y = button_release_event->event_y;
-
-          if (!__platform_input_mouse_button_set_state(mouse_button_release_event.button,
-                                                       MOUSE_BUTTON_STATE_RELEASED)) {
-            logger_error("<window:%p> <state:%s> __platform_input_mouse_button_set_state failed", window,
-                         input_mouse_button_state_string(MOUSE_BUTTON_STATE_RELEASED));
-          }
-
           if (!window->on_event((event_t *)&mouse_button_release_event)) {
             logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
                          events_type_string(mouse_button_release_event.base.type));
@@ -270,15 +271,15 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)event;
         (void)key_press_event;
 
+        keyboard_press_event_t keyboard_press_event = {0};
+
+        keyboard_press_event.base = (event_t){
+            .type = EVENT_TYPE_KEYBOARD_PRESS,
+        };
+
+        keyboard_press_event.keycode = platform_input_keyboard_keycode(key_press_event->detail);
+
         if (window->on_event) {
-          keyboard_press_event_t keyboard_press_event = {0};
-
-          keyboard_press_event.base = (event_t){
-              .type = EVENT_TYPE_KEYBOARD_PRESS,
-          };
-
-          keyboard_press_event.keycode = platform_input_keyboard_keycode(key_press_event->detail);
-
           if (!window->on_event((event_t *)&keyboard_press_event)) {
             logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
                          events_type_string(keyboard_press_event.base.type));
@@ -292,15 +293,15 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_key_release_event_t *key_release_event = (xcb_key_release_event_t *)event;
         (void)key_release_event;
 
+        keyboard_release_event_t keyboard_release_event = {0};
+
+        keyboard_release_event.base = (event_t){
+            .type = EVENT_TYPE_KEYBOARD_RELEASE,
+        };
+
+        keyboard_release_event.keycode = platform_input_keyboard_keycode(key_release_event->detail);
+
         if (window->on_event) {
-          keyboard_release_event_t keyboard_release_event = {0};
-
-          keyboard_release_event.base = (event_t){
-              .type = EVENT_TYPE_KEYBOARD_RELEASE,
-          };
-
-          keyboard_release_event.keycode = platform_input_keyboard_keycode(key_release_event->detail);
-
           if (!window->on_event((event_t *)&keyboard_release_event)) {
             logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
                          events_type_string(keyboard_release_event.base.type));
@@ -328,16 +329,16 @@ void platform_window_process_events(platform_window_t *window) {
         xcb_motion_notify_event_t *motion_notify_event = (xcb_motion_notify_event_t *)event;
         (void)motion_notify_event;
 
+        mouse_move_event_t mouse_move_event = {0};
+
+        mouse_move_event.base = (event_t){
+            .type = EVENT_TYPE_MOUSE_MOVE,
+        };
+
+        mouse_move_event.position.x = motion_notify_event->event_x;
+        mouse_move_event.position.y = motion_notify_event->event_y;
+
         if (window->on_event) {
-          mouse_move_event_t mouse_move_event = {0};
-
-          mouse_move_event.base = (event_t){
-              .type = EVENT_TYPE_MOUSE_MOVE,
-          };
-
-          mouse_move_event.position.x = motion_notify_event->event_x;
-          mouse_move_event.position.y = motion_notify_event->event_y;
-
           if (!window->on_event((event_t *)&mouse_move_event)) {
             logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
                          events_type_string(mouse_move_event.base.type));
