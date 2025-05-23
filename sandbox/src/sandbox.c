@@ -60,26 +60,22 @@ b8 on_event(event_t *event) {
   if (event->type == EVENT_TYPE_KEYBOARD_PRESS) {
     keyboard_press_event_t *keyboard_press_event = (keyboard_press_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_press_event,
-                 events_type_string(event->type), input_keyboard_keycode_string(keyboard_press_event->keycode),
-                 input_keyboard_keysymbol_string(keyboard_press_event->keysymbol));
+    logger_debug("<event:%p> <type:%s> <keycode:%s>", keyboard_press_event, events_type_string(event->type),
+                 input_keyboard_keycode_string(keyboard_press_event->keycode));
   }
 
   if (event->type == EVENT_TYPE_KEYBOARD_RELEASE) {
     keyboard_release_event_t *keyboard_release_event = (keyboard_release_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_release_event,
-                 events_type_string(event->type), input_keyboard_keycode_string(keyboard_release_event->keycode),
-                 input_keyboard_keysymbol_string(keyboard_release_event->keysymbol));
+    logger_debug("<event:%p> <type:%s> <keycode:%s>", keyboard_release_event, events_type_string(event->type),
+                 input_keyboard_keycode_string(keyboard_release_event->keycode));
   }
 
   if (event->type == EVENT_TYPE_KEYBOARD_HOLD) {
     keyboard_hold_event_t *keyboard_hold_event = (keyboard_hold_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <keycode:%s> <keysymbol:%s>", keyboard_hold_event,
-                 events_type_string(event->type), keyboard_hold_event->keycode,
-                 input_keyboard_keycode_string(keyboard_hold_event->keycode),
-                 input_keyboard_keysymbol_string(keyboard_hold_event->keysymbol));
+    logger_debug("<event:%p> <type:%s> <keycode:%s>", keyboard_hold_event, events_type_string(event->type),
+                 keyboard_hold_event->keycode, input_keyboard_keycode_string(keyboard_hold_event->keycode));
   }
 
   return true;

@@ -265,7 +265,3 @@ static const keyboard_keycode_t platform_input_keyboard_keycode_mapping[PLATFORM
 keyboard_keycode_t platform_input_keyboard_keycode(xcb_keycode_t keycode) {
   return platform_input_keyboard_keycode_mapping[keycode];
 }
-
-keyboard_keysymbol_t platform_input_keyboard_keysymbol(xcb_keysym_t keysymbol) {
-  return KEYBOARD_KEYSYMBOL_NONE;
-}

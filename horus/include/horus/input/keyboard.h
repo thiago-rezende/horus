@@ -128,12 +128,4 @@ typedef enum __keyboard_keycode {
   KEYBOARD_KEYCODE_COUNT,
 } keyboard_keycode_t;
 
-typedef enum __keyboard_keysymbol {
-  KEYBOARD_KEYSYMBOL_NONE = 0,
-  KEYBOARD_KEYSYMBOL_A,
-  KEYBOARD_KEYSYMBOL_B,
-  KEYBOARD_KEYSYMBOL_COUNT,
-} keyboard_keysymbol_t;
-
 const char *input_keyboard_keycode_string(keyboard_keycode_t keycode);
-const char *input_keyboard_keysymbol_string(keyboard_keysymbol_t keysymbol);

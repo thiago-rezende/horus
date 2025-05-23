@@ -120,23 +120,9 @@ static const char *keyboard_keycode_strings[KEYBOARD_KEYCODE_COUNT] = {
     [KEYBOARD_KEYCODE_APOSTROPHE] = "apostrophe",
 };
 
-static const char *keyboard_keysymbol_strings[KEYBOARD_KEYSYMBOL_COUNT] = {
-    [KEYBOARD_KEYSYMBOL_NONE] = "none",
-    [KEYBOARD_KEYSYMBOL_A] = "a",
-    [KEYBOARD_KEYSYMBOL_B] = "b",
-};
-
 const char *input_keyboard_keycode_string(keyboard_keycode_t keycode) {
   if (keycode < KEYBOARD_KEYCODE_COUNT && keycode >= KEYBOARD_KEYCODE_NONE) {
     return keyboard_keycode_strings[keycode];
-  }
-
-  return "unknown";
-}
-
-const char *input_keyboard_keysymbol_string(keyboard_keysymbol_t keysymbol) {
-  if (keysymbol < KEYBOARD_KEYSYMBOL_COUNT && keysymbol >= KEYBOARD_KEYSYMBOL_NONE) {
-    return keyboard_keysymbol_strings[keysymbol];
   }
 
   return "unknown";
