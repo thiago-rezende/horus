@@ -38,12 +38,18 @@ horus_dependencies = [
 
 # horus dependencies [ linux ]
 if host_machine.system() == 'linux'
+  # horus window dependencies [ linux ]
   xcb_dep = dependency('xcb')
+  xcb_xkb_dep = dependency('xcb-xkb')
 
+  # horus renderer dependencies [ linux ]
   vulkan_dep = dependency('vulkan')
 
   horus_dependencies += [
+    # horus window dependencies [ linux ]
     xcb_dep,
+    xcb_xkb_dep,
+    # horus renderer dependencies [ linux ]
     vulkan_dep,
   ]
 endif

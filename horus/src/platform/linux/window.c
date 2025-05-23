@@ -2,11 +2,13 @@
 #include <stdlib.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xkb.h>
 
 /* horus base layer */
 #include <horus/definitions.h>
 
 /* horus core layer */
+#include <horus/core/assert.h>
 #include <horus/core/strings.h>
 
 /* horus events layer */
@@ -50,54 +52,10 @@ struct __platform_window {
   platform_window_event_callback_t on_event;
 };
 
-b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
-  xcb_intern_atom_cookie_t wm_protocols_cookie;
-  xcb_intern_atom_cookie_t wm_delete_window_cookie;
-  xcb_intern_atom_cookie_t net_wm_state_cookie;
-  xcb_intern_atom_cookie_t net_wm_state_fullscreen_cookie;
+b8 __platform_window_fetch_atoms(xcb_connection_t *connection);
 
-  xcb_intern_atom_reply_t *wm_protocols_cookie_reply;
-  xcb_intern_atom_reply_t *wm_delete_window_cookie_reply;
-  xcb_intern_atom_reply_t *net_wm_state_cookie_reply;
-  xcb_intern_atom_reply_t *net_wm_state_fullscreen_cookie_reply;
-
-  const char *wm_protocols_name = "WM_PROTOCOLS";
-  const char *wm_delete_window_name = "WM_DELETE_WINDOW";
-  const char *net_wm_state_name = "_NET_WM_STATE";
-  const char *net_wm_state_fullscreen_name = "_NET_WM_STATE_FULLSCREEN";
-
-  u64 wm_protocols_name_length = string_length((char *)wm_protocols_name);
-  u64 wm_delete_window_name_length = string_length((char *)wm_delete_window_name);
-  u64 net_wm_state_name_length = string_length((char *)net_wm_state_name);
-  u64 net_wm_state_fullscreen_name_length = string_length((char *)net_wm_state_fullscreen_name);
-
-  wm_protocols_cookie = xcb_intern_atom(connection, 0, wm_protocols_name_length, wm_protocols_name);
-  wm_delete_window_cookie = xcb_intern_atom(connection, 0, wm_delete_window_name_length, wm_delete_window_name);
-  net_wm_state_cookie = xcb_intern_atom(connection, 0, net_wm_state_name_length, net_wm_state_name);
-  net_wm_state_fullscreen_cookie =
-      xcb_intern_atom(connection, 0, net_wm_state_fullscreen_name_length, net_wm_state_fullscreen_name);
-
-  wm_protocols_cookie_reply = xcb_intern_atom_reply(connection, wm_protocols_cookie, NULL);
-  wm_delete_window_cookie_reply = xcb_intern_atom_reply(connection, wm_delete_window_cookie, NULL);
-  net_wm_state_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_cookie, NULL);
-  net_wm_state_fullscreen_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_fullscreen_cookie, NULL);
-
-  global_platform_window_atoms = (platform_window_atoms_t){
-      .WM_PROTOCOLS = wm_protocols_cookie_reply->atom,
-      .WM_DELETE_WINDOW = wm_delete_window_cookie_reply->atom,
-      ._NET_WM_STATE = net_wm_state_cookie_reply->atom,
-      ._NET_WM_STATE_ADD = 1,
-      ._NET_WM_STATE_REMOVE = 0,
-      ._NET_WM_STATE_FULLSCREEN = net_wm_state_fullscreen_cookie_reply->atom,
-  };
-
-  free(wm_protocols_cookie_reply);
-  free(wm_delete_window_cookie_reply);
-  free(net_wm_state_cookie_reply);
-  free(net_wm_state_fullscreen_cookie_reply);
-
-  return true;
-}
+b8 __platform_window_setup_extensions(xcb_connection_t *connection);
+b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection);
 
 platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 fullscreen) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
@@ -107,6 +65,8 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
   window->connection = xcb_connect(NULL, NULL);
 
   logger_debug("<window:%p> <xcb_connection:%p> connected", window, window->connection);
+
+  __platform_window_setup_extensions(window->connection);
 
   const xcb_setup_t *screen_setup = xcb_get_setup(window->connection);
   xcb_screen_iterator_t screen_iterator = xcb_setup_roots_iterator(screen_setup);
@@ -436,6 +396,108 @@ b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
 
 b8 platform_window_set_event_callback(platform_window_t *window, platform_window_event_callback_t callback) {
   window->on_event = callback;
+
+  return true;
+}
+
+b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
+  xcb_intern_atom_cookie_t wm_protocols_cookie;
+  xcb_intern_atom_cookie_t wm_delete_window_cookie;
+  xcb_intern_atom_cookie_t net_wm_state_cookie;
+  xcb_intern_atom_cookie_t net_wm_state_fullscreen_cookie;
+
+  xcb_intern_atom_reply_t *wm_protocols_cookie_reply;
+  xcb_intern_atom_reply_t *wm_delete_window_cookie_reply;
+  xcb_intern_atom_reply_t *net_wm_state_cookie_reply;
+  xcb_intern_atom_reply_t *net_wm_state_fullscreen_cookie_reply;
+
+  const char *wm_protocols_name = "WM_PROTOCOLS";
+  const char *wm_delete_window_name = "WM_DELETE_WINDOW";
+  const char *net_wm_state_name = "_NET_WM_STATE";
+  const char *net_wm_state_fullscreen_name = "_NET_WM_STATE_FULLSCREEN";
+
+  u64 wm_protocols_name_length = string_length((char *)wm_protocols_name);
+  u64 wm_delete_window_name_length = string_length((char *)wm_delete_window_name);
+  u64 net_wm_state_name_length = string_length((char *)net_wm_state_name);
+  u64 net_wm_state_fullscreen_name_length = string_length((char *)net_wm_state_fullscreen_name);
+
+  wm_protocols_cookie = xcb_intern_atom(connection, 0, wm_protocols_name_length, wm_protocols_name);
+  wm_delete_window_cookie = xcb_intern_atom(connection, 0, wm_delete_window_name_length, wm_delete_window_name);
+  net_wm_state_cookie = xcb_intern_atom(connection, 0, net_wm_state_name_length, net_wm_state_name);
+  net_wm_state_fullscreen_cookie =
+      xcb_intern_atom(connection, 0, net_wm_state_fullscreen_name_length, net_wm_state_fullscreen_name);
+
+  wm_protocols_cookie_reply = xcb_intern_atom_reply(connection, wm_protocols_cookie, NULL);
+  wm_delete_window_cookie_reply = xcb_intern_atom_reply(connection, wm_delete_window_cookie, NULL);
+  net_wm_state_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_cookie, NULL);
+  net_wm_state_fullscreen_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_fullscreen_cookie, NULL);
+
+  global_platform_window_atoms = (platform_window_atoms_t){
+      .WM_PROTOCOLS = wm_protocols_cookie_reply->atom,
+      .WM_DELETE_WINDOW = wm_delete_window_cookie_reply->atom,
+      ._NET_WM_STATE = net_wm_state_cookie_reply->atom,
+      ._NET_WM_STATE_ADD = 1,
+      ._NET_WM_STATE_REMOVE = 0,
+      ._NET_WM_STATE_FULLSCREEN = net_wm_state_fullscreen_cookie_reply->atom,
+  };
+
+  free(wm_protocols_cookie_reply);
+  free(wm_delete_window_cookie_reply);
+  free(net_wm_state_cookie_reply);
+  free(net_wm_state_fullscreen_cookie_reply);
+
+  return true;
+}
+
+b8 __platform_window_setup_extensions(xcb_connection_t *connection) {
+  u8 setup_xkb_extension_result = __platform_window_setup_xkb_extension(connection);
+
+  assert_message(setup_xkb_extension_result == true,
+                 "<xcb_connection:%p> <setup_xkb_extension_result:%u> xcb_xkb_use_extension failed", connection,
+                 setup_xkb_extension_result);
+
+  return true;
+}
+
+b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
+  xcb_xkb_use_extension_cookie_t xkb_use_extension_cookie =
+      xcb_xkb_use_extension(connection, XCB_XKB_MAJOR_VERSION, XCB_XKB_MINOR_VERSION);
+
+  xcb_generic_error_t *xkb_use_extension_reply_error = NULL;
+
+  xcb_xkb_use_extension_reply_t *xkb_use_extension_reply =
+      xcb_xkb_use_extension_reply(connection, xkb_use_extension_cookie, &xkb_use_extension_reply_error);
+
+  if (xkb_use_extension_reply == NULL || xkb_use_extension_reply_error != NULL) {
+    logger_critical(
+        "<xcb_connection:%p> <xkb_use_extension_reply:%p> <error:%p> <code:%u> xcb_xkb_use_extension failed",
+        connection, xkb_use_extension_reply, xkb_use_extension_reply_error, xkb_use_extension_reply_error->error_code);
+
+    return false;
+  }
+
+  free(xkb_use_extension_reply);
+  free(xkb_use_extension_reply_error);
+
+  xcb_xkb_per_client_flags_cookie_t xcb_xkb_per_client_flags_cookie = xcb_xkb_per_client_flags(
+      connection, XCB_XKB_ID_USE_CORE_KBD, XCB_XKB_PER_CLIENT_FLAG_DETECTABLE_AUTO_REPEAT, 1, 0, 0, 0);
+
+  xcb_generic_error_t *xkb_per_client_flags_reply_error = NULL;
+
+  xcb_xkb_per_client_flags_reply_t *xkb_per_client_flags_reply =
+      xcb_xkb_per_client_flags_reply(connection, xcb_xkb_per_client_flags_cookie, &xkb_per_client_flags_reply_error);
+
+  if (xkb_per_client_flags_reply == NULL || xkb_per_client_flags_reply_error != NULL) {
+    logger_critical(
+        "<xcb_connection:%p> <xcb_xkb_per_client_flags_reply:%p> <error:%p> <code:%u> xcb_xkb_per_client_flags failed",
+        connection, xkb_per_client_flags_reply, xkb_per_client_flags_reply_error,
+        xkb_per_client_flags_reply_error->error_code);
+
+    return false;
+  }
+
+  free(xkb_per_client_flags_reply);
+  free(xkb_per_client_flags_reply_error);
 
   return true;
 }
