@@ -1,6 +1,15 @@
 /* horus input layer */
 #include <horus/input/keyboard.h>
 
+/* horus platform layer */
+#include <horus/platform/detection.h>
+
+#if defined(HORUS_PLATFORM_LINUX)
+
+#include <horus/platform/linux/input/keyboard.h>
+
+#endif
+
 static const char *keyboard_keycode_strings[KEYBOARD_KEYCODE_COUNT] = {
     [KEYBOARD_KEYCODE_NONE] = "none",
 
@@ -120,10 +129,41 @@ static const char *keyboard_keycode_strings[KEYBOARD_KEYCODE_COUNT] = {
     [KEYBOARD_KEYCODE_APOSTROPHE] = "apostrophe",
 };
 
+const char *keyboard_keycode_state_strings[KEYBOARD_KEYCODE_STATE_COUNT] = {
+    [KEYBOARD_KEYCODE_STATE_NONE] = "none",
+    [KEYBOARD_KEYCODE_STATE_HELD] = "held",
+    [KEYBOARD_KEYCODE_STATE_PRESSED] = "pressed",
+    [KEYBOARD_KEYCODE_STATE_RELEASED] = "released",
+};
+
 const char *input_keyboard_keycode_string(keyboard_keycode_t keycode) {
   if (keycode < KEYBOARD_KEYCODE_COUNT && keycode >= KEYBOARD_KEYCODE_NONE) {
     return keyboard_keycode_strings[keycode];
   }
 
   return "unknown";
+}
+
+const char *input_keyboard_keycode_state_string(keyboard_keycode_state_t state) {
+  if (state < KEYBOARD_KEYCODE_STATE_COUNT && state >= KEYBOARD_KEYCODE_STATE_NONE) {
+    return keyboard_keycode_state_strings[state];
+  }
+
+  return "unknown";
+}
+
+b8 input_keyboard_keycode_is_held(keyboard_keycode_t keycode) {
+  return platform_input_keyboard_keycode_is_held(keycode);
+}
+
+b8 input_keyboard_keycode_is_pressed(keyboard_keycode_t keycode) {
+  return platform_input_keyboard_keycode_is_pressed(keycode);
+}
+
+b8 input_keyboard_keycode_is_released(keyboard_keycode_t keycode) {
+  return platform_input_keyboard_keycode_is_released(keycode);
+}
+
+keyboard_keycode_state_t input_keyboard_keycode_state(keyboard_keycode_t keycode) {
+  return platform_input_keyboard_keycode_state(keycode);
 }

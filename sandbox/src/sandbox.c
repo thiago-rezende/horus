@@ -82,6 +82,21 @@ b8 on_event(event_t *event) {
 }
 
 b8 on_update(f64 timestep) {
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_ESCAPE)) {
+    logger_debug("<on_update> <timestep:%f> <keycode:%s> is pressed", timestep,
+                 input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));
+  }
+
+  if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_ESCAPE)) {
+    logger_debug("<on_update> <timestep:%f> <keycode:%s> is released", timestep,
+                 input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));
+  }
+
+  if (input_keyboard_keycode_is_held(KEYBOARD_KEYCODE_ESCAPE)) {
+    logger_debug("<on_update> <timestep:%f> <keycode:%s> is held", timestep,
+                 input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));
+  }
+
   if (input_mouse_button_is_pressed(MOUSE_BUTTON_LEFT)) {
     logger_debug("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
                  input_mouse_button_string(MOUSE_BUTTON_LEFT));

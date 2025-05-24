@@ -152,6 +152,7 @@ void platform_window_process_events(platform_window_t *window) {
 
   __platform_input_mouse_button_clear_state();
   __platform_input_mouse_scroll_clear_state();
+  __platform_input_keyboard_keycode_clear_state();
 
   while ((event = xcb_poll_for_event(window->connection))) {
     switch (event->response_type & ~0x80) {
@@ -279,6 +280,14 @@ void platform_window_process_events(platform_window_t *window) {
 
         keyboard_press_event.keycode = platform_input_keyboard_keycode(key_press_event->detail);
 
+        keyboard_keycode_state_t keyboard_keycode_state =
+            __platform_input_keyboard_keycode_pressed_state(keyboard_press_event.keycode);
+
+        if (!__platform_input_keyboard_keycode_set_state(keyboard_press_event.keycode, keyboard_keycode_state)) {
+          logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
+                       input_keyboard_keycode_state_string(keyboard_keycode_state));
+        }
+
         if (window->on_event) {
           if (!window->on_event((event_t *)&keyboard_press_event)) {
             logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
@@ -300,6 +309,12 @@ void platform_window_process_events(platform_window_t *window) {
         };
 
         keyboard_release_event.keycode = platform_input_keyboard_keycode(key_release_event->detail);
+
+        if (!__platform_input_keyboard_keycode_set_state(keyboard_release_event.keycode,
+                                                         KEYBOARD_KEYCODE_STATE_RELEASED)) {
+          logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
+                       input_keyboard_keycode_state_string(KEYBOARD_KEYCODE_STATE_RELEASED));
+        }
 
         if (window->on_event) {
           if (!window->on_event((event_t *)&keyboard_release_event)) {

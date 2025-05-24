@@ -128,4 +128,20 @@ typedef enum __keyboard_keycode {
   KEYBOARD_KEYCODE_COUNT,
 } keyboard_keycode_t;
 
+typedef enum __keyboard_keycode_state {
+  KEYBOARD_KEYCODE_STATE_NONE = 0,
+  KEYBOARD_KEYCODE_STATE_HELD,
+  KEYBOARD_KEYCODE_STATE_PRESSED,
+  KEYBOARD_KEYCODE_STATE_RELEASED,
+  KEYBOARD_KEYCODE_STATE_COUNT,
+} keyboard_keycode_state_t;
+
 const char *input_keyboard_keycode_string(keyboard_keycode_t keycode);
+
+const char *input_keyboard_keycode_state_string(keyboard_keycode_state_t state);
+
+b8 input_keyboard_keycode_is_held(keyboard_keycode_t keycode);
+b8 input_keyboard_keycode_is_pressed(keyboard_keycode_t keycode);
+b8 input_keyboard_keycode_is_released(keyboard_keycode_t keycode);
+
+keyboard_keycode_state_t input_keyboard_keycode_state(keyboard_keycode_t keycode);

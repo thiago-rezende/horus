@@ -593,10 +593,10 @@ b8 __platform_input_mouse_button_set_state(mouse_button_t button, mouse_button_s
 }
 
 b8 __platform_input_mouse_button_clear_state() {
-  for (size_t i = 0; i < MOUSE_BUTTON_COUNT; ++i) {
-    __platform_input_mouse_button_states[i] = __platform_input_mouse_button_states[i] == MOUSE_BUTTON_STATE_RELEASED
-                                                  ? MOUSE_BUTTON_STATE_NONE
-                                                  : __platform_input_mouse_button_states[i];
+  for (mouse_button_t button = MOUSE_BUTTON_NONE; button < MOUSE_BUTTON_COUNT; ++button) {
+    if (__platform_input_mouse_button_states[button] == MOUSE_BUTTON_STATE_RELEASED) {
+      __platform_input_mouse_button_states[button] = MOUSE_BUTTON_STATE_NONE;
+    }
   }
 
   return true;
