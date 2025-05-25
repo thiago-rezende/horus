@@ -21,6 +21,12 @@ int main(int argc, char **argv, char **envp) {
 
   application_t *application = application_create();
 
+  if (!application) {
+    logger_critical("<application:%p> creation failed", application);
+
+    return 1;
+  }
+
   logger_info("<application:%p> <name:%s> created", application, application->name);
 
   configuration_t *configuration = &application->configuration;
@@ -71,7 +77,11 @@ int main(int argc, char **argv, char **envp) {
 
   logger_info("<window:%p> destroyed", window);
 
-  application_destroy(application);
+  if (!application_destroy(application)) {
+    logger_critical("<application:%p> destruction failed", application);
+
+    return 1;
+  }
 
   logger_info("<application:%p> destroyed", application);
 
