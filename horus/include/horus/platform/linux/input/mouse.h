@@ -26,4 +26,5 @@ b8 __platform_input_mouse_scroll_clear_state();
 
 mouse_scroll_state_t __platform_input_mouse_scroll_state();
 mouse_button_state_t __platform_input_mouse_button_state(mouse_button_t button);
+
 mouse_scroll_state_t __platform_input_mouse_scroll_direction_to_state(mouse_scroll_direction_t direction);

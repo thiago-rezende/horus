@@ -11,30 +11,30 @@
 #endif
 
 static const char *mouse_button_strings[MOUSE_BUTTON_COUNT] = {
-    [MOUSE_BUTTON_NONE] = "none",                   /* */
-    [MOUSE_BUTTON_LEFT] = "left",                   /* */
-    [MOUSE_BUTTON_RIGHT] = "right",                 /* */
-    [MOUSE_BUTTON_MIDDLE] = "middle",               /* */
-    [MOUSE_BUTTON_SIDE_FORWARD] = "side_forward",   /* */
-    [MOUSE_BUTTON_SIDE_BACKWARD] = "side_backward", /* */
+    [MOUSE_BUTTON_NONE] = "none",
+    [MOUSE_BUTTON_LEFT] = "left",
+    [MOUSE_BUTTON_RIGHT] = "right",
+    [MOUSE_BUTTON_MIDDLE] = "middle",
+    [MOUSE_BUTTON_SIDE_FORWARD] = "side_forward",
+    [MOUSE_BUTTON_SIDE_BACKWARD] = "side_backward",
 };
 
 static const char *mouse_button_state_strings[MOUSE_BUTTON_STATE_COUNT] = {
-    [MOUSE_BUTTON_STATE_NONE] = "none",         /* */
-    [MOUSE_BUTTON_STATE_PRESSED] = "pressed",   /* */
-    [MOUSE_BUTTON_STATE_RELEASED] = "released", /* */
+    [MOUSE_BUTTON_STATE_NONE] = "none",
+    [MOUSE_BUTTON_STATE_PRESSED] = "pressed",
+    [MOUSE_BUTTON_STATE_RELEASED] = "released",
 };
 
 const char *mouse_scroll_direction_strings[MOUSE_SCROLL_DIRECTION_COUNT] = {
-    [MOUSE_SCROLL_DIRECTION_NONE] = "none", /* */
-    [MOUSE_SCROLL_DIRECTION_UP] = "up",     /* */
-    [MOUSE_SCROLL_DIRECTION_DOWN] = "down", /* */
+    [MOUSE_SCROLL_DIRECTION_NONE] = "none",
+    [MOUSE_SCROLL_DIRECTION_UP] = "up",
+    [MOUSE_SCROLL_DIRECTION_DOWN] = "down",
 };
 
 static const char *mouse_scroll_state_strings[MOUSE_SCROLL_STATE_COUNT] = {
-    [MOUSE_SCROLL_STATE_NONE] = "none", /* */
-    [MOUSE_SCROLL_STATE_UP] = "up",     /* */
-    [MOUSE_SCROLL_STATE_DOWN] = "down", /* */
+    [MOUSE_SCROLL_STATE_NONE] = "none",
+    [MOUSE_SCROLL_STATE_UP] = "up",
+    [MOUSE_SCROLL_STATE_DOWN] = "down",
 };
 
 const char *input_mouse_button_string(mouse_button_t button) {

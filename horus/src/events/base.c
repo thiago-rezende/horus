@@ -3,14 +3,17 @@
 
 static const char *event_type_strings[EVENT_TYPE_COUNT] = {
     [EVENT_TYPE_NONE] = "none",
+
     /* window events */
     [EVENT_TYPE_WINDOW_CLOSE] = "window_close",
     [EVENT_TYPE_WINDOW_RESIZE] = "window_resize",
     [EVENT_TYPE_WINDOW_FOCUS] = "window_focus",
     [EVENT_TYPE_WINDOW_FOCUS_LOSS] = "window_focus_loss",
+
     /* keyboard events */
     [EVENT_TYPE_KEYBOARD_PRESS] = "keyboard_press",
     [EVENT_TYPE_KEYBOARD_RELEASE] = "keyboard_release",
+
     /* mouse events */
     [EVENT_TYPE_MOUSE_MOVE] = "mouse_move",
     [EVENT_TYPE_MOUSE_SCROLL] = "mouse_scroll",

@@ -1,10 +1,10 @@
 #pragma once
 
-/* horus input layer */
-#include <horus/input/keyboard.h>
-
 /* horus events layer */
 #include <horus/events/base.h>
+
+/* horus input layer */
+#include <horus/input/keyboard.h>
 
 typedef struct __keyboard_press_event {
   event_t base;
