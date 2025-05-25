@@ -12,14 +12,20 @@ void *platform_memory_reallocate(void *data, u64 size) {
   return realloc(data, size);
 }
 
-void platform_memory_deallocate(void *data) {
+b8 platform_memory_deallocate(void *data) {
   free(data);
+
+  return true;
 }
 
-void platform_memory_clear(void *data, u64 size) {
+b8 platform_memory_clear(void *data, u64 size) {
   memset(data, 0, size);
+
+  return true;
 }
 
-void platform_memory_copy(void *target, void *data, u64 size) {
+b8 platform_memory_copy(void *target, void *data, u64 size) {
   memcpy(target, data, size);
+
+  return true;
 }

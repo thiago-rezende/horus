@@ -22,7 +22,7 @@ static const u8 prefix_size = 13 + ansi_size * 2;
 static const u16 buffer_size = 1024;
 static const u32 total_buffer_size = prefix_size + buffer_size;
 
-void __logger_general(logger_level_t level, const char *message, ...) {
+b8 __logger_general(logger_level_t level, const char *message, ...) {
   va_list args;
 
   char buffer[total_buffer_size];
@@ -41,8 +41,8 @@ void __logger_general(logger_level_t level, const char *message, ...) {
   buffer[written < total_buffer_size ? written : total_buffer_size - 1] = '\n';
 
   if (level <= LOGGER_LEVEL_ERROR) {
-    platform_console_write_error(buffer);
-  } else {
-    platform_console_write(buffer);
+    return platform_console_write_error(buffer);
   }
+
+  return platform_console_write(buffer);
 }

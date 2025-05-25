@@ -5,4 +5,4 @@
 
 f64 platform_absolute_time();
 
-void platform_sleep(u64 ms);
+b8 platform_sleep(u64 ms);

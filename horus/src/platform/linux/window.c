@@ -48,8 +48,7 @@ struct __platform_window {
   xcb_screen_t *screen;
   xcb_window_t window;
 
-  u16 width;
-  u16 height;
+  platform_window_size_t size;
 
   b8 fullscreen;
   b8 has_focus;
@@ -65,7 +64,7 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection);
 
 b8 __platform_window_is_mouse_button_scroll(xcb_button_t button);
 
-platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8 fullscreen) {
+platform_window_t *platform_window_create(char *title, platform_window_size_t size, b8 fullscreen) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
 
   window->on_event = NULL;
@@ -97,7 +96,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
                     window->window,                /* window identifier */
                     window->screen->root,          /* parent window */
                     0, 0,                          /* x, y */
-                    width, height,                 /* width, height */
+                    size.width, size.height,       /* width, height */
                     0,                             /* border width */
                     XCB_WINDOW_CLASS_INPUT_OUTPUT, /* window class */
                     window->screen->root_visual,   /* window visual */
@@ -124,8 +123,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
 
   xcb_flush(window->connection);
 
-  window->width = width;
-  window->height = height;
+  window->size = size;
   window->fullscreen = fullscreen;
   window->has_focus = false;
   window->should_close = false;
@@ -135,7 +133,7 @@ platform_window_t *platform_window_create(char *title, u16 width, u16 height, b8
   return window;
 }
 
-void platform_window_destroy(platform_window_t *window) {
+b8 platform_window_destroy(platform_window_t *window) {
   xcb_destroy_window(window->connection, window->window);
 
   logger_debug("<window:%p> <xcb_window:%lu> destroyed", window, window->window);
@@ -145,9 +143,11 @@ void platform_window_destroy(platform_window_t *window) {
   logger_debug("<window:%p> <xcb_connection:%p> disconnected", window, window->connection);
 
   platform_memory_deallocate(window);
+
+  return true;
 }
 
-void platform_window_process_events(platform_window_t *window) {
+b8 platform_window_process_events(platform_window_t *window) {
   xcb_generic_event_t *event = NULL;
 
   __platform_input_mouse_button_clear_state();
@@ -397,9 +397,10 @@ void platform_window_process_events(platform_window_t *window) {
       case XCB_CONFIGURE_NOTIFY: {
         xcb_configure_notify_event_t *configure_notify_event = (xcb_configure_notify_event_t *)event;
 
-        if (configure_notify_event->width != window->width || configure_notify_event->height != window->height) {
-          window->width = configure_notify_event->width;
-          window->height = configure_notify_event->height;
+        if (configure_notify_event->width != window->size.width ||
+            configure_notify_event->height != window->size.height) {
+          window->size.width = configure_notify_event->width;
+          window->size.height = configure_notify_event->height;
         }
 
         break;
@@ -418,6 +419,8 @@ void platform_window_process_events(platform_window_t *window) {
 
     free(event);
   }
+
+  return true;
 }
 
 b8 platform_window_should_close(platform_window_t *window) {
@@ -428,18 +431,17 @@ b8 platform_window_has_focus(platform_window_t *window) {
   return window->has_focus;
 }
 
-void platform_window_size(platform_window_t *window, u16 *width, u16 *height) {
-  *width = window->width;
-  *height = window->height;
+platform_window_size_t platform_window_size(platform_window_t *window) {
+  return window->size;
 }
 
-b8 platform_window_set_size(platform_window_t *window, u16 width, u16 height) {
+b8 platform_window_set_size(platform_window_t *window, platform_window_size_t size) {
   u16 mask = 0;
 
   mask |= XCB_CONFIG_WINDOW_WIDTH;
   mask |= XCB_CONFIG_WINDOW_HEIGHT;
 
-  u32 values[] = {width, height};
+  u32 values[] = {size.width, size.height};
 
   xcb_configure_window(window->connection, window->window, mask, values);
   xcb_flush(window->connection);
@@ -516,7 +518,6 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
   net_wm_state_fullscreen_cookie =
       xcb_intern_atom(connection, 0, net_wm_state_fullscreen_name_length, net_wm_state_fullscreen_name);
 
-  /* TODO: proper error handling */
   wm_protocols_cookie_reply = xcb_intern_atom_reply(connection, wm_protocols_cookie, NULL);
   wm_delete_window_cookie_reply = xcb_intern_atom_reply(connection, wm_delete_window_cookie, NULL);
   net_wm_state_cookie_reply = xcb_intern_atom_reply(connection, net_wm_state_cookie, NULL);

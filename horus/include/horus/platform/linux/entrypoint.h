@@ -14,7 +14,7 @@
 #include <horus/application/application.h>
 
 extern application_t *application_create();
-extern void application_destroy(application_t *application);
+extern b8 application_destroy(application_t *application);
 
 int main(int argc, char **argv, char **envp) {
   logger_info("<%s:v%s> <platform:%s> initializing", horus_project_name(), horus_project_version(), horus_platform());
@@ -26,8 +26,12 @@ int main(int argc, char **argv, char **envp) {
   configuration_t *configuration = &application->configuration;
   resolution_t *resolution = &configuration->resolution;
 
-  platform_window_t *window =
-      platform_window_create(application->name, resolution->width, resolution->height, configuration->fullscreen);
+  platform_window_size_t window_size = (platform_window_size_t){
+      .width = resolution->width,
+      .height = resolution->height,
+  };
+
+  platform_window_t *window = platform_window_create(application->name, window_size, configuration->fullscreen);
 
   logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", window, application->name,
               resolution->width, resolution->height, configuration->fullscreen);

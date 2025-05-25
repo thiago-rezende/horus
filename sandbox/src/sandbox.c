@@ -21,8 +21,10 @@ application_t *application_create() {
   return application;
 }
 
-void application_destroy(application_t *application) {
+b8 application_destroy(application_t *application) {
   platform_memory_deallocate(application);
+
+  return true;
 }
 
 b8 on_event(event_t *event) {
