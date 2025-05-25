@@ -37,6 +37,10 @@ horus_headers = [
   'horus/platform/debugger.h',
   'horus/platform/detection.h',
   'horus/platform/entrypoint.h',
+
+  # horus platform input layer
+  'horus/platform/input/mouse.h',
+  'horus/platform/input/keyboard.h',
 ]
 
 # horus header files [ linux ]

@@ -381,24 +381,8 @@ static keyboard_keycode_state_t __platform_input_keyboard_keycode_states[KEYBOAR
     [KEYBOARD_KEYCODE_APOSTROPHE] = KEYBOARD_KEYCODE_STATE_NONE,
 };
 
-keyboard_keycode_t platform_input_keyboard_keycode(xcb_keycode_t keycode) {
+keyboard_keycode_t __platform_input_keyboard_keycode(xcb_keycode_t keycode) {
   return platform_input_keyboard_keycode_mapping[keycode];
-}
-
-b8 platform_input_keyboard_keycode_is_held(keyboard_keycode_t keycode) {
-  return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_HELD;
-}
-
-b8 platform_input_keyboard_keycode_is_pressed(keyboard_keycode_t keycode) {
-  return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_PRESSED;
-}
-
-b8 platform_input_keyboard_keycode_is_released(keyboard_keycode_t keycode) {
-  return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_RELEASED;
-}
-
-keyboard_keycode_state_t platform_input_keyboard_keycode_state(keyboard_keycode_t keycode) {
-  return __platform_input_keyboard_keycode_state(keycode);
 }
 
 b8 __platform_input_keyboard_keycode_clear_state() {
@@ -437,4 +421,20 @@ keyboard_keycode_state_t __platform_input_keyboard_keycode_pressed_state(keyboar
   }
 
   return KEYBOARD_KEYCODE_STATE_PRESSED;
+}
+
+b8 platform_input_keyboard_keycode_is_held(keyboard_keycode_t keycode) {
+  return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_HELD;
+}
+
+b8 platform_input_keyboard_keycode_is_pressed(keyboard_keycode_t keycode) {
+  return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_PRESSED;
+}
+
+b8 platform_input_keyboard_keycode_is_released(keyboard_keycode_t keycode) {
+  return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_RELEASED;
+}
+
+keyboard_keycode_state_t platform_input_keyboard_keycode_state(keyboard_keycode_t keycode) {
+  return __platform_input_keyboard_keycode_state(keycode);
 }

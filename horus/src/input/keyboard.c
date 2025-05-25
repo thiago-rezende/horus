@@ -2,13 +2,7 @@
 #include <horus/input/keyboard.h>
 
 /* horus platform layer */
-#include <horus/platform/detection.h>
-
-#if defined(HORUS_PLATFORM_LINUX)
-
-#include <horus/platform/linux/input/keyboard.h>
-
-#endif
+#include <horus/platform/input/keyboard.h>
 
 static const char *keyboard_keycode_strings[KEYBOARD_KEYCODE_COUNT] = {
     [KEYBOARD_KEYCODE_NONE] = "none",

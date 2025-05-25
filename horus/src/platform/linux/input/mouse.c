@@ -540,36 +540,12 @@ mouse_button_state_t __platform_input_mouse_button_states[MOUSE_BUTTON_COUNT] = 
 
 mouse_scroll_state_t __platform_input_mouse_scroll_current_state = MOUSE_SCROLL_STATE_NONE;
 
-mouse_button_t platform_input_mouse_button(xcb_button_t button) {
+mouse_button_t __platform_input_mouse_button(xcb_button_t button) {
   return platform_input_mouse_button_mapping[button];
 }
 
-mouse_scroll_direction_t platform_input_mouse_scroll_direction(xcb_button_t button) {
+mouse_scroll_direction_t __platform_input_mouse_scroll_direction(xcb_button_t button) {
   return platform_input_mouse_scroll_direction_mapping[button];
-}
-
-b8 platform_input_mouse_button_is_pressed(mouse_button_t button) {
-  return __platform_input_mouse_button_state(button) == MOUSE_BUTTON_STATE_PRESSED;
-}
-
-b8 platform_input_mouse_button_is_released(mouse_button_t button) {
-  return __platform_input_mouse_button_state(button) == MOUSE_BUTTON_STATE_RELEASED;
-}
-
-b8 platform_input_mouse_scroll_is_up() {
-  return __platform_input_mouse_scroll_current_state == MOUSE_SCROLL_STATE_UP;
-}
-
-b8 platform_input_mouse_scroll_is_down() {
-  return __platform_input_mouse_scroll_current_state == MOUSE_SCROLL_STATE_DOWN;
-}
-
-mouse_scroll_state_t platform_input_mouse_scroll_state() {
-  return __platform_input_mouse_scroll_current_state;
-}
-
-mouse_button_state_t platform_input_mouse_button_state(mouse_button_t button) {
-  return __platform_input_mouse_button_state(button);
 }
 
 b8 __platform_input_mouse_scroll_set_state(mouse_scroll_state_t state) {
@@ -626,4 +602,28 @@ mouse_scroll_state_t __platform_input_mouse_scroll_direction_to_state(mouse_scro
   }
 
   return MOUSE_SCROLL_STATE_NONE;
+}
+
+b8 platform_input_mouse_button_is_pressed(mouse_button_t button) {
+  return __platform_input_mouse_button_state(button) == MOUSE_BUTTON_STATE_PRESSED;
+}
+
+b8 platform_input_mouse_button_is_released(mouse_button_t button) {
+  return __platform_input_mouse_button_state(button) == MOUSE_BUTTON_STATE_RELEASED;
+}
+
+b8 platform_input_mouse_scroll_is_up() {
+  return __platform_input_mouse_scroll_current_state == MOUSE_SCROLL_STATE_UP;
+}
+
+b8 platform_input_mouse_scroll_is_down() {
+  return __platform_input_mouse_scroll_current_state == MOUSE_SCROLL_STATE_DOWN;
+}
+
+mouse_scroll_state_t platform_input_mouse_scroll_state() {
+  return __platform_input_mouse_scroll_current_state;
+}
+
+mouse_button_state_t platform_input_mouse_button_state(mouse_button_t button) {
+  return __platform_input_mouse_button_state(button);
 }

@@ -180,7 +180,7 @@ void platform_window_process_events(platform_window_t *window) {
               .type = EVENT_TYPE_MOUSE_SCROLL,
           };
 
-          mouse_scroll_event.direction = platform_input_mouse_scroll_direction(button_press_event->detail);
+          mouse_scroll_event.direction = __platform_input_mouse_scroll_direction(button_press_event->detail);
 
           mouse_scroll_event.position.x = button_press_event->event_x;
           mouse_scroll_event.position.y = button_press_event->event_y;
@@ -209,7 +209,7 @@ void platform_window_process_events(platform_window_t *window) {
             .type = EVENT_TYPE_MOUSE_BUTTON_PRESS,
         };
 
-        mouse_button_press_event.button = platform_input_mouse_button(button_press_event->detail);
+        mouse_button_press_event.button = __platform_input_mouse_button(button_press_event->detail);
 
         mouse_button_press_event.position.x = button_press_event->event_x;
         mouse_button_press_event.position.y = button_press_event->event_y;
@@ -248,7 +248,7 @@ void platform_window_process_events(platform_window_t *window) {
             .type = EVENT_TYPE_MOUSE_BUTTON_RELEASE,
         };
 
-        mouse_button_release_event.button = platform_input_mouse_button(button_release_event->detail);
+        mouse_button_release_event.button = __platform_input_mouse_button(button_release_event->detail);
 
         mouse_button_release_event.position.x = button_release_event->event_x;
         mouse_button_release_event.position.y = button_release_event->event_y;
@@ -278,7 +278,7 @@ void platform_window_process_events(platform_window_t *window) {
             .type = EVENT_TYPE_KEYBOARD_PRESS,
         };
 
-        keyboard_press_event.keycode = platform_input_keyboard_keycode(key_press_event->detail);
+        keyboard_press_event.keycode = __platform_input_keyboard_keycode(key_press_event->detail);
 
         keyboard_keycode_state_t keyboard_keycode_state =
             __platform_input_keyboard_keycode_pressed_state(keyboard_press_event.keycode);
@@ -308,7 +308,7 @@ void platform_window_process_events(platform_window_t *window) {
             .type = EVENT_TYPE_KEYBOARD_RELEASE,
         };
 
-        keyboard_release_event.keycode = platform_input_keyboard_keycode(key_release_event->detail);
+        keyboard_release_event.keycode = __platform_input_keyboard_keycode(key_release_event->detail);
 
         if (!__platform_input_keyboard_keycode_set_state(keyboard_release_event.keycode,
                                                          KEYBOARD_KEYCODE_STATE_RELEASED)) {

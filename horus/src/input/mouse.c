@@ -2,13 +2,7 @@
 #include <horus/input/mouse.h>
 
 /* horus platform layer */
-#include <horus/platform/detection.h>
-
-#if defined(HORUS_PLATFORM_LINUX)
-
-#include <horus/platform/linux/input/mouse.h>
-
-#endif
+#include <horus/platform/input/mouse.h>
 
 static const char *mouse_button_strings[MOUSE_BUTTON_COUNT] = {
     [MOUSE_BUTTON_NONE] = "none",
