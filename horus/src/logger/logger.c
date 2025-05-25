@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
 
 /* horus logger layer */
 #include <horus/logger/ansi.h>
@@ -29,7 +28,7 @@ void __logger_general(logger_level_t level, const char *message, ...) {
   char buffer[total_buffer_size];
   platform_memory_clear(buffer, total_buffer_size);
 
-  strncpy(buffer, logger_prefixes[level], prefix_size);
+  platform_memory_copy(buffer, (void *)logger_prefixes[level], prefix_size);
 
   va_start(args, message);
 
