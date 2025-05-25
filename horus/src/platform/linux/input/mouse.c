@@ -621,7 +621,7 @@ b8 platform_input_mouse_scroll_is_down() {
 }
 
 mouse_scroll_state_t platform_input_mouse_scroll_state() {
-  return __platform_input_mouse_scroll_current_state;
+  return __platform_input_mouse_scroll_state();
 }
 
 mouse_button_state_t platform_input_mouse_button_state(mouse_button_t button) {
