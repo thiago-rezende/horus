@@ -45,6 +45,10 @@ const char *input_mouse_button_state_string(mouse_button_state_t state);
 const char *input_mouse_scroll_state_string(mouse_scroll_state_t state);
 const char *input_mouse_scroll_direction_string(mouse_scroll_direction_t direction);
 
+mouse_position_t input_mouse_position();
+
+b8 input_mouse_has_moved();
+
 b8 input_mouse_button_is_pressed(mouse_button_t button);
 b8 input_mouse_button_is_released(mouse_button_t button);
 

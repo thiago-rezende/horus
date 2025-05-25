@@ -152,6 +152,7 @@ void platform_window_process_events(platform_window_t *window) {
 
   __platform_input_mouse_button_clear_state();
   __platform_input_mouse_scroll_clear_state();
+  __platform_input_mouse_position_clear_state();
   __platform_input_keyboard_keycode_clear_state();
 
   while ((event = xcb_poll_for_event(window->connection))) {
@@ -352,6 +353,18 @@ void platform_window_process_events(platform_window_t *window) {
 
         mouse_move_event.position.x = motion_notify_event->event_x;
         mouse_move_event.position.y = motion_notify_event->event_y;
+
+        mouse_position_t current_position = __platform_input_mouse_current_position();
+
+        if (!__platform_input_mouse_set_previous_position(current_position)) {
+          logger_error("<window:%p> <position:(%u, %u)> __platform_input_mouse_set_previous_position failed", window,
+                       mouse_move_event.position.x, mouse_move_event.position.y);
+        }
+
+        if (!__platform_input_mouse_set_current_position(mouse_move_event.position)) {
+          logger_error("<window:%p> <position:(%u, %u)> __platform_input_mouse_set_current_position failed", window,
+                       mouse_move_event.position.x, mouse_move_event.position.y);
+        }
 
         if (window->on_event) {
           if (!window->on_event((event_t *)&mouse_move_event)) {

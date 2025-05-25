@@ -82,6 +82,12 @@ b8 on_event(event_t *event) {
 }
 
 b8 on_update(f64 timestep) {
+  if (input_mouse_has_moved()) {
+    mouse_position_t position = input_mouse_position();
+
+    logger_debug("<on_update> <timestep:%f> <x:%u> <y:%u> mouse moved", timestep, position.x, position.y);
+  }
+
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_ESCAPE)) {
     logger_debug("<on_update> <timestep:%f> <keycode:%s> is pressed", timestep,
                  input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));

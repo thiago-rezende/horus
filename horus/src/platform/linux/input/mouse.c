@@ -1,3 +1,6 @@
+/* horus core layer */
+#include <horus/core/assert.h>
+
 /* horus input layer [ linux ] */
 #include <horus/platform/linux/input/mouse.h>
 
@@ -529,6 +532,9 @@ static const mouse_scroll_state_t platform_input_mouse_scroll_direction_to_state
         [MOUSE_SCROLL_DIRECTION_DOWN] = MOUSE_SCROLL_STATE_DOWN, /* */
 };
 
+mouse_position_t __platform_input_mouse_current_position_state = {0};
+mouse_position_t __platform_input_mouse_previous_position_state = {0};
+
 mouse_button_state_t __platform_input_mouse_button_states[MOUSE_BUTTON_COUNT] = {
     [MOUSE_BUTTON_NONE] = MOUSE_BUTTON_STATE_NONE,          /* */
     [MOUSE_BUTTON_LEFT] = MOUSE_BUTTON_STATE_NONE,          /* */
@@ -546,6 +552,26 @@ mouse_button_t __platform_input_mouse_button(xcb_button_t button) {
 
 mouse_scroll_direction_t __platform_input_mouse_scroll_direction(xcb_button_t button) {
   return platform_input_mouse_scroll_direction_mapping[button];
+}
+
+mouse_position_t __platform_input_mouse_current_position() {
+  return __platform_input_mouse_current_position_state;
+}
+
+mouse_position_t __platform_input_mouse_previous_position() {
+  return __platform_input_mouse_previous_position_state;
+}
+
+b8 __platform_input_mouse_set_current_position(mouse_position_t position) {
+  __platform_input_mouse_current_position_state = position;
+
+  return true;
+}
+
+b8 __platform_input_mouse_set_previous_position(mouse_position_t position) {
+  __platform_input_mouse_previous_position_state = position;
+
+  return true;
 }
 
 b8 __platform_input_mouse_scroll_set_state(mouse_scroll_state_t state) {
@@ -584,6 +610,16 @@ b8 __platform_input_mouse_scroll_clear_state() {
   return true;
 }
 
+b8 __platform_input_mouse_position_clear_state() {
+  mouse_position_t current_position = __platform_input_mouse_current_position();
+
+  b8 result = __platform_input_mouse_set_previous_position(current_position);
+
+  assert_message(result == true, "__platform_input_mouse_set_previous_position failed", result);
+
+  return true;
+}
+
 mouse_scroll_state_t __platform_input_mouse_scroll_state() {
   return __platform_input_mouse_scroll_current_state;
 }
@@ -602,6 +638,21 @@ mouse_scroll_state_t __platform_input_mouse_scroll_direction_to_state(mouse_scro
   }
 
   return MOUSE_SCROLL_STATE_NONE;
+}
+
+mouse_position_t platform_input_mouse_position() {
+  return __platform_input_mouse_current_position();
+}
+
+b8 platform_input_mouse_has_moved() {
+  mouse_position_t current_position = __platform_input_mouse_current_position();
+  mouse_position_t previous_position = __platform_input_mouse_previous_position();
+
+  if (current_position.x != previous_position.x || current_position.y != previous_position.y) {
+    return true;
+  }
+
+  return false;
 }
 
 b8 platform_input_mouse_button_is_pressed(mouse_button_t button) {

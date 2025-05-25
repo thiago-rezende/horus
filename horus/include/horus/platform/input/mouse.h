@@ -3,6 +3,10 @@
 /* horus input layer */
 #include <horus/input/mouse.h>
 
+mouse_position_t platform_input_mouse_position();
+
+b8 platform_input_mouse_has_moved();
+
 b8 platform_input_mouse_button_is_pressed(mouse_button_t button);
 b8 platform_input_mouse_button_is_released(mouse_button_t button);
 

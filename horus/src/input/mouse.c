@@ -63,6 +63,14 @@ const char *input_mouse_scroll_state_string(mouse_scroll_state_t state) {
   return "unknown";
 }
 
+mouse_position_t input_mouse_position() {
+  return platform_input_mouse_position();
+}
+
+b8 input_mouse_has_moved() {
+  return platform_input_mouse_has_moved();
+}
+
 b8 input_mouse_button_is_pressed(mouse_button_t button) {
   return platform_input_mouse_button_is_pressed(button);
 }
