@@ -385,7 +385,7 @@ keyboard_keycode_t __platform_input_keyboard_keycode(xcb_keycode_t keycode) {
   return platform_input_keyboard_keycode_mapping[keycode];
 }
 
-b8 __platform_input_keyboard_keycode_clear_state() {
+b8 __platform_input_keyboard_keycode_clear_state(void) {
   for (keyboard_keycode_t keycode = KEYBOARD_KEYCODE_NONE; keycode < KEYBOARD_KEYCODE_COUNT; ++keycode) {
     if (__platform_input_keyboard_keycode_states[keycode] == KEYBOARD_KEYCODE_STATE_RELEASED) {
       __platform_input_keyboard_keycode_states[keycode] = KEYBOARD_KEYCODE_STATE_NONE;

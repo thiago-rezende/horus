@@ -63,11 +63,11 @@ const char *input_mouse_scroll_state_string(mouse_scroll_state_t state) {
   return "unknown";
 }
 
-mouse_position_t input_mouse_position() {
+mouse_position_t input_mouse_position(void) {
   return platform_input_mouse_position();
 }
 
-b8 input_mouse_has_moved() {
+b8 input_mouse_has_moved(void) {
   return platform_input_mouse_has_moved();
 }
 
@@ -83,14 +83,14 @@ mouse_button_state_t input_mouse_button_state(mouse_button_t button) {
   return platform_input_mouse_button_state(button);
 }
 
-b8 input_mouse_scroll_is_up() {
+b8 input_mouse_scroll_is_up(void) {
   return platform_input_mouse_scroll_is_up();
 }
 
-b8 input_mouse_scroll_is_down() {
+b8 input_mouse_scroll_is_down(void) {
   return platform_input_mouse_scroll_is_down();
 }
 
-mouse_scroll_state_t input_mouse_scroll_state() {
+mouse_scroll_state_t input_mouse_scroll_state(void) {
   return platform_input_mouse_scroll_state();
 }

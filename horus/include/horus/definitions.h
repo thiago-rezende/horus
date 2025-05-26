@@ -1,20 +1,20 @@
 #pragma once
 
-const char *horus_project_name();
-const char *horus_project_version();
-const char *horus_project_license();
-const char *horus_project_description();
+const char *horus_project_name(void);
+const char *horus_project_version(void);
+const char *horus_project_license(void);
+const char *horus_project_description(void);
 
-const char *horus_platform();
+const char *horus_platform(void);
 
-const char *horus_gettext_package();
+const char *horus_gettext_package(void);
 
-const char *horus_bindir();
-const char *horus_libdir();
-const char *horus_datadir();
-const char *horus_includedir();
-const char *horus_localedir();
-const char *horus_localstatedir();
-const char *horus_mandir();
-const char *horus_sysconfdir();
-const char *horus_prefix();
+const char *horus_bindir(void);
+const char *horus_libdir(void);
+const char *horus_datadir(void);
+const char *horus_includedir(void);
+const char *horus_localedir(void);
+const char *horus_localstatedir(void);
+const char *horus_mandir(void);
+const char *horus_sysconfdir(void);
+const char *horus_prefix(void);

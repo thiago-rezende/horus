@@ -13,7 +13,7 @@
 /* horus application layer */
 #include <horus/application/application.h>
 
-extern application_t *application_create();
+extern application_t *application_create(void);
 extern b8 application_destroy(application_t *application);
 
 int main(int argc, char **argv, char **envp) {

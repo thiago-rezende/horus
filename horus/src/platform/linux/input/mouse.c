@@ -554,11 +554,11 @@ mouse_scroll_direction_t __platform_input_mouse_scroll_direction(xcb_button_t bu
   return platform_input_mouse_scroll_direction_mapping[button];
 }
 
-mouse_position_t __platform_input_mouse_current_position() {
+mouse_position_t __platform_input_mouse_current_position(void) {
   return __platform_input_mouse_current_position_state;
 }
 
-mouse_position_t __platform_input_mouse_previous_position() {
+mouse_position_t __platform_input_mouse_previous_position(void) {
   return __platform_input_mouse_previous_position_state;
 }
 
@@ -594,7 +594,7 @@ b8 __platform_input_mouse_button_set_state(mouse_button_t button, mouse_button_s
   return false;
 }
 
-b8 __platform_input_mouse_button_clear_state() {
+b8 __platform_input_mouse_button_clear_state(void) {
   for (mouse_button_t button = MOUSE_BUTTON_NONE; button < MOUSE_BUTTON_COUNT; ++button) {
     if (__platform_input_mouse_button_states[button] == MOUSE_BUTTON_STATE_RELEASED) {
       __platform_input_mouse_button_states[button] = MOUSE_BUTTON_STATE_NONE;
@@ -604,13 +604,13 @@ b8 __platform_input_mouse_button_clear_state() {
   return true;
 }
 
-b8 __platform_input_mouse_scroll_clear_state() {
+b8 __platform_input_mouse_scroll_clear_state(void) {
   __platform_input_mouse_scroll_current_state = MOUSE_SCROLL_STATE_NONE;
 
   return true;
 }
 
-b8 __platform_input_mouse_position_clear_state() {
+b8 __platform_input_mouse_position_clear_state(void) {
   mouse_position_t current_position = __platform_input_mouse_current_position();
 
   b8 result = __platform_input_mouse_set_previous_position(current_position);
@@ -620,7 +620,7 @@ b8 __platform_input_mouse_position_clear_state() {
   return true;
 }
 
-mouse_scroll_state_t __platform_input_mouse_scroll_state() {
+mouse_scroll_state_t __platform_input_mouse_scroll_state(void) {
   return __platform_input_mouse_scroll_current_state;
 }
 
@@ -640,11 +640,11 @@ mouse_scroll_state_t __platform_input_mouse_scroll_direction_to_state(mouse_scro
   return MOUSE_SCROLL_STATE_NONE;
 }
 
-mouse_position_t platform_input_mouse_position() {
+mouse_position_t platform_input_mouse_position(void) {
   return __platform_input_mouse_current_position();
 }
 
-b8 platform_input_mouse_has_moved() {
+b8 platform_input_mouse_has_moved(void) {
   mouse_position_t current_position = __platform_input_mouse_current_position();
   mouse_position_t previous_position = __platform_input_mouse_previous_position();
 
@@ -663,15 +663,15 @@ b8 platform_input_mouse_button_is_released(mouse_button_t button) {
   return __platform_input_mouse_button_state(button) == MOUSE_BUTTON_STATE_RELEASED;
 }
 
-b8 platform_input_mouse_scroll_is_up() {
+b8 platform_input_mouse_scroll_is_up(void) {
   return __platform_input_mouse_scroll_current_state == MOUSE_SCROLL_STATE_UP;
 }
 
-b8 platform_input_mouse_scroll_is_down() {
+b8 platform_input_mouse_scroll_is_down(void) {
   return __platform_input_mouse_scroll_current_state == MOUSE_SCROLL_STATE_DOWN;
 }
 
-mouse_scroll_state_t platform_input_mouse_scroll_state() {
+mouse_scroll_state_t platform_input_mouse_scroll_state(void) {
   return __platform_input_mouse_scroll_state();
 }
 

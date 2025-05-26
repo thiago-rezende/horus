@@ -2,7 +2,7 @@
 
 #include <sandbox/sandbox.h>
 
-application_t *application_create() {
+application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
   platform_memory_clear(application, sizeof(application_t));
 

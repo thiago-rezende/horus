@@ -7,7 +7,7 @@
 /* horus platform layer */
 #include <horus/platform/time.h>
 
-f64 platform_absolute_time() {
+f64 platform_absolute_time(void) {
   struct timespec current;
 
   clock_gettime(CLOCK_MONOTONIC_RAW, &current);

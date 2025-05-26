@@ -6,7 +6,7 @@
 /* horus application layer */
 #include <horus/application/application.h>
 
-application_t *application_create();
+application_t *application_create(void);
 b8 application_destroy(application_t *application);
 
 b8 on_event(event_t *event);

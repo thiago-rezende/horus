@@ -3,62 +3,62 @@
 /* horus base layer */
 #include <horus/definitions.h>
 
-const char *horus_project_name() {
+const char *horus_project_name(void) {
   return HORUS_PROJECT_NAME;
 }
 
-const char *horus_project_version() {
+const char *horus_project_version(void) {
   return HORUS_PROJECT_VERSION;
 }
 
-const char *horus_project_license() {
+const char *horus_project_license(void) {
   return HORUS_PROJECT_LICENSE;
 }
 
-const char *horus_project_description() {
+const char *horus_project_description(void) {
   return HORUS_PROJECT_DESCRIPTION;
 }
 
-const char *horus_platform() {
+const char *horus_platform(void) {
   return HORUS_PLATFORM;
 }
 
-const char *horus_gettext_package() {
+const char *horus_gettext_package(void) {
   return HORUS_GETTEXT_PACKAGE;
 }
 
-const char *horus_bindir() {
+const char *horus_bindir(void) {
   return HORUS_BINDIR;
 }
 
-const char *horus_libdir() {
+const char *horus_libdir(void) {
   return HORUS_LIBDIR;
 }
 
-const char *horus_datadir() {
+const char *horus_datadir(void) {
   return HORUS_DATADIR;
 }
 
-const char *horus_includedir() {
+const char *horus_includedir(void) {
   return HORUS_INCLUDEDIR;
 }
 
-const char *horus_localedir() {
+const char *horus_localedir(void) {
   return HORUS_LOCALEDIR;
 }
 
-const char *horus_localstatedir() {
+const char *horus_localstatedir(void) {
   return HORUS_LOCALSTATEDIR;
 }
 
-const char *horus_mandir() {
+const char *horus_mandir(void) {
   return HORUS_MANDIR;
 }
 
-const char *horus_sysconfdir() {
+const char *horus_sysconfdir(void) {
   return HORUS_SYSCONFDIR;
 }
 
-const char *horus_prefix() {
+const char *horus_prefix(void) {
   return HORUS_PREFIX;
 }
