@@ -15,7 +15,7 @@ typedef struct __platform_window_size_t {
   u16 height;
 } platform_window_size_t;
 
-platform_window_t *platform_window_create(char *title, platform_window_size_t size, b8 windowed);
+platform_window_t *platform_window_create(char *title, platform_window_size_t size, b8 fullscreen);
 
 b8 platform_window_destroy(platform_window_t *window);
 
