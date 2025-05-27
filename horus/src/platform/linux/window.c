@@ -92,9 +92,10 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   int value_list[2];
 
   value_list[0] = window->screen->black_pixel;
-  value_list[1] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
-                  XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW | XCB_EVENT_MASK_KEY_PRESS |
-                  XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_FOCUS_CHANGE;
+  value_list[1] = XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS |
+                  XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW |
+                  XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
+                  XCB_EVENT_MASK_FOCUS_CHANGE;
 
   xcb_create_window(window->connection,            /* connection */
                     XCB_COPY_FROM_PARENT,          /* depth */
@@ -633,7 +634,7 @@ b8 __platform_window_set_global_instance(platform_window_t *window) {
 }
 
 b8 __platform_window_resized_clear_state(platform_window_t *window) {
-  window->has_focus = false;
+  window->has_resized = false;
 
   return true;
 }
