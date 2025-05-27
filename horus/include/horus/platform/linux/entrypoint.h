@@ -27,6 +27,8 @@ int main(int argc, char **argv, char **envp) {
     return 1;
   }
 
+  __application_set_global_instance(application);
+
   logger_info("<application:%p> <name:%s> created", application, application->name);
 
   configuration_t *configuration = &application->configuration;

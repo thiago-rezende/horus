@@ -8,15 +8,15 @@ application_t *application_create(void) {
 
   application->name = "Sandbox Application";
 
-  application->on_event = on_event;
-  application->on_update = on_update;
-  application->on_render = on_render;
-
   application->configuration = (configuration_t){.fullscreen = false,
                                                  .resolution = (resolution_t){
                                                      .width = 1280,
                                                      .height = 720,
                                                  }};
+
+  application->on_event = on_event;
+  application->on_update = on_update;
+  application->on_render = on_render;
 
   return application;
 }

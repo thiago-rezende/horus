@@ -15,6 +15,9 @@ horus_sources = [
 
   # horus events layer
   'src/events/base.c',
+
+  # horus application layer
+  'src/application/application.c',
 ]
 
 # horus source files [ linux ]

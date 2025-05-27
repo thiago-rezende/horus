@@ -18,3 +18,7 @@ typedef struct __application {
   b8 (*on_render)(void);
   b8 (*on_update)(f64 timestep);
 } application_t;
+
+application_t *application(void);
+
+b8 __application_set_global_instance(application_t *application);
