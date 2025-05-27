@@ -25,6 +25,8 @@ b8 platform_window_should_close(platform_window_t *window);
 
 b8 platform_window_has_focus(platform_window_t *window);
 
+b8 platform_window_has_resized(platform_window_t *window);
+
 platform_window_size_t platform_window_size(platform_window_t *window);
 
 b8 platform_window_set_size(platform_window_t *window, platform_window_size_t size);
@@ -40,3 +42,5 @@ b8 platform_window_set_event_callback(platform_window_t *window, platform_window
 platform_window_t *platform_window(void);
 
 b8 __platform_window_set_global_instance(platform_window_t *window);
+
+b8 __platform_window_resized_clear_state(platform_window_t *window);

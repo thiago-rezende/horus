@@ -52,12 +52,15 @@ struct __platform_window {
 
   b8 fullscreen;
   b8 has_focus;
+  b8 has_resized;
   b8 should_close;
 
   platform_window_event_callback_t on_event;
 };
 
 platform_window_t *__window = NULL;
+
+b8 __window_resized_state = false;
 
 b8 __platform_window_fetch_atoms(xcb_connection_t *connection);
 
@@ -128,6 +131,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   window->size = size;
   window->fullscreen = fullscreen;
   window->has_focus = false;
+  window->has_resized = false;
   window->should_close = false;
 
   logger_debug("<window:%p> <xcb_window:%lu> created", window, window->window);
@@ -151,6 +155,8 @@ b8 platform_window_destroy(platform_window_t *window) {
 
 b8 platform_window_process_events(platform_window_t *window) {
   xcb_generic_event_t *event = NULL;
+
+  __platform_window_resized_clear_state(window);
 
   __platform_input_mouse_button_clear_state();
   __platform_input_mouse_scroll_clear_state();
@@ -403,6 +409,8 @@ b8 platform_window_process_events(platform_window_t *window) {
             configure_notify_event->height != window->size.height) {
           window->size.width = configure_notify_event->width;
           window->size.height = configure_notify_event->height;
+
+          window->has_resized = true;
         }
 
         break;
@@ -431,6 +439,10 @@ b8 platform_window_should_close(platform_window_t *window) {
 
 b8 platform_window_has_focus(platform_window_t *window) {
   return window->has_focus;
+}
+
+b8 platform_window_has_resized(platform_window_t *window) {
+  return window->has_resized;
 }
 
 platform_window_size_t platform_window_size(platform_window_t *window) {
@@ -618,4 +630,10 @@ b8 __platform_window_set_global_instance(platform_window_t *window) {
   }
 
   return false;
+}
+
+b8 __platform_window_resized_clear_state(platform_window_t *window) {
+  window->has_focus = false;
+
+  return true;
 }
