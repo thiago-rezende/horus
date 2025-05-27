@@ -36,3 +36,7 @@ b8 platform_window_is_fullscreen(platform_window_t *window);
 b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen);
 
 b8 platform_window_set_event_callback(platform_window_t *window, platform_window_event_callback_t callback);
+
+platform_window_t *platform_window(void);
+
+b8 __platform_window_set_global_instance(platform_window_t *window);

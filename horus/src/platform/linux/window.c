@@ -57,6 +57,8 @@ struct __platform_window {
   platform_window_event_callback_t on_event;
 };
 
+platform_window_t *__window = NULL;
+
 b8 __platform_window_fetch_atoms(xcb_connection_t *connection);
 
 b8 __platform_window_setup_extensions(xcb_connection_t *connection);
@@ -602,4 +604,18 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
 
 b8 __platform_window_is_mouse_button_scroll(xcb_button_t button) {
   return button >= PLATFORM_MOUSE_SCROLL_UP_BUTTON && button <= PLATFORM_MOUSE_SCROLL_RIGHT_BUTTON;
+}
+
+platform_window_t *platform_window(void) {
+  return __window;
+}
+
+b8 __platform_window_set_global_instance(platform_window_t *window) {
+  if (!__window && window) {
+    __window = window;
+
+    return true;
+  }
+
+  return false;
 }

@@ -41,6 +41,8 @@ int main(int argc, char **argv, char **envp) {
 
   platform_window_t *window = platform_window_create(application->name, window_size, configuration->fullscreen);
 
+  __platform_window_set_global_instance(window);
+
   logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", window, application->name,
               resolution->width, resolution->height, configuration->fullscreen);
 
