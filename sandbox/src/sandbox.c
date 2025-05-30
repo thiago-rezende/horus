@@ -77,7 +77,7 @@ b8 on_event(event_t *event) {
     keyboard_hold_event_t *keyboard_hold_event = (keyboard_hold_event_t *)event;
 
     logger_debug("<event:%p> <type:%s> <keycode:%s>", keyboard_hold_event, events_type_string(event->type),
-                 keyboard_hold_event->keycode, input_keyboard_keycode_string(keyboard_hold_event->keycode));
+                 input_keyboard_keycode_string(keyboard_hold_event->keycode));
   }
 
   return true;

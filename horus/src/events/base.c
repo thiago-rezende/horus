@@ -11,6 +11,7 @@ static const char *event_type_strings[EVENT_TYPE_COUNT] = {
     [EVENT_TYPE_WINDOW_FOCUS_LOSS] = "window_focus_loss",
 
     /* keyboard events */
+    [EVENT_TYPE_KEYBOARD_HOLD] = "keyboard_hold",
     [EVENT_TYPE_KEYBOARD_PRESS] = "keyboard_press",
     [EVENT_TYPE_KEYBOARD_RELEASE] = "keyboard_release",
 
@@ -22,7 +23,7 @@ static const char *event_type_strings[EVENT_TYPE_COUNT] = {
 };
 
 const char *events_type_string(event_type_t type) {
-  if (type < EVENT_TYPE_COUNT && type >= 0) {
+  if (type < EVENT_TYPE_COUNT && type >= EVENT_TYPE_NONE) {
     return event_type_strings[type];
   }
 

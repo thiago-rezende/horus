@@ -282,26 +282,36 @@ b8 platform_window_process_events(platform_window_t *window) {
         xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)event;
         (void)key_press_event;
 
+        keyboard_hold_event_t keyboard_hold_event = {0};
         keyboard_press_event_t keyboard_press_event = {0};
+
+        keyboard_hold_event.base = (event_t){
+            .type = EVENT_TYPE_KEYBOARD_HOLD,
+        };
 
         keyboard_press_event.base = (event_t){
             .type = EVENT_TYPE_KEYBOARD_PRESS,
         };
 
-        keyboard_press_event.keycode = __platform_input_keyboard_keycode(key_press_event->detail);
+        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(key_press_event->detail);
 
-        keyboard_keycode_state_t keyboard_keycode_state =
-            __platform_input_keyboard_keycode_pressed_state(keyboard_press_event.keycode);
+        keyboard_hold_event.keycode = keycode;
+        keyboard_press_event.keycode = keycode;
 
-        if (!__platform_input_keyboard_keycode_set_state(keyboard_press_event.keycode, keyboard_keycode_state)) {
+        keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keycode);
+
+        if (!__platform_input_keyboard_keycode_set_state(keycode, keyboard_keycode_state)) {
           logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
                        input_keyboard_keycode_state_string(keyboard_keycode_state));
         }
 
         if (window->on_event) {
-          if (!window->on_event((event_t *)&keyboard_press_event)) {
+          event_t *event = keyboard_keycode_state == KEYBOARD_KEYCODE_STATE_HELD ? (event_t *)&keyboard_hold_event
+                                                                                 : (event_t *)&keyboard_press_event;
+
+          if (!window->on_event(event)) {
             logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
-                         events_type_string(keyboard_press_event.base.type));
+                         events_type_string(event->type));
           }
         }
 
