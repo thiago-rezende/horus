@@ -55,5 +55,18 @@ if host_machine.system() == 'linux'
   ]
 endif
 
+# horus header files [ windows ]
+if host_machine.system() == 'windows'
+  horus_headers += [
+    # horus platform layer [ windows ]
+    'horus/platform/windows/windows.h',
+    'horus/platform/windows/entrypoint.h',
+
+    # horus input layer [ windows ]
+    'horus/platform/windows/input/mouse.h',
+    'horus/platform/windows/input/keyboard.h',
+  ]
+endif
+
 # horus headers installation
 install_headers(horus_headers, preserve_path: true)

@@ -7,7 +7,7 @@ project(
   meson_version: '>=1.0.0',
   default_options: [
     'c_std=c99',
-    'b_sanitize=leak',
+    'b_sanitize=address',
     'buildtype=debug',
   ],
 )
@@ -38,6 +38,15 @@ summary(
     'build_sandbox': get_option('build_sandbox'),
   },
   section: 'Options',
+)
+
+# project platform summary
+summary(
+  {
+    'host': host_machine.system(),
+    'target': target_machine.system()
+  },
+  section: 'Platform'
 )
 
 # project directories summary

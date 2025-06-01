@@ -10,14 +10,14 @@
 #elif defined(_WIN32)
 
 #define HORUS_PLATFORM_WINDOWS
-#error "[ platform ]: windows platform is not supported!"
+/* #error "[ platform ]: windows platform is not supported!" */
 
 /* Windows x64/x86 */
 #if defined(_WIN64)
 
 /* Windows x64  */
 #define HORUS_PLATFORM_WINDOWS_64
-#error "[ platform ]: windows x64 builds are not supported!"
+/* #error "[ platform ]: windows x64 builds are not supported!" */
 
 #else  // _WIN64
 

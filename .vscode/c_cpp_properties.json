@@ -10,6 +10,22 @@
       "cStandard": "c99",
       "intelliSenseMode": "linux-clang-x64",
       "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+    },
+    {
+      "name": "Meson | Windows",
+      "includePath": [
+        "${workspaceFolder}/**"
+      ],
+      "defines": [
+        "DEBUG",
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "compilerPath": "C:/msys64/clang64/bin/clang",
+      "cStandard": "c99",
+      "intelliSenseMode": "windows-clang-x64",
+      "compileCommands": "${workspaceFolder}/build/compile_commands.json"
     }
   ],
   "version": 4

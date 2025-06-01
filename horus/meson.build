@@ -35,6 +35,21 @@ if host_machine.system() == 'linux'
   ]
 endif
 
+# horus source files [ windows ]
+if host_machine.system() == 'windows'
+  horus_sources += [
+    # horus platform layer [ windows ]
+    'src/platform/windows/time.c',
+    'src/platform/windows/memory.c',
+    'src/platform/windows/window.c',
+    'src/platform/windows/console.c',
+
+    # horus input layer [ windows ]
+    'src/platform/windows/input/mouse.c',
+    'src/platform/windows/input/keyboard.c',
+  ]
+endif
+
 # horus include directories
 horus_includes = include_directories('include')
 
@@ -60,6 +75,17 @@ if host_machine.system() == 'linux'
     xcb_xkb_dep,
 
     # horus renderer dependencies [ linux ]
+    vulkan_dep,
+  ]
+endif
+
+# horus dependencies [ windows ]
+if host_machine.system() == 'windows'
+  # horus renderer dependencies [ windows ]
+  vulkan_dep = dependency('vulkan')
+
+  horus_dependencies += [
+    # horus renderer dependencies [ windows ]
     vulkan_dep,
   ]
 endif
@@ -92,7 +118,7 @@ configure_file(
 )
 
 # horus library
-horus_lib = shared_library(
+horus_lib = static_library(
   'horus',
   sources: horus_sources,
   include_directories: horus_includes,

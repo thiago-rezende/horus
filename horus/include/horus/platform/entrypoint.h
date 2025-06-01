@@ -9,3 +9,10 @@
 #include <horus/platform/linux/entrypoint.h>
 
 #endif
+
+#if defined(HORUS_PLATFORM_WINDOWS)
+
+/* horus platform layer [ windows ] */
+#include <horus/platform/windows/entrypoint.h>
+
+#endif

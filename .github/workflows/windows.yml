@@ -1,0 +1,174 @@
+name: Windows
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: clang64
+          update: true
+          install: >-
+            clang64/mingw-w64-clang-x86_64-meson
+            clang64/mingw-w64-clang-x86_64-toolchain
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+
+      - name: Compile Project
+        run: meson compile -C build
+
+  test:
+    needs: build
+
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: clang64
+          update: true
+          install: >-
+            clang64/mingw-w64-clang-x86_64-meson
+            clang64/mingw-w64-clang-x86_64-toolchain
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+
+      - name: Execute Tests
+        run: meson test -C build -v
+
+  analysis:
+    needs: test
+
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: clang64
+          update: true
+          install: >-
+            clang64/mingw-w64-clang-x86_64-meson
+            clang64/mingw-w64-clang-x86_64-toolchain
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+
+      - name: Code Analysis
+        run: ninja -C build scan-build
+
+  lint:
+    needs: analysis
+
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: clang64
+          update: true
+          install: >-
+            clang64/mingw-w64-clang-x86_64-meson
+            clang64/mingw-w64-clang-x86_64-toolchain
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Setup Project
+        run: meson setup build
+        env:
+          CC: clang
+
+      - name: Lint Check
+        run: ninja -C build clang-format-check
