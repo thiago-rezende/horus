@@ -31,12 +31,15 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: clang64
-          update: true
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
+          update: false
+
+      - name: Setup System Dependencies
+        run: |
+          pacman --noconfirm -S --needed \
+            clang64/mingw-w64-clang-x86_64-meson \
+            clang64/mingw-w64-clang-x86_64-toolchain \
+            clang64/mingw-w64-clang-x86_64-vulkan-headers \
+            clang64/mingw-w64-clang-x86_64-vulkan-loader \
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
@@ -73,12 +76,15 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: clang64
-          update: true
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
+          update: false
+
+      - name: Setup System Dependencies
+        run: |
+          pacman --noconfirm -S --needed \
+            clang64/mingw-w64-clang-x86_64-meson \
+            clang64/mingw-w64-clang-x86_64-toolchain \
+            clang64/mingw-w64-clang-x86_64-vulkan-headers \
+            clang64/mingw-w64-clang-x86_64-vulkan-loader \
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
@@ -115,12 +121,15 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: clang64
-          update: true
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
+          update: false
+
+      - name: Setup System Dependencies
+        run: |
+          pacman --noconfirm -S --needed \
+            clang64/mingw-w64-clang-x86_64-meson \
+            clang64/mingw-w64-clang-x86_64-toolchain \
+            clang64/mingw-w64-clang-x86_64-vulkan-headers \
+            clang64/mingw-w64-clang-x86_64-vulkan-loader \
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
@@ -157,12 +166,15 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: clang64
-          update: true
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
+          update: false
+
+      - name: Setup System Dependencies
+        run: |
+          pacman --noconfirm -S --needed \
+            clang64/mingw-w64-clang-x86_64-meson \
+            clang64/mingw-w64-clang-x86_64-toolchain \
+            clang64/mingw-w64-clang-x86_64-vulkan-headers \
+            clang64/mingw-w64-clang-x86_64-vulkan-loader \
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
