@@ -129,7 +129,7 @@ jobs:
           CC: clang
 
       - name: Code Analysis
-        run: ninja -C build scan-build
+        run: scan-build ninja -C build
 
   lint:
     needs: analysis

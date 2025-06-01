@@ -7,7 +7,7 @@
 
 # Horus
 
-[![ci-badge]][ci-url] [![license-badge]][license-url] [![c-badge]][c-url] [![meson-badge]][meson-url]
+[![ci-badge-linux]][ci-url-linux] [![ci-badge-windows]][ci-url-windows] [![license-badge]][license-url] [![c-badge]][c-url] [![meson-badge]][meson-url]
 
 <!-- Short Description -->
 
@@ -19,14 +19,16 @@ This project is being developed to be the simplest and yet complete cross-platfo
 
 <!-- Links -->
 
-[ci-url]: https://github.com/thiago-rezende/horus/actions
+[ci-url-linux]: https://github.com/thiago-rezende/horus/actions/workflows/linux.yml
+[ci-url-windows]: https://github.com/thiago-rezende/horus/actions/workflows/windows.yml
 [license-url]: https://opensource.org/licenses/BSD-3-Clause
 [c-url]: https://en.cppreference.com/w/c
 [meson-url]: https://mesonbuild.com/
 
 <!-- Badges -->
 
-[ci-badge]: https://img.shields.io/github/actions/workflow/status/thiago-rezende/horus/ci.yml?style=flat-square
+[ci-badge-linux]: https://img.shields.io/github/actions/workflow/status/thiago-rezende/horus/linux.yml?branch=main&style=flat-square&label=linux
+[ci-badge-windows]: https://img.shields.io/github/actions/workflow/status/thiago-rezende/horus/windows.yml?branch=main&style=flat-square&label=windows
 [license-badge]: https://img.shields.io/badge/license-BSD_3_Clause-yellowgreen.svg?style=flat-square
 [meson-badge]: https://img.shields.io/badge/meson-1.0-39207c.svg?style=flat-square
 [c-badge]: https://img.shields.io/badge/C-99-blue.svg?style=flat-square
