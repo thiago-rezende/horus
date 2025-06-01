@@ -1,0 +1,95 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Meson | Setup",
+      "type": "shell",
+      "command": "meson",
+      "args": [
+        "setup",
+        "build",
+        "--buildtype",
+        "debug",
+      ],
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "C:/msys64/usr/bin/bash.exe",
+            "args": [
+              "--login",
+              "-i",
+              "-c",
+            ],
+          },
+          "env": {
+            "MSYSTEM": "CLANG64",
+            "CHERE_INVOKING": "1",
+            "MSYS2_PATH_TYPE": "inherit",
+          }
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Meson | Reconfigure",
+      "type": "shell",
+      "command": "meson",
+      "args": [
+        "setup",
+        "build",
+        "--buildtype",
+        "debug",
+        "--reconfigure"
+      ],
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "C:/msys64/usr/bin/bash.exe",
+            "args": [
+              "--login",
+              "-i",
+              "-c",
+            ],
+          },
+          "env": {
+            "MSYSTEM": "CLANG64",
+            "CHERE_INVOKING": "1",
+            "MSYS2_PATH_TYPE": "inherit",
+          }
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Meson | Build",
+      "type": "shell",
+      "command": "meson",
+      "args": [
+        "compile",
+        "-C",
+        "build",
+      ],
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "C:/msys64/usr/bin/bash.exe",
+            "args": [
+              "--login",
+              "-i",
+              "-c",
+            ],
+          },
+          "env": {
+            "MSYSTEM": "CLANG64",
+            "CHERE_INVOKING": "1",
+            "MSYS2_PATH_TYPE": "inherit",
+          }
+        }
+      },
+      "problemMatcher": [],
+      "dependsOn": [
+        "Meson | Setup"
+      ]
+    }
+  ]
+}

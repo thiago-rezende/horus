@@ -22,10 +22,14 @@
         "MSYSTEM": "CLANG64",
         "CHERE_INVOKING": "1",
         "MSYS2_PATH_TYPE": "inherit",
-        "ASAN_OPTIONS": "detect_leaks=1"
       },
-      "overrideName": true
+      "overrideName": true,
     }
   },
   "terminal.integrated.defaultProfile.windows": "CLANG64",
+  "terminal.integrated.env.windows": {
+    "MSYSTEM": "CLANG64",
+    "CHERE_INVOKING": "1",
+    "MSYS2_PATH_TYPE": "inherit",
+  },
 }

@@ -7,10 +7,13 @@ project(
   meson_version: '>=1.0.0',
   default_options: [
     'c_std=c99',
-    'b_sanitize=address',
     'buildtype=debug',
   ],
 )
+
+if target_machine.system() == 'linux'
+  add_project_arguments('-fsanitize=leak', language: 'c')
+endif
 
 project_description = 'A simple closs-platform application development framework'
 
