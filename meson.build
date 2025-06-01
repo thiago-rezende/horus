@@ -44,9 +44,9 @@ summary(
 summary(
   {
     'host': host_machine.system(),
-    'target': target_machine.system()
+    'target': target_machine.system(),
   },
-  section: 'Platform'
+  section: 'Platform',
 )
 
 # project directories summary
