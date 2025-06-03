@@ -27,6 +27,10 @@
 #include <horus/platform/linux/input/mouse.h>
 #include <horus/platform/linux/input/keyboard.h>
 
+#define XCB_ATOM_MAX_LENGTH 255
+
+#define WINDOW_TITLE_MAX_LENGTH 255
+
 #define PLATFORM_MOUSE_SCROLL_UP_BUTTON 4
 #define PLATFORM_MOUSE_SCROLL_DOWN_BUTTON 5
 #define PLATFORM_MOUSE_SCROLL_LEFT_BUTTON 6
@@ -117,7 +121,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
                       &global_platform_window_atoms.WM_DELETE_WINDOW);
 
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                      string_length(title), title);
+                      string_length_secure(title, WINDOW_TITLE_MAX_LENGTH), title);
 
   if (fullscreen) {
     xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window,
@@ -476,7 +480,7 @@ b8 platform_window_set_size(platform_window_t *window, platform_window_size_t si
 
 b8 platform_window_set_title(platform_window_t *window, char *title) {
   xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                      string_length(title), title);
+                      string_length_secure(title, WINDOW_TITLE_MAX_LENGTH), title);
 
   xcb_flush(window->connection);
 
@@ -532,10 +536,11 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
   const char *net_wm_state_name = "_NET_WM_STATE";
   const char *net_wm_state_fullscreen_name = "_NET_WM_STATE_FULLSCREEN";
 
-  u64 wm_protocols_name_length = string_length((char *)wm_protocols_name);
-  u64 wm_delete_window_name_length = string_length((char *)wm_delete_window_name);
-  u64 net_wm_state_name_length = string_length((char *)net_wm_state_name);
-  u64 net_wm_state_fullscreen_name_length = string_length((char *)net_wm_state_fullscreen_name);
+  u64 wm_protocols_name_length = string_length_secure((char *)wm_protocols_name, XCB_ATOM_MAX_LENGTH);
+  u64 wm_delete_window_name_length = string_length_secure((char *)wm_delete_window_name, XCB_ATOM_MAX_LENGTH);
+  u64 net_wm_state_name_length = string_length_secure((char *)net_wm_state_name, XCB_ATOM_MAX_LENGTH);
+  u64 net_wm_state_fullscreen_name_length =
+      string_length_secure((char *)net_wm_state_fullscreen_name, XCB_ATOM_MAX_LENGTH);
 
   wm_protocols_cookie = xcb_intern_atom(connection, 0, wm_protocols_name_length, wm_protocols_name);
   wm_delete_window_cookie = xcb_intern_atom(connection, 0, wm_delete_window_name_length, wm_delete_window_name);
