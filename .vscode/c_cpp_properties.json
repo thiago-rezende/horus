@@ -18,9 +18,9 @@
       ],
       "defines": [
         "DEBUG",
-        "_DEBUG",
-        "UNICODE",
-        "_UNICODE"
+        "_DEBUG"
+        /* "UNICODE", */
+        /* "_UNICODE" */
       ],
       "compilerPath": "C:/msys64/clang64/bin/clang",
       "cStandard": "c99",

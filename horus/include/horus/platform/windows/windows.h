@@ -80,8 +80,8 @@
  * map to L"..." instead of "...".
  *
  */
-#define UNICODE
-#define _UNICODE
+/* #define UNICODE */
+/* #define _UNICODE */
 
 /* Windows header file */
 #include <windows.h>

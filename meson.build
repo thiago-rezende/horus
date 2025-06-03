@@ -11,10 +11,6 @@ project(
   ],
 )
 
-if target_machine.system() == 'linux'
-  add_project_arguments('-fsanitize=leak', language: 'c')
-endif
-
 project_description = 'A simple closs-platform application development framework'
 
 # horus target
