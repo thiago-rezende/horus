@@ -89,7 +89,7 @@ b8 on_update(f64 timestep) {
   if (platform_window_has_resized(window)) {
     platform_window_size_t size = platform_window_size(window);
 
-    logger_debug("<on_update> <timestep:%f> <width:%u> <height:%u> window resized", size.width, size.height);
+    logger_debug("<on_update> <timestep:%f> <width:%u> <height:%u> window resized", timestep, size.width, size.height);
   }
 
   if (input_mouse_has_moved()) {

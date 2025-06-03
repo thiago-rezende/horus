@@ -160,6 +160,25 @@ platform_window_size_t platform_window_size(platform_window_t *window) {
 }
 
 b8 platform_window_set_size(platform_window_t *window, platform_window_size_t size) {
+  RECT rectangle = {0};
+  rectangle.top = 0;
+  rectangle.left = 0;
+  rectangle.right = size.width;
+  rectangle.bottom = size.height;
+
+  AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, false, WS_EX_OVERLAPPEDWINDOW | WS_EX_ACCEPTFILES);
+
+  if (!SetWindowPos(window->window, 0, 0, 0, rectangle.right - rectangle.left, rectangle.bottom - rectangle.top,
+                    SWP_NOMOVE | SWP_NOZORDER)) {
+    logger_error("<window:%p> <win32_window:%p> platform_window_set_size failed", window, window->window);
+
+    return false;
+  }
+
+  window->size = size;
+
+  window->has_resized = true;
+
   return true;
 }
 
