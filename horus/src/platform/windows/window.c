@@ -104,7 +104,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   window->has_resized = false;
   window->should_close = false;
 
-  logger_debug("<window:%p> <hinstance:%p> created", window, window->hinstance);
+  logger_debug("<window:%p> <win32_window:%p> created", window, window->window);
 
   return window;
 }
@@ -114,7 +114,7 @@ b8 platform_window_destroy(platform_window_t *window) {
 
   DestroyWindow(window->window);
 
-  logger_debug("<window:%p> <hinstance:%p> destroyed", window, window->hinstance);
+  logger_debug("<window:%p> <win32_window:%p> destroyed", window, window->window);
 
   platform_memory_deallocate(window);
 
@@ -164,6 +164,12 @@ b8 platform_window_set_size(platform_window_t *window, platform_window_size_t si
 }
 
 b8 platform_window_set_title(platform_window_t *window, char *title) {
+  if (!SetWindowText(window->window, title)) {
+    logger_error("<window:%p> <win32_window:%p> platform_window_set_title failed", window, window->window);
+
+    return false;
+  }
+
   return true;
 }
 
