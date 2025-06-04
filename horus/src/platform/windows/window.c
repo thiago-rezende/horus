@@ -65,7 +65,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   rectangle.right = size.width;
   rectangle.bottom = size.height;
 
-  AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, 0, WS_EX_OVERLAPPEDWINDOW | WS_EX_ACCEPTFILES);
+  AdjustWindowRectEx(&rectangle, WS_EX_APPWINDOW, 0, WS_EX_APPWINDOW);
 
   window->window_class.cbSize = sizeof(window->window_class);
   window->window_class.style = CS_HREDRAW | CS_VREDRAW;
@@ -82,18 +82,18 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
 
   RegisterClassEx(&window->window_class);
 
-  window->window = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW | WS_EX_ACCEPTFILES, /* dwExStyle */
-                                  window->window_class_name,                  /* lpClassName */
-                                  title,                                      /* lpWindowName */
-                                  WS_OVERLAPPEDWINDOW,                        /* dwStyle */
-                                  CW_USEDEFAULT,                              /* X */
-                                  CW_USEDEFAULT,                              /* Y */
-                                  rectangle.right - rectangle.left,           /* nWidth */
-                                  rectangle.bottom - rectangle.top,           /* nHeight */
-                                  NULL,                                       /* hWndParent */
-                                  NULL,                                       /* hMenu */
-                                  window->hinstance,                          /* hInstance */
-                                  window                                      /* lpParam */
+  window->window = CreateWindowEx(WS_EX_APPWINDOW,                  /* dwExStyle */
+                                  window->window_class_name,        /* lpClassName */
+                                  title,                            /* lpWindowName */
+                                  WS_OVERLAPPEDWINDOW,              /* dwStyle */
+                                  CW_USEDEFAULT,                    /* X */
+                                  CW_USEDEFAULT,                    /* Y */
+                                  rectangle.right - rectangle.left, /* nWidth */
+                                  rectangle.bottom - rectangle.top, /* nHeight */
+                                  NULL,                             /* hWndParent */
+                                  NULL,                             /* hMenu */
+                                  window->hinstance,                /* hInstance */
+                                  window                            /* lpParam */
   );
 
   ShowWindow(window->window, SW_SHOWDEFAULT);
@@ -166,7 +166,7 @@ b8 platform_window_set_size(platform_window_t *window, platform_window_size_t si
   rectangle.right = size.width;
   rectangle.bottom = size.height;
 
-  AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, false, WS_EX_OVERLAPPEDWINDOW | WS_EX_ACCEPTFILES);
+  AdjustWindowRectEx(&rectangle, WS_EX_APPWINDOW, false, WS_EX_APPWINDOW);
 
   if (!SetWindowPos(window->window, 0, 0, 0, rectangle.right - rectangle.left, rectangle.bottom - rectangle.top,
                     SWP_NOMOVE | SWP_NOZORDER)) {
