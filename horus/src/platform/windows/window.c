@@ -96,6 +96,17 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
                                   window                            /* lpParam */
   );
 
+  if (fullscreen) {
+    SetWindowLongPtr(window->window, GWL_STYLE, WS_POPUP);
+
+    u16 width = (u16)GetSystemMetrics(SM_CXSCREEN);
+    u16 height = (u16)GetSystemMetrics(SM_CYSCREEN);
+
+    SetWindowPos(window->window, HWND_TOP, 0, 0, width, height, SWP_FRAMECHANGED);
+  }
+
+  window->fullscreen = fullscreen;
+
   ShowWindow(window->window, SW_SHOWDEFAULT);
 
   window->size = size;
