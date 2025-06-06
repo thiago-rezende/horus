@@ -50,6 +50,10 @@ platform_window_t *__window = NULL;
 
 b8 __window_resized_state = false;
 
+RECT __window_rect_before_fullscreen = {0};
+DWORD __window_style_before_fullscreen = 0;
+DWORD __window_exstyle_before_fullscreen = 0;
+
 static LRESULT CALLBACK windows_handle_event(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK windows_handle_event_setup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -65,7 +69,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   rectangle.right = size.width;
   rectangle.bottom = size.height;
 
-  AdjustWindowRectEx(&rectangle, WS_EX_APPWINDOW, 0, WS_EX_APPWINDOW);
+  AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, 0, WS_EX_APPWINDOW);
 
   window->window_class.cbSize = sizeof(window->window_class);
   window->window_class.style = CS_HREDRAW | CS_VREDRAW;
@@ -96,24 +100,18 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
                                   window                            /* lpParam */
   );
 
-  if (fullscreen) {
-    SetWindowLongPtr(window->window, GWL_STYLE, WS_POPUP);
-
-    u16 width = (u16)GetSystemMetrics(SM_CXSCREEN);
-    u16 height = (u16)GetSystemMetrics(SM_CYSCREEN);
-
-    SetWindowPos(window->window, HWND_TOP, 0, 0, width, height, SWP_FRAMECHANGED);
-  }
-
-  window->fullscreen = fullscreen;
-
   ShowWindow(window->window, SW_SHOWDEFAULT);
 
   window->size = size;
-  window->fullscreen = fullscreen;
   window->has_focus = false;
   window->has_resized = false;
   window->should_close = false;
+
+  if (fullscreen) {
+    platform_window_set_fullscreen(window, fullscreen);
+  }
+
+  window->fullscreen = fullscreen;
 
   logger_debug("<window:%p> <win32_window:%p> created", window, window->window);
 
@@ -171,13 +169,17 @@ platform_window_size_t platform_window_size(platform_window_t *window) {
 }
 
 b8 platform_window_set_size(platform_window_t *window, platform_window_size_t size) {
+  if (window->fullscreen) {
+    return true;
+  }
+
   RECT rectangle = {0};
   rectangle.top = 0;
   rectangle.left = 0;
   rectangle.right = size.width;
   rectangle.bottom = size.height;
 
-  AdjustWindowRectEx(&rectangle, WS_EX_APPWINDOW, false, WS_EX_APPWINDOW);
+  AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, false, WS_EX_APPWINDOW);
 
   if (!SetWindowPos(window->window, 0, 0, 0, rectangle.right - rectangle.left, rectangle.bottom - rectangle.top,
                     SWP_NOMOVE | SWP_NOZORDER)) {
@@ -208,6 +210,38 @@ b8 platform_window_is_fullscreen(platform_window_t *window) {
 }
 
 b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
+  if (window->fullscreen == fullscreen) {
+    return true;
+  }
+
+  if (fullscreen) {
+    GetWindowRect(window->window, &__window_rect_before_fullscreen);
+    __window_style_before_fullscreen = GetWindowLong(window->window, GWL_STYLE);
+    __window_exstyle_before_fullscreen = GetWindowLong(window->window, GWL_EXSTYLE);
+
+    MONITORINFO monitor_info = {sizeof(MONITORINFO)};
+
+    GetMonitorInfo(MonitorFromWindow(window->window, MONITOR_DEFAULTTOPRIMARY), &monitor_info);
+
+    SetWindowLong(window->window, GWL_STYLE, GetWindowLong(window->window, GWL_STYLE) & ~(WS_OVERLAPPEDWINDOW));
+    SetWindowLong(window->window, GWL_EXSTYLE, GetWindowLong(window->window, GWL_EXSTYLE) & ~(WS_EX_OVERLAPPEDWINDOW));
+
+    SetWindowPos(window->window, HWND_TOP, monitor_info.rcMonitor.left, monitor_info.rcMonitor.top,
+                 monitor_info.rcMonitor.right - monitor_info.rcMonitor.left,
+                 monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+  } else {
+    SetWindowLong(window->window, GWL_STYLE, __window_style_before_fullscreen);
+    SetWindowLong(window->window, GWL_EXSTYLE, __window_exstyle_before_fullscreen);
+
+    SetWindowPos(window->window, HWND_NOTOPMOST, __window_rect_before_fullscreen.left,
+                 __window_rect_before_fullscreen.top,
+                 __window_rect_before_fullscreen.right - __window_rect_before_fullscreen.left,
+                 __window_rect_before_fullscreen.bottom - __window_rect_before_fullscreen.top,
+                 SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+  }
+
+  window->fullscreen = fullscreen;
+
   return true;
 }
 
