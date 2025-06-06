@@ -3,7 +3,13 @@
 /* horus input layer */
 #include <horus/input/mouse.h>
 
-mouse_button_t __platform_input_mouse_button(/* platform_button_t */ u8 button);
+/* horus platform layer [ windows ] */
+#include <horus/platform/windows/windows.h>
+
+mouse_button_t __platform_input_mouse_button(UINT button);
+
+b8 __platform_input_mouse_button_pressed(UINT button);
+b8 __platform_input_mouse_button_released(UINT button);
 
 mouse_scroll_direction_t __platform_input_mouse_scroll_direction(/* platform_button_t */ u8 button);
 

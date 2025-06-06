@@ -6,12 +6,6 @@
 
 #define PLATFORM_INPUT_MOUSE_BUTTON_COUNT 256
 
-static const mouse_button_t platform_input_mouse_button_mapping[PLATFORM_INPUT_MOUSE_BUTTON_COUNT] = {
-    MOUSE_BUTTON_NONE};
-
-static const mouse_scroll_direction_t platform_input_mouse_scroll_direction_mapping[PLATFORM_INPUT_MOUSE_BUTTON_COUNT] =
-    {MOUSE_SCROLL_DIRECTION_NONE};
-
 static const mouse_scroll_state_t platform_input_mouse_scroll_direction_to_state_mapping[MOUSE_SCROLL_DIRECTION_COUNT] =
     {
         [MOUSE_SCROLL_DIRECTION_NONE] = MOUSE_SCROLL_STATE_NONE, /* */
@@ -33,12 +27,56 @@ mouse_button_state_t __platform_input_mouse_button_states[MOUSE_BUTTON_COUNT] = 
 
 mouse_scroll_state_t __platform_input_mouse_scroll_current_state = MOUSE_SCROLL_STATE_NONE;
 
-mouse_button_t __platform_input_mouse_button(/* platform_button_t */ u8 button) {
-  return platform_input_mouse_button_mapping[button];
+mouse_button_t __platform_input_mouse_button(UINT button) {
+  if (button == WM_LBUTTONUP || button == WM_LBUTTONDOWN) {
+    return MOUSE_BUTTON_LEFT;
+  }
+
+  if (button == WM_RBUTTONUP || button == WM_RBUTTONDOWN) {
+    return MOUSE_BUTTON_RIGHT;
+  }
+
+  if (button == WM_MBUTTONUP || button == WM_MBUTTONDOWN) {
+    return MOUSE_BUTTON_MIDDLE;
+  }
+
+  return MOUSE_BUTTON_NONE;
+}
+
+b8 __platform_input_mouse_button_pressed(UINT button) {
+  if (button == WM_LBUTTONDOWN) {
+    return true;
+  }
+
+  if (button == WM_RBUTTONDOWN) {
+    return true;
+  }
+
+  if (button == WM_MBUTTONDOWN) {
+    return true;
+  }
+
+  return false;
+}
+
+b8 __platform_input_mouse_button_released(UINT button) {
+  if (button == WM_LBUTTONUP) {
+    return true;
+  }
+
+  if (button == WM_RBUTTONUP) {
+    return true;
+  }
+
+  if (button == WM_MBUTTONUP) {
+    return true;
+  }
+
+  return false;
 }
 
 mouse_scroll_direction_t __platform_input_mouse_scroll_direction(/* platform_button_t */ u8 button) {
-  return platform_input_mouse_scroll_direction_mapping[button];
+  return MOUSE_SCROLL_DIRECTION_NONE;
 }
 
 mouse_position_t __platform_input_mouse_current_position(void) {

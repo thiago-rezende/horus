@@ -145,6 +145,46 @@ b8 platform_window_process_events(platform_window_t *window) {
       window->should_close = true;
     }
 
+    if (__platform_input_mouse_button_pressed(event.message)) {
+      mouse_button_press_event_t mouse_button_press_event = {
+          .base = (event_t){.type = EVENT_TYPE_MOUSE_BUTTON_PRESS},
+          .button = __platform_input_mouse_button(event.message),
+          .position = (mouse_position_t){.x = 0, .y = 0},
+      };
+
+      if (!__platform_input_mouse_button_set_state(mouse_button_press_event.button, MOUSE_BUTTON_STATE_PRESSED)) {
+        logger_error("<window:%p> <state:%s> __platform_input_mouse_button_set_state failed", window,
+                     input_mouse_button_state_string(MOUSE_BUTTON_STATE_PRESSED));
+      }
+
+      if (window->on_event) {
+        if (!window->on_event((event_t *)&mouse_button_press_event)) {
+          logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                       events_type_string(mouse_button_press_event.base.type));
+        }
+      }
+    }
+
+    if (__platform_input_mouse_button_released(event.message)) {
+      mouse_button_release_event_t mouse_button_release_event = {
+          .base = (event_t){.type = EVENT_TYPE_MOUSE_BUTTON_RELEASE},
+          .button = __platform_input_mouse_button(event.message),
+          .position = (mouse_position_t){.x = 0, .y = 0},
+      };
+
+      if (!__platform_input_mouse_button_set_state(mouse_button_release_event.button, MOUSE_BUTTON_STATE_RELEASED)) {
+        logger_error("<window:%p> <state:%s> __platform_input_mouse_button_set_state failed", window,
+                     input_mouse_button_state_string(MOUSE_BUTTON_STATE_RELEASED));
+      }
+
+      if (window->on_event) {
+        if (!window->on_event((event_t *)&mouse_button_release_event)) {
+          logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                       events_type_string(mouse_button_release_event.base.type));
+        }
+      }
+    }
+
     TranslateMessage(&event);
     DispatchMessage(&event);
   }
