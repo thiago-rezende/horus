@@ -193,6 +193,36 @@ b8 platform_window_process_events(platform_window_t *window) {
       }
     }
 
+    if (event.message == WM_MOUSEMOVE) {
+      mouse_move_event_t mouse_move_event = {0};
+
+      mouse_move_event.base = (event_t){
+          .type = EVENT_TYPE_MOUSE_MOVE,
+      };
+
+      mouse_move_event.position.x = (u16)GET_X_LPARAM(event.lParam);
+      mouse_move_event.position.y = (u16)GET_Y_LPARAM(event.lParam);
+
+      mouse_position_t current_position = __platform_input_mouse_current_position();
+
+      if (!__platform_input_mouse_set_previous_position(current_position)) {
+        logger_error("<window:%p> <position:(%u, %u)> __platform_input_mouse_set_previous_position failed", window,
+                     mouse_move_event.position.x, mouse_move_event.position.y);
+      }
+
+      if (!__platform_input_mouse_set_current_position(mouse_move_event.position)) {
+        logger_error("<window:%p> <position:(%u, %u)> __platform_input_mouse_set_current_position failed", window,
+                     mouse_move_event.position.x, mouse_move_event.position.y);
+      }
+
+      if (window->on_event) {
+        if (!window->on_event((event_t *)&mouse_move_event)) {
+          logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                       events_type_string(mouse_move_event.base.type));
+        }
+      }
+    }
+
     TranslateMessage(&event);
     DispatchMessage(&event);
   }
