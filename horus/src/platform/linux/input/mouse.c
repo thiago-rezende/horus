@@ -24,12 +24,7 @@ mouse_position_t __platform_input_mouse_current_position_state = {0};
 mouse_position_t __platform_input_mouse_previous_position_state = {0};
 
 mouse_button_state_t __platform_input_mouse_button_states[MOUSE_BUTTON_COUNT] = {
-    [MOUSE_BUTTON_NONE] = MOUSE_BUTTON_STATE_NONE,          /* */
-    [MOUSE_BUTTON_LEFT] = MOUSE_BUTTON_STATE_NONE,          /* */
-    [MOUSE_BUTTON_RIGHT] = MOUSE_BUTTON_STATE_NONE,         /* */
-    [MOUSE_BUTTON_MIDDLE] = MOUSE_BUTTON_STATE_NONE,        /* */
-    [MOUSE_BUTTON_SIDE_FORWARD] = MOUSE_BUTTON_STATE_NONE,  /* */
-    [MOUSE_BUTTON_SIDE_BACKWARD] = MOUSE_BUTTON_STATE_NONE, /* */
+    MOUSE_BUTTON_STATE_NONE,
 };
 
 mouse_scroll_state_t __platform_input_mouse_scroll_current_state = MOUSE_SCROLL_STATE_NONE;
