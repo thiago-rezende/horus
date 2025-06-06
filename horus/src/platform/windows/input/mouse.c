@@ -22,7 +22,7 @@ mouse_button_state_t __platform_input_mouse_button_states[MOUSE_BUTTON_COUNT] = 
 
 mouse_scroll_state_t __platform_input_mouse_scroll_current_state = MOUSE_SCROLL_STATE_NONE;
 
-mouse_button_t __platform_input_mouse_button(UINT button) {
+mouse_button_t __platform_input_mouse_button(UINT button, WPARAM wparam) {
   if (button == WM_LBUTTONUP || button == WM_LBUTTONDOWN) {
     return MOUSE_BUTTON_LEFT;
   }
@@ -33,6 +33,18 @@ mouse_button_t __platform_input_mouse_button(UINT button) {
 
   if (button == WM_MBUTTONUP || button == WM_MBUTTONDOWN) {
     return MOUSE_BUTTON_MIDDLE;
+  }
+
+  if (button == WM_XBUTTONUP || button == WM_XBUTTONDOWN) {
+    WORD xbutton = GET_XBUTTON_WPARAM(wparam);
+
+    if (xbutton == XBUTTON1) {
+      return MOUSE_BUTTON_SIDE_BACKWARD;
+    }
+
+    if (xbutton == XBUTTON2) {
+      return MOUSE_BUTTON_SIDE_FORWARD;
+    }
   }
 
   return MOUSE_BUTTON_NONE;
@@ -51,6 +63,10 @@ b8 __platform_input_mouse_button_pressed(UINT button) {
     return true;
   }
 
+  if (button == WM_XBUTTONDOWN) {
+    return true;
+  }
+
   return false;
 }
 
@@ -64,6 +80,10 @@ b8 __platform_input_mouse_button_released(UINT button) {
   }
 
   if (button == WM_MBUTTONUP) {
+    return true;
+  }
+
+  if (button == WM_XBUTTONUP) {
     return true;
   }
 

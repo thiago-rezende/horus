@@ -6,7 +6,7 @@
 /* horus platform layer [ windows ] */
 #include <horus/platform/windows/windows.h>
 
-mouse_button_t __platform_input_mouse_button(UINT button);
+mouse_button_t __platform_input_mouse_button(UINT button, WPARAM wparam);
 
 b8 __platform_input_mouse_button_pressed(UINT button);
 b8 __platform_input_mouse_button_released(UINT button);

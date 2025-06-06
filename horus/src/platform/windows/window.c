@@ -148,8 +148,12 @@ b8 platform_window_process_events(platform_window_t *window) {
     if (__platform_input_mouse_button_pressed(event.message)) {
       mouse_button_press_event_t mouse_button_press_event = {
           .base = (event_t){.type = EVENT_TYPE_MOUSE_BUTTON_PRESS},
-          .button = __platform_input_mouse_button(event.message),
-          .position = (mouse_position_t){.x = 0, .y = 0},
+          .button = __platform_input_mouse_button(event.message, event.wParam),
+          .position =
+              (mouse_position_t){
+                  .x = (u16)GET_X_LPARAM(event.lParam),
+                  .y = (u16)GET_Y_LPARAM(event.lParam),
+              },
       };
 
       if (!__platform_input_mouse_button_set_state(mouse_button_press_event.button, MOUSE_BUTTON_STATE_PRESSED)) {
@@ -168,8 +172,12 @@ b8 platform_window_process_events(platform_window_t *window) {
     if (__platform_input_mouse_button_released(event.message)) {
       mouse_button_release_event_t mouse_button_release_event = {
           .base = (event_t){.type = EVENT_TYPE_MOUSE_BUTTON_RELEASE},
-          .button = __platform_input_mouse_button(event.message),
-          .position = (mouse_position_t){.x = 0, .y = 0},
+          .button = __platform_input_mouse_button(event.message, event.wParam),
+          .position =
+              (mouse_position_t){
+                  .x = (u16)GET_X_LPARAM(event.lParam),
+                  .y = (u16)GET_Y_LPARAM(event.lParam),
+              },
       };
 
       if (!__platform_input_mouse_button_set_state(mouse_button_release_event.button, MOUSE_BUTTON_STATE_RELEASED)) {

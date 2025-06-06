@@ -85,3 +85,4 @@
 
 /* Windows header file */
 #include <windows.h>
+#include <windowsx.h>
