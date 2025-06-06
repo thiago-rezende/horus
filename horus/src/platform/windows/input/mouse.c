@@ -90,7 +90,17 @@ b8 __platform_input_mouse_button_released(UINT button) {
   return false;
 }
 
-mouse_scroll_direction_t __platform_input_mouse_scroll_direction(/* platform_button_t */ u8 button) {
+mouse_scroll_direction_t __platform_input_mouse_scroll_direction(WPARAM wparam) {
+  short delta = GET_WHEEL_DELTA_WPARAM(wparam);
+
+  if (delta > 0) {
+    return MOUSE_SCROLL_DIRECTION_UP;
+  }
+
+  if (delta < 0) {
+    return MOUSE_SCROLL_DIRECTION_DOWN;
+  }
+
   return MOUSE_SCROLL_DIRECTION_NONE;
 }
 

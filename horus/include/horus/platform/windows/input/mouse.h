@@ -11,7 +11,7 @@ mouse_button_t __platform_input_mouse_button(UINT button, WPARAM wparam);
 b8 __platform_input_mouse_button_pressed(UINT button);
 b8 __platform_input_mouse_button_released(UINT button);
 
-mouse_scroll_direction_t __platform_input_mouse_scroll_direction(/* platform_button_t */ u8 button);
+mouse_scroll_direction_t __platform_input_mouse_scroll_direction(WPARAM wparam);
 
 mouse_position_t __platform_input_mouse_current_position(void);
 mouse_position_t __platform_input_mouse_previous_position(void);

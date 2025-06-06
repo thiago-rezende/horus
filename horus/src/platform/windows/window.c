@@ -223,6 +223,34 @@ b8 platform_window_process_events(platform_window_t *window) {
       }
     }
 
+    if (event.message == WM_MOUSEWHEEL) {
+      mouse_scroll_event_t mouse_scroll_event = {0};
+
+      mouse_scroll_event.base = (event_t){
+          .type = EVENT_TYPE_MOUSE_SCROLL,
+      };
+
+      mouse_scroll_event.direction = __platform_input_mouse_scroll_direction(event.wParam);
+
+      mouse_scroll_event.position.x = (u16)GET_X_LPARAM(event.lParam);
+      mouse_scroll_event.position.y = (u16)GET_Y_LPARAM(event.lParam);
+
+      mouse_scroll_state_t mouse_scroll_state =
+          __platform_input_mouse_scroll_direction_to_state(mouse_scroll_event.direction);
+
+      if (!__platform_input_mouse_scroll_set_state(mouse_scroll_state)) {
+        logger_error("<window:%p> <state:%s> __platform_input_mouse_scroll_set_state failed", window,
+                     input_mouse_scroll_state_string(mouse_scroll_state));
+      }
+
+      if (window->on_event) {
+        if (!window->on_event((event_t *)&mouse_scroll_event)) {
+          logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                       events_type_string(mouse_scroll_event.base.type));
+        }
+      }
+    }
+
     TranslateMessage(&event);
     DispatchMessage(&event);
   }
