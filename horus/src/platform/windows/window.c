@@ -193,6 +193,64 @@ b8 platform_window_process_events(platform_window_t *window) {
       }
     }
 
+    if (event.message == WM_KEYDOWN) {
+      keyboard_hold_event_t keyboard_hold_event = {0};
+      keyboard_press_event_t keyboard_press_event = {0};
+
+      keyboard_hold_event.base = (event_t){
+          .type = EVENT_TYPE_KEYBOARD_HOLD,
+      };
+
+      keyboard_press_event.base = (event_t){
+          .type = EVENT_TYPE_KEYBOARD_PRESS,
+      };
+
+      keyboard_keycode_t keycode = __platform_input_keyboard_keycode(event.wParam);
+
+      keyboard_hold_event.keycode = keycode;
+      keyboard_press_event.keycode = keycode;
+
+      keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keycode);
+
+      if (!__platform_input_keyboard_keycode_set_state(keycode, keyboard_keycode_state)) {
+        logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
+                     input_keyboard_keycode_state_string(keyboard_keycode_state));
+      }
+
+      if (window->on_event) {
+        event_t *event = keyboard_keycode_state == KEYBOARD_KEYCODE_STATE_HELD ? (event_t *)&keyboard_hold_event
+                                                                               : (event_t *)&keyboard_press_event;
+
+        if (!window->on_event(event)) {
+          logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                       events_type_string(event->type));
+        }
+      }
+    }
+
+    if (event.message == WM_KEYUP) {
+      keyboard_release_event_t keyboard_release_event = {0};
+
+      keyboard_release_event.base = (event_t){
+          .type = EVENT_TYPE_KEYBOARD_RELEASE,
+      };
+
+      keyboard_release_event.keycode = __platform_input_keyboard_keycode(event.wParam);
+
+      if (!__platform_input_keyboard_keycode_set_state(keyboard_release_event.keycode,
+                                                       KEYBOARD_KEYCODE_STATE_RELEASED)) {
+        logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
+                     input_keyboard_keycode_state_string(KEYBOARD_KEYCODE_STATE_RELEASED));
+      }
+
+      if (window->on_event) {
+        if (!window->on_event((event_t *)&keyboard_release_event)) {
+          logger_error("<window:%p> <on_event:%p> <type:%s> failed", window, window->on_event,
+                       events_type_string(keyboard_release_event.base.type));
+        }
+      }
+    }
+
     if (event.message == WM_MOUSEMOVE) {
       mouse_move_event_t mouse_move_event = {0};
 

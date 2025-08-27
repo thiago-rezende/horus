@@ -3,7 +3,10 @@
 /* horus input layer */
 #include <horus/input/keyboard.h>
 
-keyboard_keycode_t __platform_input_keyboard_keycode(/* platform_keycode_t */ u8 keycode);
+/* horus platform layer [ windows ]*/
+#include <horus/platform/windows/windows.h>
+
+keyboard_keycode_t __platform_input_keyboard_keycode(WPARAM virtual_key);
 
 b8 __platform_input_keyboard_keycode_clear_state(void);
 
