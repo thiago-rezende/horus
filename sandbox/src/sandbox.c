@@ -62,22 +62,25 @@ b8 on_event(event_t *event) {
   if (event->type == EVENT_TYPE_KEYBOARD_PRESS) {
     keyboard_press_event_t *keyboard_press_event = (keyboard_press_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <keycode:%s>", keyboard_press_event, events_type_string(event->type),
-                 input_keyboard_keycode_string(keyboard_press_event->keycode));
+    logger_debug("<event:%p> <type:%s> <keycode:%s> <scancode:%s>", keyboard_press_event,
+                 events_type_string(event->type), input_keyboard_keycode_string(keyboard_press_event->keycode),
+                 input_keyboard_keycode_string(keyboard_press_event->scancode));
   }
 
   if (event->type == EVENT_TYPE_KEYBOARD_RELEASE) {
     keyboard_release_event_t *keyboard_release_event = (keyboard_release_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <keycode:%s>", keyboard_release_event, events_type_string(event->type),
-                 input_keyboard_keycode_string(keyboard_release_event->keycode));
+    logger_debug("<event:%p> <type:%s> <keycode:%s> <scancode:%s>", keyboard_release_event,
+                 events_type_string(event->type), input_keyboard_keycode_string(keyboard_release_event->keycode),
+                 input_keyboard_keycode_string(keyboard_release_event->scancode));
   }
 
   if (event->type == EVENT_TYPE_KEYBOARD_HOLD) {
     keyboard_hold_event_t *keyboard_hold_event = (keyboard_hold_event_t *)event;
 
-    logger_debug("<event:%p> <type:%s> <keycode:%s>", keyboard_hold_event, events_type_string(event->type),
-                 input_keyboard_keycode_string(keyboard_hold_event->keycode));
+    logger_debug("<event:%p> <type:%s> <keycode:%s> <scancode:%s>", keyboard_hold_event,
+                 events_type_string(event->type), input_keyboard_keycode_string(keyboard_hold_event->keycode),
+                 input_keyboard_keycode_string(keyboard_hold_event->scancode));
   }
 
   return true;
@@ -106,6 +109,8 @@ b8 on_update(f64 timestep) {
   if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_ESCAPE)) {
     logger_debug("<on_update> <timestep:%f> <keycode:%s> is released", timestep,
                  input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));
+
+    platform_window_set_should_close(window, true);
   }
 
   if (input_keyboard_keycode_is_held(KEYBOARD_KEYCODE_ESCAPE)) {

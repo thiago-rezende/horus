@@ -61,7 +61,6 @@ static const char *keyboard_keycode_strings[KEYBOARD_KEYCODE_COUNT] = {
     [KEYBOARD_KEYCODE_RIGHT] = "right",
 
     /* modifiers */
-    [KEYBOARD_KEYCODE_PRINT] = "print",
     [KEYBOARD_KEYCODE_LEFT_ALT] = "left_alt",
     [KEYBOARD_KEYCODE_LEFT_META] = "left_meta",
     [KEYBOARD_KEYCODE_RIGHT_ALT] = "right_alt",

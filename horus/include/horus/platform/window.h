@@ -23,6 +23,8 @@ b8 platform_window_process_events(platform_window_t *window);
 
 b8 platform_window_should_close(platform_window_t *window);
 
+b8 platform_window_set_should_close(platform_window_t *window, b8 should_close);
+
 b8 platform_window_has_focus(platform_window_t *window);
 
 b8 platform_window_has_resized(platform_window_t *window);

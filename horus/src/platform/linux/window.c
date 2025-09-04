@@ -300,7 +300,9 @@ b8 platform_window_process_events(platform_window_t *window) {
         keyboard_keycode_t keycode = __platform_input_keyboard_keycode(key_press_event->detail);
 
         keyboard_hold_event.keycode = keycode;
+        keyboard_hold_event.scancode = KEYBOARD_KEYCODE_NONE; /* TODO: scancode detecion */
         keyboard_press_event.keycode = keycode;
+        keyboard_press_event.scancode = KEYBOARD_KEYCODE_NONE; /* TODO: scancode detection */
 
         keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keycode);
 
@@ -450,6 +452,12 @@ b8 platform_window_process_events(platform_window_t *window) {
 
 b8 platform_window_should_close(platform_window_t *window) {
   return window->should_close;
+}
+
+b8 platform_window_set_should_close(platform_window_t *window, b8 should_close) {
+  window->should_close = should_close;
+
+  return true;
 }
 
 b8 platform_window_has_focus(platform_window_t *window) {

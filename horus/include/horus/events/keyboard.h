@@ -10,16 +10,19 @@ typedef struct __keyboard_press_event {
   event_t base;
 
   keyboard_keycode_t keycode;
+  keyboard_keycode_t scancode;
 } keyboard_press_event_t;
 
 typedef struct __keyboard_release_event {
   event_t base;
 
   keyboard_keycode_t keycode;
+  keyboard_keycode_t scancode;
 } keyboard_release_event_t;
 
 typedef struct __keyboard_hold_event {
   event_t base;
 
   keyboard_keycode_t keycode;
+  keyboard_keycode_t scancode;
 } keyboard_hold_event_t;

@@ -206,9 +206,12 @@ b8 platform_window_process_events(platform_window_t *window) {
       };
 
       keyboard_keycode_t keycode = __platform_input_keyboard_keycode(event.wParam);
+      keyboard_keycode_t scancode = __platform_input_keyboard_scancode(event.lParam);
 
       keyboard_hold_event.keycode = keycode;
+      keyboard_hold_event.scancode = scancode;
       keyboard_press_event.keycode = keycode;
+      keyboard_press_event.scancode = scancode;
 
       keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keycode);
 
@@ -236,6 +239,7 @@ b8 platform_window_process_events(platform_window_t *window) {
       };
 
       keyboard_release_event.keycode = __platform_input_keyboard_keycode(event.wParam);
+      keyboard_release_event.scancode = __platform_input_keyboard_scancode(event.lParam);
 
       if (!__platform_input_keyboard_keycode_set_state(keyboard_release_event.keycode,
                                                        KEYBOARD_KEYCODE_STATE_RELEASED)) {
@@ -318,6 +322,12 @@ b8 platform_window_process_events(platform_window_t *window) {
 
 b8 platform_window_should_close(platform_window_t *window) {
   return window->should_close;
+}
+
+b8 platform_window_set_should_close(platform_window_t *window, b8 should_close) {
+  window->should_close = should_close;
+
+  return true;
 }
 
 b8 platform_window_has_focus(platform_window_t *window) {
