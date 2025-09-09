@@ -21,7 +21,10 @@
 #include <horus/platform/window.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
+
+#if !defined(HORUS_ENTRYPOINT_DISABLE)
 #include <horus/platform/entrypoint.h>
+#endif
 
 /* horus logger layer */
 #include <horus/logger/logger.h>

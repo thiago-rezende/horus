@@ -31,6 +31,11 @@ if get_option('build_sandbox')
   subdir('sandbox')
 endif
 
+# tests targets
+if get_option('build_tests')
+  subdir('tests')
+endif
+
 # project options summary
 summary(
   {

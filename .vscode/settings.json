@@ -10,7 +10,7 @@
     "--buildtype=debug",
   ],
   "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
-  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "C_Cpp.default.compileCommands": "/home/horus/Projects/c/horus/build/compile_commands.json",
   "terminal.integrated.profiles.windows": {
     "CLANG64": {
       "path": "C:/msys64/usr/bin/bash.exe",
@@ -31,5 +31,9 @@
     "MSYSTEM": "CLANG64",
     "CHERE_INVOKING": "1",
     "MSYS2_PATH_TYPE": "inherit",
+  },
+  "files.associations": {
+    "horus.h": "c",
+    "entrypoint.h": "c"
   },
 }

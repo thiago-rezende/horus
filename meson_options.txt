@@ -5,3 +5,10 @@ option(
   type: 'boolean',
   description: 'build the sandbox application',
 )
+
+option(
+  'build_tests',
+  value: true,
+  type: 'boolean',
+  description: 'build the project tests',
+)

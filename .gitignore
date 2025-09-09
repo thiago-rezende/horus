@@ -2,6 +2,10 @@
 build
 builddir
 
+subprojects/*
+!subprojects/*.wrap
+!subprojects/.wraplock
+
 # VS Code
 .vscode/*
 !.vscode/c_cpp_properties.json
