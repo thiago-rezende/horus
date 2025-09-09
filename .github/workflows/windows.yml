@@ -77,6 +77,7 @@ jobs:
           update: false
           install: >-
             clang64/mingw-w64-clang-x86_64-meson
+            clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
@@ -119,6 +120,7 @@ jobs:
           update: false
           install: >-
             clang64/mingw-w64-clang-x86_64-meson
+            clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
@@ -161,6 +163,7 @@ jobs:
           update: false
           install: >-
             clang64/mingw-w64-clang-x86_64-meson
+            clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
