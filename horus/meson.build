@@ -6,6 +6,9 @@ horus_sources = [
   # horus core layer
   'src/core/strings.c',
 
+  # horus containers layer
+  'src/containers/array.c',
+
   # horus logger layer
   'src/logger/logger.c',
 

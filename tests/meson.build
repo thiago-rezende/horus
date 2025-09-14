@@ -12,3 +12,6 @@ tests_dependencies = [
 
 # core layer tests
 subdir('core')
+
+# containers layer tests
+subdir('containers')

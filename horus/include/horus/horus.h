@@ -12,6 +12,9 @@
 #include <horus/core/macros.h>
 #include <horus/core/strings.h>
 
+/* horus containers layer */
+#include <horus/containers/array.h>
+
 /* horus application layer */
 #include <horus/application/application.h>
 #include <horus/application/configuration.h>

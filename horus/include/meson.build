@@ -12,6 +12,9 @@ horus_headers = [
   'horus/core/macros.h',
   'horus/core/strings.h',
 
+  # horus containers layer
+  'horus/containers/array.h',
+
   # horus application layer
   'horus/application/application.h',
   'horus/application/configuration.h',
