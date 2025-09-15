@@ -305,17 +305,17 @@ b8 platform_window_process_events(platform_window_t *window) {
         xcb_keycode_t xcb_keycode = key_press_event->detail;
         xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->keysyms, xcb_keycode, 0);
 
-        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keycode);
-        keyboard_keycode_t keysymbol = __platform_input_keyboard_keysymbol(xcb_keysymbol);
+        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keysymbol);
+        keyboard_keycode_t scancode = __platform_input_keyboard_scancode(xcb_keycode);
 
-        keyboard_hold_event.keycode = keysymbol;
-        keyboard_hold_event.scancode = keycode;
-        keyboard_press_event.keycode = keysymbol;
-        keyboard_press_event.scancode = keycode;
+        keyboard_hold_event.keycode = keycode;
+        keyboard_hold_event.scancode = scancode;
+        keyboard_press_event.keycode = keycode;
+        keyboard_press_event.scancode = scancode;
 
-        keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keysymbol);
+        keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keycode);
 
-        if (!__platform_input_keyboard_keycode_set_state(keysymbol, keyboard_keycode_state)) {
+        if (!__platform_input_keyboard_keycode_set_state(keycode, keyboard_keycode_state)) {
           logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
                        input_keyboard_keycode_state_string(keyboard_keycode_state));
         }
@@ -346,13 +346,13 @@ b8 platform_window_process_events(platform_window_t *window) {
         xcb_keycode_t xcb_keycode = key_release_event->detail;
         xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->keysyms, xcb_keycode, 0);
 
-        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keycode);
-        keyboard_keycode_t keysymbol = __platform_input_keyboard_keysymbol(xcb_keysymbol);
+        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keysymbol);
+        keyboard_keycode_t scancode = __platform_input_keyboard_scancode(xcb_keycode);
 
-        keyboard_release_event.keycode = keysymbol;
-        keyboard_release_event.scancode = keycode;
+        keyboard_release_event.keycode = keycode;
+        keyboard_release_event.scancode = scancode;
 
-        if (!__platform_input_keyboard_keycode_set_state(keysymbol, KEYBOARD_KEYCODE_STATE_RELEASED)) {
+        if (!__platform_input_keyboard_keycode_set_state(keycode, KEYBOARD_KEYCODE_STATE_RELEASED)) {
           logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
                        input_keyboard_keycode_state_string(KEYBOARD_KEYCODE_STATE_RELEASED));
         }

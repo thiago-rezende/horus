@@ -268,11 +268,11 @@ static keyboard_keycode_state_t __platform_input_keyboard_keycode_states[KEYBOAR
     KEYBOARD_KEYCODE_STATE_NONE,
 };
 
-keyboard_keycode_t __platform_input_keyboard_keycode(xcb_keycode_t keycode) {
+keyboard_keycode_t __platform_input_keyboard_scancode(xcb_keycode_t keycode) {
   return platform_input_keyboard_keycode_mapping[keycode];
 }
 
-keyboard_keycode_t __platform_input_keyboard_keysymbol(xcb_keysym_t keysymbol) {
+keyboard_keycode_t __platform_input_keyboard_keycode(xcb_keysym_t keysymbol) {
   switch (keysymbol) {
     /* letters */
     case XK_a:
