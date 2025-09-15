@@ -6,6 +6,7 @@
 #include <horus/input/keyboard.h>
 
 keyboard_keycode_t __platform_input_keyboard_keycode(xcb_keycode_t keycode);
+keyboard_keycode_t __platform_input_keyboard_keysymbol(xcb_keysym_t keysymbol);
 
 b8 __platform_input_keyboard_keycode_clear_state(void);
 

@@ -3,6 +3,7 @@
 
 #include <xcb/xcb.h>
 #include <xcb/xkb.h>
+#include <xcb/xcb_keysyms.h>
 
 /* horus base layer */
 #include <horus/definitions.h>
@@ -51,6 +52,8 @@ struct __platform_window {
   xcb_connection_t *connection;
   xcb_screen_t *screen;
   xcb_window_t window;
+
+  xcb_key_symbols_t *keysyms;
 
   platform_window_size_t size;
 
@@ -130,6 +133,8 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   }
 
   xcb_map_window(window->connection, window->window);
+
+  window->keysyms = xcb_key_symbols_alloc(window->connection);
 
   xcb_flush(window->connection);
 
@@ -297,16 +302,20 @@ b8 platform_window_process_events(platform_window_t *window) {
             .type = EVENT_TYPE_KEYBOARD_PRESS,
         };
 
-        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(key_press_event->detail);
+        xcb_keycode_t xcb_keycode = key_press_event->detail;
+        xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->keysyms, xcb_keycode, 0);
 
-        keyboard_hold_event.keycode = keycode;
-        keyboard_hold_event.scancode = KEYBOARD_KEYCODE_NONE; /* TODO: scancode detecion */
-        keyboard_press_event.keycode = keycode;
-        keyboard_press_event.scancode = KEYBOARD_KEYCODE_NONE; /* TODO: scancode detection */
+        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keycode);
+        keyboard_keycode_t keysymbol = __platform_input_keyboard_keysymbol(xcb_keysymbol);
 
-        keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keycode);
+        keyboard_hold_event.keycode = keysymbol;
+        keyboard_hold_event.scancode = keycode;
+        keyboard_press_event.keycode = keysymbol;
+        keyboard_press_event.scancode = keycode;
 
-        if (!__platform_input_keyboard_keycode_set_state(keycode, keyboard_keycode_state)) {
+        keyboard_keycode_state_t keyboard_keycode_state = __platform_input_keyboard_keycode_pressed_state(keysymbol);
+
+        if (!__platform_input_keyboard_keycode_set_state(keysymbol, keyboard_keycode_state)) {
           logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
                        input_keyboard_keycode_state_string(keyboard_keycode_state));
         }
@@ -334,10 +343,16 @@ b8 platform_window_process_events(platform_window_t *window) {
             .type = EVENT_TYPE_KEYBOARD_RELEASE,
         };
 
-        keyboard_release_event.keycode = __platform_input_keyboard_keycode(key_release_event->detail);
+        xcb_keycode_t xcb_keycode = key_release_event->detail;
+        xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->keysyms, xcb_keycode, 0);
 
-        if (!__platform_input_keyboard_keycode_set_state(keyboard_release_event.keycode,
-                                                         KEYBOARD_KEYCODE_STATE_RELEASED)) {
+        keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keycode);
+        keyboard_keycode_t keysymbol = __platform_input_keyboard_keysymbol(xcb_keysymbol);
+
+        keyboard_release_event.keycode = keysymbol;
+        keyboard_release_event.scancode = keycode;
+
+        if (!__platform_input_keyboard_keycode_set_state(keysymbol, KEYBOARD_KEYCODE_STATE_RELEASED)) {
           logger_error("<window:%p> <state:%s> __platform_input_keyboard_keycode_set_state failed", window,
                        input_keyboard_keycode_state_string(KEYBOARD_KEYCODE_STATE_RELEASED));
         }
@@ -634,6 +649,21 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
 
   free(xkb_per_client_flags_reply);
   free(xkb_per_client_flags_reply_error);
+
+  xcb_void_cookie_t xcb_xkb_select_events_cookie = xcb_xkb_select_events(
+      connection, XCB_XKB_ID_USE_CORE_KBD, XCB_XKB_EVENT_TYPE_MAP_NOTIFY | XCB_XKB_EVENT_TYPE_STATE_NOTIFY, 0,
+      XCB_XKB_EVENT_TYPE_MAP_NOTIFY | XCB_XKB_EVENT_TYPE_STATE_NOTIFY, 0, 0, NULL);
+
+  xcb_generic_error_t *xcb_xkb_select_events_error = xcb_request_check(connection, xcb_xkb_select_events_cookie);
+
+  if (xcb_xkb_select_events_error != NULL) {
+    logger_critical("<xcb_connection:%p> <error:%p> <code:%u> xcb_xkb_select_events failed", connection,
+                    xcb_xkb_select_events_error, xcb_xkb_select_events_error->error_code);
+
+    free(xcb_xkb_select_events_error);
+
+    return false;
+  }
 
   return true;
 }

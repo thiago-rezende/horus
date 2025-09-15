@@ -68,6 +68,7 @@ if host_machine.system() == 'linux'
   # horus window dependencies [ linux ]
   xcb_dep = dependency('xcb')
   xcb_xkb_dep = dependency('xcb-xkb')
+  xcb_keysyms_dep = dependency('xcb-keysyms')
 
   # horus renderer dependencies [ linux ]
   vulkan_dep = dependency('vulkan')
@@ -76,6 +77,7 @@ if host_machine.system() == 'linux'
     # horus window dependencies [ linux ]
     xcb_dep,
     xcb_xkb_dep,
+    xcb_keysyms_dep,
 
     # horus renderer dependencies [ linux ]
     vulkan_dep,

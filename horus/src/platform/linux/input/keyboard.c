@@ -1,6 +1,8 @@
 /* horus input layer [ linux ] */
 #include <horus/platform/linux/input/keyboard.h>
 
+#include <X11/keysym.h>
+
 #define PLATFORM_INPUT_KEYBOARD_KEYCODE_COUNT 256
 
 static const keyboard_keycode_t platform_input_keyboard_keycode_mapping[PLATFORM_INPUT_KEYBOARD_KEYCODE_COUNT] = {
@@ -268,6 +270,237 @@ static keyboard_keycode_state_t __platform_input_keyboard_keycode_states[KEYBOAR
 
 keyboard_keycode_t __platform_input_keyboard_keycode(xcb_keycode_t keycode) {
   return platform_input_keyboard_keycode_mapping[keycode];
+}
+
+keyboard_keycode_t __platform_input_keyboard_keysymbol(xcb_keysym_t keysymbol) {
+  switch (keysymbol) {
+    /* letters */
+    case XK_a:
+    case XK_A:
+      return KEYBOARD_KEYCODE_A;
+    case XK_b:
+    case XK_B:
+      return KEYBOARD_KEYCODE_B;
+    case XK_c:
+    case XK_C:
+      return KEYBOARD_KEYCODE_C;
+    case XK_d:
+    case XK_D:
+      return KEYBOARD_KEYCODE_D;
+    case XK_e:
+    case XK_E:
+      return KEYBOARD_KEYCODE_E;
+    case XK_f:
+    case XK_F:
+      return KEYBOARD_KEYCODE_F;
+    case XK_g:
+    case XK_G:
+      return KEYBOARD_KEYCODE_G;
+    case XK_h:
+    case XK_H:
+      return KEYBOARD_KEYCODE_H;
+    case XK_i:
+    case XK_I:
+      return KEYBOARD_KEYCODE_I;
+    case XK_j:
+    case XK_J:
+      return KEYBOARD_KEYCODE_J;
+    case XK_k:
+    case XK_K:
+      return KEYBOARD_KEYCODE_K;
+    case XK_l:
+    case XK_L:
+      return KEYBOARD_KEYCODE_L;
+    case XK_m:
+    case XK_M:
+      return KEYBOARD_KEYCODE_M;
+    case XK_n:
+    case XK_N:
+      return KEYBOARD_KEYCODE_N;
+    case XK_o:
+    case XK_O:
+      return KEYBOARD_KEYCODE_O;
+    case XK_p:
+    case XK_P:
+      return KEYBOARD_KEYCODE_P;
+    case XK_q:
+    case XK_Q:
+      return KEYBOARD_KEYCODE_Q;
+    case XK_r:
+    case XK_R:
+      return KEYBOARD_KEYCODE_R;
+    case XK_s:
+    case XK_S:
+      return KEYBOARD_KEYCODE_S;
+    case XK_t:
+    case XK_T:
+      return KEYBOARD_KEYCODE_T;
+    case XK_u:
+    case XK_U:
+      return KEYBOARD_KEYCODE_U;
+    case XK_v:
+    case XK_V:
+      return KEYBOARD_KEYCODE_V;
+    case XK_w:
+    case XK_W:
+      return KEYBOARD_KEYCODE_W;
+    case XK_x:
+    case XK_X:
+      return KEYBOARD_KEYCODE_X;
+    case XK_y:
+    case XK_Y:
+      return KEYBOARD_KEYCODE_Y;
+    case XK_z:
+    case XK_Z:
+      return KEYBOARD_KEYCODE_Z;
+
+    /* numbers */
+    case XK_0:
+      return KEYBOARD_KEYCODE_0;
+    case XK_1:
+      return KEYBOARD_KEYCODE_1;
+    case XK_2:
+      return KEYBOARD_KEYCODE_2;
+    case XK_3:
+      return KEYBOARD_KEYCODE_3;
+    case XK_4:
+      return KEYBOARD_KEYCODE_4;
+    case XK_5:
+      return KEYBOARD_KEYCODE_5;
+    case XK_6:
+      return KEYBOARD_KEYCODE_6;
+    case XK_7:
+      return KEYBOARD_KEYCODE_7;
+    case XK_8:
+      return KEYBOARD_KEYCODE_8;
+    case XK_9:
+      return KEYBOARD_KEYCODE_9;
+
+    /* general */
+    case XK_Tab:
+      return KEYBOARD_KEYCODE_TAB;
+    case XK_Return:
+      return KEYBOARD_KEYCODE_ENTER;
+    case XK_space:
+      return KEYBOARD_KEYCODE_SPACE;
+    case XK_Escape:
+      return KEYBOARD_KEYCODE_ESCAPE;
+    case XK_BackSpace:
+      return KEYBOARD_KEYCODE_BACKSPACE;
+
+    /* arrows */
+    case XK_Up:
+      return KEYBOARD_KEYCODE_UP;
+    case XK_Down:
+      return KEYBOARD_KEYCODE_DOWN;
+    case XK_Left:
+      return KEYBOARD_KEYCODE_LEFT;
+    case XK_Right:
+      return KEYBOARD_KEYCODE_RIGHT;
+
+    /* modifiers */
+    case XK_Alt_L:
+      return KEYBOARD_KEYCODE_LEFT_ALT;
+    case XK_Meta_L:
+      return KEYBOARD_KEYCODE_LEFT_META;
+    case XK_Alt_R:
+      return KEYBOARD_KEYCODE_RIGHT_ALT;
+    case XK_Shift_L:
+      return KEYBOARD_KEYCODE_LEFT_SHIFT;
+    case XK_Super_L:
+      return KEYBOARD_KEYCODE_LEFT_SUPER;
+    case XK_Meta_R:
+      return KEYBOARD_KEYCODE_RIGHT_META;
+    case XK_Shift_R:
+      return KEYBOARD_KEYCODE_RIGHT_SHIFT;
+    case XK_Super_R:
+      return KEYBOARD_KEYCODE_RIGHT_SUPER;
+    case XK_bracketleft:
+      return KEYBOARD_KEYCODE_LEFT_BRACKET;
+    case XK_Control_L:
+      return KEYBOARD_KEYCODE_LEFT_CONTROL;
+    case XK_bracketright:
+      return KEYBOARD_KEYCODE_RIGHT_BRACKET;
+    case XK_Control_R:
+      return KEYBOARD_KEYCODE_RIGHT_CONTROL;
+
+    /* functions */
+    case XK_F1:
+      return KEYBOARD_KEYCODE_F1;
+    case XK_F2:
+      return KEYBOARD_KEYCODE_F2;
+    case XK_F3:
+      return KEYBOARD_KEYCODE_F3;
+    case XK_F4:
+      return KEYBOARD_KEYCODE_F4;
+    case XK_F5:
+      return KEYBOARD_KEYCODE_F5;
+    case XK_F6:
+      return KEYBOARD_KEYCODE_F6;
+    case XK_F7:
+      return KEYBOARD_KEYCODE_F7;
+    case XK_F8:
+      return KEYBOARD_KEYCODE_F8;
+    case XK_F9:
+      return KEYBOARD_KEYCODE_F9;
+    case XK_F10:
+      return KEYBOARD_KEYCODE_F10;
+    case XK_F11:
+      return KEYBOARD_KEYCODE_F11;
+    case XK_F12:
+      return KEYBOARD_KEYCODE_F12;
+
+    /* general */
+    case XK_End:
+      return KEYBOARD_KEYCODE_END;
+    case XK_Home:
+      return KEYBOARD_KEYCODE_HOME;
+    case XK_Delete:
+      return KEYBOARD_KEYCODE_DELETE;
+    case XK_Insert:
+      return KEYBOARD_KEYCODE_INSERT;
+    case XK_Page_Up:
+      return KEYBOARD_KEYCODE_PAGEUP;
+    case XK_Page_Down:
+      return KEYBOARD_KEYCODE_PAGEDOWN;
+
+    /* general */
+    case XK_Num_Lock:
+      return KEYBOARD_KEYCODE_NUMLOCK;
+    case XK_Caps_Lock:
+      return KEYBOARD_KEYCODE_CAPSLOCK;
+    case XK_Scroll_Lock:
+      return KEYBOARD_KEYCODE_SCROLLLOCK;
+
+    /* general */
+    case XK_Pause:
+      return KEYBOARD_KEYCODE_PAUSE;
+    case XK_Print:
+      return KEYBOARD_KEYCODE_PRINTSCREEN;
+
+    /* symbols */
+    case XK_comma:
+      return KEYBOARD_KEYCODE_COMMA;
+    case XK_grave:
+      return KEYBOARD_KEYCODE_GRAVE;
+    case XK_minus:
+      return KEYBOARD_KEYCODE_MINUS;
+    case XK_slash:
+      return KEYBOARD_KEYCODE_SLASH;
+    case XK_equal:
+      return KEYBOARD_KEYCODE_EQUALS;
+    case XK_period:
+      return KEYBOARD_KEYCODE_PERIOD;
+    case XK_backslash:
+      return KEYBOARD_KEYCODE_BACKSLASH;
+    case XK_semicolon:
+      return KEYBOARD_KEYCODE_SEMICOLON;
+    case XK_apostrophe:
+      return KEYBOARD_KEYCODE_APOSTROPHE;
+
+    default:
+      return KEYBOARD_KEYCODE_NONE;
+  }
 }
 
 b8 __platform_input_keyboard_keycode_clear_state(void) {
