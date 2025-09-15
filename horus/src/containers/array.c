@@ -23,10 +23,15 @@ b8 array_create(u64 capacity, u64 stride, array_t **output) {
   };
 
   if (array->buffer == NULL) {
+    platform_memory_deallocate(array);
+
     return false;
   }
 
   if (!platform_memory_clear(array->buffer, capacity * stride)) {
+    platform_memory_deallocate(array->buffer);
+    platform_memory_deallocate(array);
+
     return false;
   }
 
@@ -36,11 +41,25 @@ b8 array_create(u64 capacity, u64 stride, array_t **output) {
 }
 
 b8 array_destroy(array_t *array) {
-  if (array != NULL) {
+  if (array == NULL) {
+    return false;
+  }
+
+  if (array->buffer != NULL) {
     platform_memory_deallocate(array->buffer);
   }
 
   platform_memory_deallocate(array);
+
+  return true;
+}
+
+b8 array_clear(array_t *array) {
+  if (array == NULL) {
+    return false;
+  }
+
+  array->count = 0;
 
   return true;
 }
@@ -54,7 +73,7 @@ b8 array_retrieve(array_t *array, u64 index, void *item) {
     return false;
   }
 
-  void *offset = array->buffer + (index * array->stride);
+  void *offset = (uint8_t *)array->buffer + (index * array->stride);
 
   if (!platform_memory_copy(item, offset, array->stride)) {
     return false;
@@ -72,7 +91,7 @@ b8 array_insert(array_t *array, void *item) {
     return false;
   }
 
-  void *offset = array->buffer + (array->count * array->stride);
+  void *offset = (uint8_t *)array->buffer + (array->count * array->stride);
 
   if (!platform_memory_copy(offset, item, array->stride)) {
     return false;

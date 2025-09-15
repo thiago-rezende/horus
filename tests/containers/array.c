@@ -39,7 +39,7 @@ static void test_array_create_and_destroy(void **state) {
   assert_true(result);
 }
 
-static void test_insert_and_retrieve(void **state) {
+static void test_array_insert_and_retrieve(void **state) {
   (void)state; /* unused */
 
   /* default attributes */
@@ -76,7 +76,7 @@ static void test_insert_and_retrieve(void **state) {
   array_destroy(array);
 }
 
-static void test_insert_beyond_capacity(void **state) {
+static void test_array_insert_beyond_capacity(void **state) {
   (void)state; /* unused */
 
   /* default attributes */
@@ -108,7 +108,7 @@ static void test_insert_beyond_capacity(void **state) {
   array_destroy(array);
 }
 
-static void test_retrieve_beyond_count(void **state) {
+static void test_array_retrieve_beyond_count(void **state) {
   (void)state; /* unused */
 
   /* default attributes */
@@ -135,7 +135,7 @@ static void test_retrieve_beyond_count(void **state) {
   array_destroy(array);
 }
 
-static void test_buffer_direct_usage(void **state) {
+static void test_array_buffer_direct_usage(void **state) {
   (void)state; /* unused */
 
   /* default attributes */
@@ -172,11 +172,57 @@ static void test_buffer_direct_usage(void **state) {
   array_destroy(array);
 }
 
+static void test_array_clear(void **state) {
+  (void)state; /* unused */
+
+  /* default attributes */
+  const u64 index = 0;
+  const u64 stride = sizeof(u64);
+  const u64 capacity = 10;
+
+  /* default values */
+  const u64 item_to_insert = 100;
+  u64 item_to_retrieve = 0;
+
+  /* array object */
+  array_t *array = NULL;
+
+  /* array creation */
+  array_create(capacity, stride, &array);
+
+  /* array intertion */
+  array_insert(array, (void *)&item_to_insert);
+
+  /* array retrieval */
+  b8 result = array_retrieve(array, index, (void *)&item_to_retrieve);
+
+  /* retrieval result assertion */
+  assert_true(result);
+
+  /* item comparison assertion */
+  assert_int_equal(item_to_insert, item_to_retrieve);
+
+  /* array clear */
+  result = array_clear(array);
+
+  /* clear result assertion */
+  assert_true(result);
+
+  /* array retrieval */
+  result = array_retrieve(array, index, (void *)&item_to_retrieve);
+
+  /* retrieval result assertion */
+  assert_false(result);
+
+  /* array destruction */
+  array_destroy(array);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_array_create_and_destroy), cmocka_unit_test(test_insert_and_retrieve),
-      cmocka_unit_test(test_insert_beyond_capacity),   cmocka_unit_test(test_retrieve_beyond_count),
-      cmocka_unit_test(test_buffer_direct_usage),
+      cmocka_unit_test(test_array_create_and_destroy),     cmocka_unit_test(test_array_insert_and_retrieve),
+      cmocka_unit_test(test_array_insert_beyond_capacity), cmocka_unit_test(test_array_retrieve_beyond_count),
+      cmocka_unit_test(test_array_buffer_direct_usage),    cmocka_unit_test(test_array_clear),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);

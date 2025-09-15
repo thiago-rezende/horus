@@ -14,5 +14,6 @@ typedef struct __array {
 b8 array_create(u64 capacity, u64 stride, array_t **output);
 b8 array_destroy(array_t *array);
 
+b8 array_clear(array_t *array);
 b8 array_insert(array_t *array, void *item);
 b8 array_retrieve(array_t *array, u64 index, void *item);
