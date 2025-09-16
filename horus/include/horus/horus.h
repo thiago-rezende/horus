@@ -40,3 +40,6 @@
 #include <horus/events/base.h>
 #include <horus/events/mouse.h>
 #include <horus/events/keyboard.h>
+
+/* horus renderer layer */
+#include <horus/renderer/renderer.h>

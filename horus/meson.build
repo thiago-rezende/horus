@@ -21,6 +21,12 @@ horus_sources = [
 
   # horus application layer
   'src/application/application.c',
+
+  # horus renderer layer
+  'src/renderer/general.c',
+
+  # horus vulkan renderer layer
+  'src/renderer/vulkan/renderer.c',
 ]
 
 # horus source files [ linux ]

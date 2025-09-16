@@ -44,6 +44,10 @@ horus_headers = [
   # horus platform input layer
   'horus/platform/input/mouse.h',
   'horus/platform/input/keyboard.h',
+
+  # horus renderer layer
+  'horus/renderer/general.h',
+  'horus/renderer/renderer.h',
 ]
 
 # horus header files [ linux ]
