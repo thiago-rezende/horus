@@ -101,15 +101,7 @@ b8 on_update(f64 timestep) {
     logger_debug("<on_update> <timestep:%f> <x:%u> <y:%u> mouse moved", timestep, position.x, position.y);
   }
 
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_ESCAPE)) {
-    logger_debug("<on_update> <timestep:%f> <keycode:%s> is pressed", timestep,
-                 input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));
-  }
-
   if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_ESCAPE)) {
-    logger_debug("<on_update> <timestep:%f> <keycode:%s> is released", timestep,
-                 input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));
-
     platform_window_set_should_close(window, true);
   }
 

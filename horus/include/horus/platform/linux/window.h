@@ -6,7 +6,7 @@
 /* horus platform layer */
 #include <horus/platform/window.h>
 
-typedef struct __platform_window_context {
+struct __platform_window_context {
   xcb_connection_t *connection;
   xcb_screen_t *screen;
   xcb_window_t window;

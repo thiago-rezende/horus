@@ -16,6 +16,9 @@
 /* horus application layer */
 #include <horus/application/application.h>
 
+/* horus renderer layer */
+#include <horus/renderer/renderer.h>
+
 extern application_t *application_create(void);
 extern b8 application_destroy(application_t *application);
 
@@ -49,6 +52,10 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
   logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", window, application->name,
               resolution->width, resolution->height, configuration->fullscreen);
 
+  renderer_t *renderer = renderer_create(application, window);
+
+  logger_info("<renderer:%p> <implementation:%s> created", renderer, renderer_implementation_string(renderer));
+
   if (application->on_event) {
     if (!platform_window_set_event_callback(window, application->on_event)) {
       logger_error("<application:%p> <on_event> failed", application);
@@ -79,6 +86,10 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
     platform_window_process_events(window);
   }
+
+  renderer_destroy(renderer);
+
+  logger_info("<renderer:%p> <implementation:%s> destroyed", renderer, renderer_implementation_string(renderer));
 
   platform_window_destroy(window);
 

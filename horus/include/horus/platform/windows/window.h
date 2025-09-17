@@ -6,7 +6,7 @@
 /* horus platform layer */
 #include <horus/platform/window.h>
 
-typedef struct __platform_window_context {
+struct __platform_window_context {
   HINSTANCE hinstance;
 
   HWND window;
