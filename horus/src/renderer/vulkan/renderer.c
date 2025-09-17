@@ -1,3 +1,5 @@
+#include <vulkan/vulkan.h>
+
 /* horus renderer layer */
 #include <horus/renderer/renderer.h>
 
@@ -10,8 +12,6 @@
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
-#include <vulkan/vulkan.h>
-
 struct __renderer {
   renderer_implementation_t implementation;
   const char *implementation_string;
@@ -19,11 +19,7 @@ struct __renderer {
   VkInstance instance;
 };
 
-b8 renderer_create(application_t *application, platform_window_t *window, renderer_t **output) {
-  if (output == NULL) {
-    return false;
-  }
-
+renderer_t *renderer_create(application_t *application, platform_window_t *window) {
   renderer_t *renderer = platform_memory_allocate(sizeof(renderer_t));
 
   *renderer = (renderer_t){
@@ -57,15 +53,13 @@ b8 renderer_create(application_t *application, platform_window_t *window, render
 
     platform_memory_deallocate(renderer);
 
-    return false;
+    return NULL;
   }
 
   logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkInstance created", renderer,
                renderer->implementation_string, renderer->instance);
 
-  *output = renderer;
-
-  return true;
+  return renderer;
 }
 
 b8 renderer_destroy(renderer_t *renderer) {

@@ -49,9 +49,7 @@ int main(int argc, char **argv, char **envp) {
   logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", window, application->name,
               resolution->width, resolution->height, configuration->fullscreen);
 
-  renderer_t *renderer = NULL;
-
-  renderer_create(application, window, &renderer);
+  renderer_t *renderer = renderer_create(application, window);
 
   logger_info("<renderer:%p> <implementation:%s> created", renderer, renderer_implementation_string(renderer));
 

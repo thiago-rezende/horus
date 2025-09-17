@@ -4,15 +4,11 @@
 /* horus platform layer */
 #include <horus/platform/memory.h>
 
-b8 array_create(u64 capacity, u64 stride, array_t **output) {
-  if (output == NULL) {
-    return false;
-  }
-
+array_t *array_create(u64 capacity, u64 stride) {
   array_t *array = (array_t *)platform_memory_allocate(sizeof(array_t));
 
   if (array == NULL) {
-    return false;
+    return NULL;
   }
 
   *array = (array_t){
@@ -25,19 +21,17 @@ b8 array_create(u64 capacity, u64 stride, array_t **output) {
   if (array->buffer == NULL) {
     platform_memory_deallocate(array);
 
-    return false;
+    return NULL;
   }
 
   if (!platform_memory_clear(array->buffer, capacity * stride)) {
     platform_memory_deallocate(array->buffer);
     platform_memory_deallocate(array);
 
-    return false;
+    return NULL;
   }
 
-  *output = array;
-
-  return true;
+  return array;
 }
 
 b8 array_destroy(array_t *array) {

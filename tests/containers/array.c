@@ -15,14 +15,11 @@ static void test_array_create_and_destroy(void **state) {
   const u64 stride = sizeof(u64);
   const u64 capacity = 10;
 
-  /* array object */
-  array_t *array = NULL;
-
   /* array creation */
-  b8 result = array_create(capacity, stride, &array);
+  array_t *array = array_create(capacity, stride);
 
   /* creation result assertion */
-  assert_true(result);
+  assert_non_null(array);
 
   /* array object assertion */
   assert_non_null(array);
@@ -33,7 +30,7 @@ static void test_array_create_and_destroy(void **state) {
   assert_int_equal(array->capacity, capacity);
 
   /* array destruction */
-  result = array_destroy(array);
+  b8 result = array_destroy(array);
 
   /* destruction result assertion */
   assert_true(result);
@@ -51,11 +48,8 @@ static void test_array_insert_and_retrieve(void **state) {
   const u64 item_to_insert = 100;
   u64 item_to_retrieve = 0;
 
-  /* array object */
-  array_t *array = NULL;
-
   /* array creation */
-  array_create(capacity, stride, &array);
+  array_t *array = array_create(capacity, stride);
 
   /* array intertion */
   b8 result = array_insert(array, (void *)&item_to_insert);
@@ -86,11 +80,8 @@ static void test_array_insert_beyond_capacity(void **state) {
   /* default values */
   const u64 item_to_insert = 100;
 
-  /* array object */
-  array_t *array = NULL;
-
   /* array creation */
-  array_create(capacity, stride, &array);
+  array_t *array = array_create(capacity, stride);
 
   /* array intertion */
   b8 result = array_insert(array, (void *)&item_to_insert);
@@ -119,11 +110,8 @@ static void test_array_retrieve_beyond_count(void **state) {
   /* default values */
   const u64 item_to_insert = 100;
 
-  /* array object */
-  array_t *array = NULL;
-
   /* array creation */
-  array_create(capacity, stride, &array);
+  array_t *array = array_create(capacity, stride);
 
   /* array retrieval */
   b8 result = array_retrieve(array, index, (void *)&item_to_insert);
@@ -145,11 +133,8 @@ static void test_array_buffer_direct_usage(void **state) {
   /* default values */
   const u64 buffer[5] = {1, 2, 3, 4, 5};
 
-  /* array object */
-  array_t *array = NULL;
-
   /* array creation */
-  array_create(capacity, stride, &array);
+  array_t *array = array_create(capacity, stride);
 
   /* array insertion */
   for (size_t index = 0; index < capacity; index++) {
@@ -184,11 +169,8 @@ static void test_array_clear(void **state) {
   const u64 item_to_insert = 100;
   u64 item_to_retrieve = 0;
 
-  /* array object */
-  array_t *array = NULL;
-
   /* array creation */
-  array_create(capacity, stride, &array);
+  array_t *array = array_create(capacity, stride);
 
   /* array intertion */
   array_insert(array, (void *)&item_to_insert);

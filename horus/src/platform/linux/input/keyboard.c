@@ -1,7 +1,7 @@
+#include <X11/keysym.h>
+
 /* horus input layer [ linux ] */
 #include <horus/platform/linux/input/keyboard.h>
-
-#include <X11/keysym.h>
 
 #define PLATFORM_INPUT_KEYBOARD_KEYCODE_COUNT 256
 

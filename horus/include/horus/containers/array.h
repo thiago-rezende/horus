@@ -11,7 +11,7 @@ typedef struct __array {
   u64 capacity;
 } array_t;
 
-b8 array_create(u64 capacity, u64 stride, array_t **output);
+array_t *array_create(u64 capacity, u64 stride);
 b8 array_destroy(array_t *array);
 
 b8 array_clear(array_t *array);
