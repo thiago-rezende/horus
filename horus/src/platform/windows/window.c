@@ -21,6 +21,7 @@
 #include <horus/platform/window.h>
 
 /* horus platform layer [ windows ] */
+#include <horus/platform/windows/window.h>
 #include <horus/platform/windows/windows.h>
 
 /* horus input layer [ windows ] */
@@ -30,11 +31,7 @@
 #define WINDOW_TITLE_MAX_LENGTH 255
 
 struct __platform_window {
-  HINSTANCE hinstance;
-
-  HWND window;
-  WNDCLASSEX window_class;
-  LPCSTR window_class_name;
+  platform_window_context_t context;
 
   platform_window_size_t size;
 
@@ -60,8 +57,8 @@ static LRESULT CALLBACK windows_handle_event_setup(HWND hWnd, UINT msg, WPARAM w
 platform_window_t *platform_window_create(char *title, platform_window_size_t size, b8 fullscreen) {
   platform_window_t *window = platform_memory_allocate(sizeof(platform_window_t));
 
-  window->hinstance = GetModuleHandle(NULL);
-  window->window_class_name = "horus_window_class";
+  window->context.hinstance = GetModuleHandle(NULL);
+  window->context.window_class_name = "horus_window_class";
 
   RECT rectangle = {0};
   rectangle.top = 0;
@@ -71,36 +68,36 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
 
   AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, 0, WS_EX_APPWINDOW);
 
-  window->window_class.cbSize = sizeof(window->window_class);
-  window->window_class.style = CS_HREDRAW | CS_VREDRAW;
-  window->window_class.lpfnWndProc = windows_handle_event_setup;
-  window->window_class.cbClsExtra = 0;
-  window->window_class.cbWndExtra = 0;
-  window->window_class.hInstance = window->hinstance;
-  window->window_class.hIcon = NULL;
-  window->window_class.hCursor = NULL;
-  window->window_class.hbrBackground = GetStockObject(BLACK_BRUSH);
-  window->window_class.lpszMenuName = NULL;
-  window->window_class.lpszClassName = window->window_class_name;
-  window->window_class.hIconSm = NULL;
+  window->context.window_class.cbSize = sizeof(window->context.window_class);
+  window->context.window_class.style = CS_HREDRAW | CS_VREDRAW;
+  window->context.window_class.lpfnWndProc = windows_handle_event_setup;
+  window->context.window_class.cbClsExtra = 0;
+  window->context.window_class.cbWndExtra = 0;
+  window->context.window_class.hInstance = window->context.hinstance;
+  window->context.window_class.hIcon = NULL;
+  window->context.window_class.hCursor = NULL;
+  window->context.window_class.hbrBackground = GetStockObject(BLACK_BRUSH);
+  window->context.window_class.lpszMenuName = NULL;
+  window->context.window_class.lpszClassName = window->context.window_class_name;
+  window->context.window_class.hIconSm = NULL;
 
-  RegisterClassEx(&window->window_class);
+  RegisterClassEx(&window->context.window_class);
 
-  window->window = CreateWindowEx(WS_EX_APPWINDOW,                  /* dwExStyle */
-                                  window->window_class_name,        /* lpClassName */
-                                  title,                            /* lpWindowName */
-                                  WS_OVERLAPPEDWINDOW,              /* dwStyle */
-                                  CW_USEDEFAULT,                    /* X */
-                                  CW_USEDEFAULT,                    /* Y */
-                                  rectangle.right - rectangle.left, /* nWidth */
-                                  rectangle.bottom - rectangle.top, /* nHeight */
-                                  NULL,                             /* hWndParent */
-                                  NULL,                             /* hMenu */
-                                  window->hinstance,                /* hInstance */
-                                  window                            /* lpParam */
+  window->context.window = CreateWindowEx(WS_EX_APPWINDOW,                   /* dwExStyle */
+                                          window->context.window_class_name, /* lpClassName */
+                                          title,                             /* lpWindowName */
+                                          WS_OVERLAPPEDWINDOW,               /* dwStyle */
+                                          CW_USEDEFAULT,                     /* X */
+                                          CW_USEDEFAULT,                     /* Y */
+                                          rectangle.right - rectangle.left,  /* nWidth */
+                                          rectangle.bottom - rectangle.top,  /* nHeight */
+                                          NULL,                              /* hWndParent */
+                                          NULL,                              /* hMenu */
+                                          window->context.hinstance,         /* hInstance */
+                                          window                             /* lpParam */
   );
 
-  ShowWindow(window->window, SW_SHOWDEFAULT);
+  ShowWindow(window->context.window, SW_SHOWDEFAULT);
 
   window->size = size;
   window->has_focus = false;
@@ -113,17 +110,17 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
 
   window->fullscreen = fullscreen;
 
-  logger_debug("<window:%p> <win32_window:%p> created", window, window->window);
+  logger_debug("<window:%p> <win32_window:%p> created", window, window->context.window);
 
   return window;
 }
 
 b8 platform_window_destroy(platform_window_t *window) {
-  UnregisterClass(window->window_class_name, window->hinstance);
+  UnregisterClass(window->context.window_class_name, window->context.hinstance);
 
-  DestroyWindow(window->window);
+  DestroyWindow(window->context.window);
 
-  logger_debug("<window:%p> <win32_window:%p> destroyed", window, window->window);
+  logger_debug("<window:%p> <win32_window:%p> destroyed", window, window->context.window);
 
   platform_memory_deallocate(window);
 
@@ -355,9 +352,9 @@ b8 platform_window_set_size(platform_window_t *window, platform_window_size_t si
 
   AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, false, WS_EX_APPWINDOW);
 
-  if (!SetWindowPos(window->window, 0, 0, 0, rectangle.right - rectangle.left, rectangle.bottom - rectangle.top,
+  if (!SetWindowPos(window->context.window, 0, 0, 0, rectangle.right - rectangle.left, rectangle.bottom - rectangle.top,
                     SWP_NOMOVE | SWP_NOZORDER)) {
-    logger_error("<window:%p> <win32_window:%p> platform_window_set_size failed", window, window->window);
+    logger_error("<window:%p> <win32_window:%p> platform_window_set_size failed", window, window->context.window);
 
     return false;
   }
@@ -370,8 +367,8 @@ b8 platform_window_set_size(platform_window_t *window, platform_window_size_t si
 }
 
 b8 platform_window_set_title(platform_window_t *window, char *title) {
-  if (!SetWindowText(window->window, title)) {
-    logger_error("<window:%p> <win32_window:%p> platform_window_set_title failed", window, window->window);
+  if (!SetWindowText(window->context.window, title)) {
+    logger_error("<window:%p> <win32_window:%p> platform_window_set_title failed", window, window->context.window);
 
     return false;
   }
@@ -389,25 +386,27 @@ b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
   }
 
   if (fullscreen) {
-    GetWindowRect(window->window, &__window_rect_before_fullscreen);
-    __window_style_before_fullscreen = GetWindowLong(window->window, GWL_STYLE);
-    __window_exstyle_before_fullscreen = GetWindowLong(window->window, GWL_EXSTYLE);
+    GetWindowRect(window->context.window, &__window_rect_before_fullscreen);
+    __window_style_before_fullscreen = GetWindowLong(window->context.window, GWL_STYLE);
+    __window_exstyle_before_fullscreen = GetWindowLong(window->context.window, GWL_EXSTYLE);
 
     MONITORINFO monitor_info = {sizeof(MONITORINFO)};
 
-    GetMonitorInfo(MonitorFromWindow(window->window, MONITOR_DEFAULTTOPRIMARY), &monitor_info);
+    GetMonitorInfo(MonitorFromWindow(window->context.window, MONITOR_DEFAULTTOPRIMARY), &monitor_info);
 
-    SetWindowLong(window->window, GWL_STYLE, GetWindowLong(window->window, GWL_STYLE) & ~(WS_OVERLAPPEDWINDOW));
-    SetWindowLong(window->window, GWL_EXSTYLE, GetWindowLong(window->window, GWL_EXSTYLE) & ~(WS_EX_OVERLAPPEDWINDOW));
+    SetWindowLong(window->context.window, GWL_STYLE,
+                  GetWindowLong(window->context.window, GWL_STYLE) & ~(WS_OVERLAPPEDWINDOW));
+    SetWindowLong(window->context.window, GWL_EXSTYLE,
+                  GetWindowLong(window->context.window, GWL_EXSTYLE) & ~(WS_EX_OVERLAPPEDWINDOW));
 
-    SetWindowPos(window->window, HWND_TOP, monitor_info.rcMonitor.left, monitor_info.rcMonitor.top,
+    SetWindowPos(window->context.window, HWND_TOP, monitor_info.rcMonitor.left, monitor_info.rcMonitor.top,
                  monitor_info.rcMonitor.right - monitor_info.rcMonitor.left,
                  monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
   } else {
-    SetWindowLong(window->window, GWL_STYLE, __window_style_before_fullscreen);
-    SetWindowLong(window->window, GWL_EXSTYLE, __window_exstyle_before_fullscreen);
+    SetWindowLong(window->context.window, GWL_STYLE, __window_style_before_fullscreen);
+    SetWindowLong(window->context.window, GWL_EXSTYLE, __window_exstyle_before_fullscreen);
 
-    SetWindowPos(window->window, HWND_NOTOPMOST, __window_rect_before_fullscreen.left,
+    SetWindowPos(window->context.window, HWND_NOTOPMOST, __window_rect_before_fullscreen.left,
                  __window_rect_before_fullscreen.top,
                  __window_rect_before_fullscreen.right - __window_rect_before_fullscreen.left,
                  __window_rect_before_fullscreen.bottom - __window_rect_before_fullscreen.top,
@@ -423,6 +422,10 @@ b8 platform_window_set_event_callback(platform_window_t *window, platform_window
   window->on_event = callback;
 
   return true;
+}
+
+platform_window_context_t *platform_window_context(platform_window_t *window) {
+  return &window->context;
 }
 
 platform_window_t *platform_window(void) {

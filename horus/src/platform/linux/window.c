@@ -23,6 +23,9 @@
 #include <horus/platform/memory.h>
 #include <horus/platform/window.h>
 
+/* horus platform layer [ linux ] */
+#include <horus/platform/linux/window.h>
+
 /* horus input layer [ linux ] */
 #include <horus/platform/linux/input/mouse.h>
 #include <horus/platform/linux/input/keyboard.h>
@@ -48,11 +51,7 @@ typedef struct __platform_window_atoms {
 static platform_window_atoms_t global_platform_window_atoms = {0};
 
 struct __platform_window {
-  xcb_connection_t *connection;
-  xcb_screen_t *screen;
-  xcb_window_t window;
-
-  xcb_key_symbols_t *keysyms;
+  platform_window_context_t context;
 
   platform_window_size_t size;
 
@@ -79,60 +78,60 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
 
   window->on_event = NULL;
 
-  window->connection = xcb_connect(NULL, NULL);
+  window->context.connection = xcb_connect(NULL, NULL);
 
-  logger_debug("<window:%p> <xcb_connection:%p> connected", window, window->connection);
+  logger_debug("<window:%p> <xcb_connection:%p> connected", window, window->context.connection);
 
-  const xcb_setup_t *screen_setup = xcb_get_setup(window->connection);
+  const xcb_setup_t *screen_setup = xcb_get_setup(window->context.connection);
   xcb_screen_iterator_t screen_iterator = xcb_setup_roots_iterator(screen_setup);
 
-  window->screen = screen_iterator.data;
+  window->context.screen = screen_iterator.data;
 
-  window->window = xcb_generate_id(window->connection);
+  window->context.window = xcb_generate_id(window->context.connection);
 
   uint32_t value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 
   int value_list[2];
 
-  value_list[0] = window->screen->black_pixel;
+  value_list[0] = window->context.screen->black_pixel;
   value_list[1] = XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS |
                   XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW |
                   XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
                   XCB_EVENT_MASK_FOCUS_CHANGE;
 
-  xcb_create_window(window->connection,            /* connection */
-                    XCB_COPY_FROM_PARENT,          /* depth */
-                    window->window,                /* window identifier */
-                    window->screen->root,          /* parent window */
-                    0, 0,                          /* x, y */
-                    size.width, size.height,       /* width, height */
-                    0,                             /* border width */
-                    XCB_WINDOW_CLASS_INPUT_OUTPUT, /* window class */
-                    window->screen->root_visual,   /* window visual */
-                    value_mask,                    /* masks */
-                    value_list                     /* masks */
+  xcb_create_window(window->context.connection,          /* connection */
+                    XCB_COPY_FROM_PARENT,                /* depth */
+                    window->context.window,              /* window identifier */
+                    window->context.screen->root,        /* parent window */
+                    0, 0,                                /* x, y */
+                    size.width, size.height,             /* width, height */
+                    0,                                   /* border width */
+                    XCB_WINDOW_CLASS_INPUT_OUTPUT,       /* window class */
+                    window->context.screen->root_visual, /* window visual */
+                    value_mask,                          /* masks */
+                    value_list                           /* masks */
   );
 
-  __platform_window_fetch_atoms(window->connection);
+  __platform_window_fetch_atoms(window->context.connection);
 
-  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window,
+  xcb_change_property(window->context.connection, XCB_PROP_MODE_REPLACE, window->context.window,
                       global_platform_window_atoms.WM_PROTOCOLS, 4, 32, 1,
                       &global_platform_window_atoms.WM_DELETE_WINDOW);
 
-  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                      string_length_secure(title, WINDOW_TITLE_MAX_LENGTH), title);
+  xcb_change_property(window->context.connection, XCB_PROP_MODE_REPLACE, window->context.window, XCB_ATOM_WM_NAME,
+                      XCB_ATOM_STRING, 8, string_length_secure(title, WINDOW_TITLE_MAX_LENGTH), title);
 
   if (fullscreen) {
-    xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window,
+    xcb_change_property(window->context.connection, XCB_PROP_MODE_REPLACE, window->context.window,
                         global_platform_window_atoms._NET_WM_STATE, XCB_ATOM_ATOM, 32, 1,
                         &global_platform_window_atoms._NET_WM_STATE_FULLSCREEN);
   }
 
-  xcb_map_window(window->connection, window->window);
+  xcb_map_window(window->context.connection, window->context.window);
 
-  window->keysyms = xcb_key_symbols_alloc(window->connection);
+  window->context.keysyms = xcb_key_symbols_alloc(window->context.connection);
 
-  xcb_flush(window->connection);
+  xcb_flush(window->context.connection);
 
   window->size = size;
   window->fullscreen = fullscreen;
@@ -140,23 +139,23 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   window->has_resized = false;
   window->should_close = false;
 
-  logger_debug("<window:%p> <xcb_window:%lu> created", window, window->window);
+  logger_debug("<window:%p> <xcb_window:%lu> created", window, window->context.window);
 
   return window;
 }
 
 b8 platform_window_destroy(platform_window_t *window) {
-  xcb_destroy_window(window->connection, window->window);
+  xcb_destroy_window(window->context.connection, window->context.window);
 
-  logger_debug("<window:%p> <xcb_window:%lu> destroyed", window, window->window);
+  logger_debug("<window:%p> <xcb_window:%lu> destroyed", window, window->context.window);
 
-  xcb_disconnect(window->connection);
+  xcb_disconnect(window->context.connection);
 
-  logger_debug("<window:%p> <xcb_connection:%p> disconnected", window, window->connection);
+  logger_debug("<window:%p> <xcb_connection:%p> disconnected", window, window->context.connection);
 
-  xcb_key_symbols_free(window->keysyms);
+  xcb_key_symbols_free(window->context.keysyms);
 
-  logger_debug("<window:%p> <xcb_key_symbols:%p> destroyed", window, window->keysyms);
+  logger_debug("<window:%p> <xcb_key_symbols:%p> destroyed", window, window->context.keysyms);
 
   platform_memory_deallocate(window);
 
@@ -173,7 +172,7 @@ b8 platform_window_process_events(platform_window_t *window) {
   __platform_input_mouse_position_clear_state();
   __platform_input_keyboard_keycode_clear_state();
 
-  while ((event = xcb_poll_for_event(window->connection))) {
+  while ((event = xcb_poll_for_event(window->context.connection))) {
     switch (event->response_type & ~0x80) {
       case XCB_EXPOSE: {
         xcb_expose_event_t *expose_event = (xcb_expose_event_t *)event;
@@ -303,7 +302,7 @@ b8 platform_window_process_events(platform_window_t *window) {
         };
 
         xcb_keycode_t xcb_keycode = key_press_event->detail;
-        xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->keysyms, xcb_keycode, 0);
+        xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->context.keysyms, xcb_keycode, 0);
 
         keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keysymbol);
         keyboard_keycode_t scancode = __platform_input_keyboard_scancode(xcb_keycode);
@@ -344,7 +343,7 @@ b8 platform_window_process_events(platform_window_t *window) {
         };
 
         xcb_keycode_t xcb_keycode = key_release_event->detail;
-        xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->keysyms, xcb_keycode, 0);
+        xcb_keysym_t xcb_keysymbol = xcb_key_symbols_get_keysym(window->context.keysyms, xcb_keycode, 0);
 
         keyboard_keycode_t keycode = __platform_input_keyboard_keycode(xcb_keysymbol);
         keyboard_keycode_t scancode = __platform_input_keyboard_scancode(xcb_keycode);
@@ -495,17 +494,17 @@ b8 platform_window_set_size(platform_window_t *window, platform_window_size_t si
 
   u32 values[] = {size.width, size.height};
 
-  xcb_configure_window(window->connection, window->window, mask, values);
-  xcb_flush(window->connection);
+  xcb_configure_window(window->context.connection, window->context.window, mask, values);
+  xcb_flush(window->context.connection);
 
   return true;
 }
 
 b8 platform_window_set_title(platform_window_t *window, char *title) {
-  xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                      string_length_secure(title, WINDOW_TITLE_MAX_LENGTH), title);
+  xcb_change_property(window->context.connection, XCB_PROP_MODE_REPLACE, window->context.window, XCB_ATOM_WM_NAME,
+                      XCB_ATOM_STRING, 8, string_length_secure(title, WINDOW_TITLE_MAX_LENGTH), title);
 
-  xcb_flush(window->connection);
+  xcb_flush(window->context.connection);
 
   return true;
 }
@@ -518,7 +517,7 @@ b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
   xcb_client_message_event_t event = {0};
 
   event.response_type = XCB_CLIENT_MESSAGE;
-  event.window = window->window;
+  event.window = window->context.window;
   event.type = global_platform_window_atoms._NET_WM_STATE;
   event.format = 32;
 
@@ -527,10 +526,10 @@ b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen) {
   event.data.data32[1] = global_platform_window_atoms._NET_WM_STATE_FULLSCREEN;
   event.data.data32[2] = XCB_ATOM_NONE;
 
-  xcb_send_event(window->connection, 1, window->screen->root,
+  xcb_send_event(window->context.connection, 1, window->context.screen->root,
                  XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY, (const char *)&event);
 
-  xcb_flush(window->connection);
+  xcb_flush(window->context.connection);
 
   window->fullscreen = fullscreen;
 
@@ -541,6 +540,14 @@ b8 platform_window_set_event_callback(platform_window_t *window, platform_window
   window->on_event = callback;
 
   return true;
+}
+
+platform_window_t *platform_window(void) {
+  return __window;
+}
+
+platform_window_context_t *platform_window_context(platform_window_t *window) {
+  return &window->context;
 }
 
 b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
@@ -595,10 +602,6 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
 
 b8 __platform_window_is_mouse_button_scroll(xcb_button_t button) {
   return button >= PLATFORM_MOUSE_SCROLL_UP_BUTTON && button <= PLATFORM_MOUSE_SCROLL_RIGHT_BUTTON;
-}
-
-platform_window_t *platform_window(void) {
-  return __window;
 }
 
 b8 __platform_window_set_global_instance(platform_window_t *window) {

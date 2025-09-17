@@ -58,6 +58,7 @@ horus_headers = [
 if host_machine.system() == 'linux'
   horus_headers += [
     # horus platform layer [ linux ]
+    'horus/platform/linux/window.h',
     'horus/platform/linux/entrypoint.h',
 
     # horus input layer [ linux ]
@@ -70,6 +71,7 @@ endif
 if host_machine.system() == 'windows'
   horus_headers += [
     # horus platform layer [ windows ]
+    'horus/platform/windows/window.h',
     'horus/platform/windows/windows.h',
     'horus/platform/windows/entrypoint.h',
 

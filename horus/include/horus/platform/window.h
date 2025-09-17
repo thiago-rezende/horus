@@ -7,6 +7,7 @@
 #include <horus/events/base.h>
 
 typedef struct __platform_window platform_window_t;
+typedef struct __platform_window_context platform_window_context_t;
 
 typedef b8 (*platform_window_event_callback_t)(event_t *event);
 
@@ -40,6 +41,8 @@ b8 platform_window_is_fullscreen(platform_window_t *window);
 b8 platform_window_set_fullscreen(platform_window_t *window, b8 fullscreen);
 
 b8 platform_window_set_event_callback(platform_window_t *window, platform_window_event_callback_t callback);
+
+platform_window_context_t *platform_window_context(platform_window_t *window);
 
 platform_window_t *platform_window(void);
 
