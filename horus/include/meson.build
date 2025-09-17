@@ -48,6 +48,10 @@ horus_headers = [
   # horus renderer layer
   'horus/renderer/general.h',
   'horus/renderer/renderer.h',
+
+  # horus vulkan renderer layer
+  'horus/renderer/vulkan/renderer.h',
+  'horus/renderer/vulkan/platform.h',
 ]
 
 # horus header files [ linux ]

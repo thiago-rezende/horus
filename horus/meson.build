@@ -41,6 +41,9 @@ if host_machine.system() == 'linux'
     # horus input layer [ linux ]
     'src/platform/linux/input/mouse.c',
     'src/platform/linux/input/keyboard.c',
+
+    # horus vulkan renderer layer
+    'src/renderer/vulkan/linux/platform.c',
   ]
 endif
 
@@ -56,6 +59,9 @@ if host_machine.system() == 'windows'
     # horus input layer [ windows ]
     'src/platform/windows/input/mouse.c',
     'src/platform/windows/input/keyboard.c',
+
+    # horus vulkan renderer layer
+    'src/renderer/vulkan/windows/platform.c',
   ]
 endif
 
