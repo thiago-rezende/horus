@@ -22,21 +22,43 @@
 /* horus containers layer */
 #include <horus/containers/array.h>
 
-const static logger_level_t
-    vulkan_debug_message_severity_to_logger_level[VK_DEBUG_UTILS_MESSAGE_SEVERITY_FLAG_BITS_MAX_ENUM_EXT] = {
-        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT] = LOGGER_LEVEL_INFO,
-        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT] = LOGGER_LEVEL_TRACE,
-        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT] = LOGGER_LEVEL_WARNING,
-        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT] = LOGGER_LEVEL_ERROR,
-};
-
 VKAPI_ATTR VkBool32 VKAPI_CALL renderer_vulkan_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
                                                               VkDebugUtilsMessageTypeFlagsEXT type,
                                                               const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
                                                               void *user_data) {
   renderer_t *renderer = (renderer_t *)user_data;
 
-  logger_level_t level = vulkan_debug_message_severity_to_logger_level[severity];
+  logger_level_t level = LOGGER_LEVEL_TRACE;
+
+  switch (severity) {
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: {
+      level = LOGGER_LEVEL_TRACE;
+
+      break;
+    }
+
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: {
+      level = LOGGER_LEVEL_INFO;
+
+      break;
+    }
+
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: {
+      level = LOGGER_LEVEL_WARNING;
+
+      break;
+    }
+
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: {
+      level = LOGGER_LEVEL_ERROR;
+
+      break;
+    }
+
+    default: {
+      level = LOGGER_LEVEL_INFO;
+    }
+  }
 
   __logger_general(level, "<renderer:%p> <implementation:%s> %s", renderer, renderer->implementation_string,
                    callback_data->pMessage);
@@ -80,20 +102,20 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 }
 
 b8 renderer_destroy(renderer_t *renderer) {
-  if (!renderer_vulkan_destroy_instance(renderer)) {
-    logger_critical("<renderer:%p> <implementation:%s> <instance:%p> VkInstance destruction failed", renderer,
-                    renderer->implementation_string, renderer->instance);
-  }
-
-  logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkInstance destroyed", renderer,
-               renderer->implementation_string, renderer->instance);
-
   if (!renderer_vulkan_destroy_debug_messenger(renderer)) {
     logger_critical("<renderer:%p> <implementation:%s> <instance:%p> VkDebugUtilsMessengerEXT destruction failed",
                     renderer, renderer->implementation_string, renderer->instance);
   }
 
   logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkDebugUtilsMessengerEXT destroyed", renderer,
+               renderer->implementation_string, renderer->instance);
+
+  if (!renderer_vulkan_destroy_instance(renderer)) {
+    logger_critical("<renderer:%p> <implementation:%s> <instance:%p> VkInstance destruction failed", renderer,
+                    renderer->implementation_string, renderer->instance);
+  }
+
+  logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkInstance destroyed", renderer,
                renderer->implementation_string, renderer->instance);
 
   platform_memory_deallocate(renderer);
