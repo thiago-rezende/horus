@@ -50,6 +50,7 @@ horus_headers = [
   'horus/renderer/renderer.h',
 
   # horus vulkan renderer layer
+  'horus/renderer/vulkan/loader.h',
   'horus/renderer/vulkan/renderer.h',
   'horus/renderer/vulkan/platform.h',
 ]

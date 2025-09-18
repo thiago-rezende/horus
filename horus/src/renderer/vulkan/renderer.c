@@ -2,6 +2,9 @@
 
 /* horus renderer layer */
 #include <horus/renderer/renderer.h>
+
+/* horus vulkan renderer layer */
+#include <horus/renderer/vulkan/loader.h>
 #include <horus/renderer/vulkan/renderer.h>
 
 /* horus vulkan renderer layer */
@@ -19,6 +22,28 @@
 /* horus containers layer */
 #include <horus/containers/array.h>
 
+const static logger_level_t
+    vulkan_debug_message_severity_to_logger_level[VK_DEBUG_UTILS_MESSAGE_SEVERITY_FLAG_BITS_MAX_ENUM_EXT] = {
+        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT] = LOGGER_LEVEL_INFO,
+        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT] = LOGGER_LEVEL_TRACE,
+        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT] = LOGGER_LEVEL_WARNING,
+        [VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT] = LOGGER_LEVEL_ERROR,
+};
+
+VKAPI_ATTR VkBool32 VKAPI_CALL renderer_vulkan_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                                                              VkDebugUtilsMessageTypeFlagsEXT type,
+                                                              const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
+                                                              void *user_data) {
+  renderer_t *renderer = (renderer_t *)user_data;
+
+  logger_level_t level = vulkan_debug_message_severity_to_logger_level[severity];
+
+  __logger_general(level, "<renderer:%p> <implementation:%s> %s", renderer, renderer->implementation_string,
+                   callback_data->pMessage);
+
+  return VK_FALSE;
+}
+
 renderer_t *renderer_create(application_t *application, platform_window_t *window) {
   renderer_t *renderer = platform_memory_allocate(sizeof(renderer_t));
 
@@ -28,7 +53,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
   };
 
   if (!renderer_vulkan_create_instance(renderer, application)) {
-    logger_critical("<renderer:%p> <implementation:%s> vkCreateInstance failed", renderer,
+    logger_critical("<renderer:%p> <implementation:%s> VkInstance creation failed", renderer,
                     renderer->implementation_string);
 
     platform_memory_deallocate(renderer);
@@ -39,14 +64,22 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
   logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkInstance created", renderer,
                renderer->implementation_string, renderer->instance);
 
+  if (!renderer_vulkan_create_debug_messenger(renderer)) {
+    logger_critical("<renderer:%p> <implementation:%s> VkDebugUtilsMessengerEXT creation failed", renderer,
+                    renderer->implementation_string);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
+
+  logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkDebugUtilsMessengerEXT created", renderer,
+               renderer->implementation_string, renderer->instance);
+
   return renderer;
 }
 
 b8 renderer_destroy(renderer_t *renderer) {
-  if (renderer == NULL) {
-    return false;
-  }
-
   if (!renderer_vulkan_destroy_instance(renderer)) {
     logger_critical("<renderer:%p> <implementation:%s> <instance:%p> VkInstance destruction failed", renderer,
                     renderer->implementation_string, renderer->instance);
@@ -55,32 +88,28 @@ b8 renderer_destroy(renderer_t *renderer) {
   logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkInstance destroyed", renderer,
                renderer->implementation_string, renderer->instance);
 
+  if (!renderer_vulkan_destroy_debug_messenger(renderer)) {
+    logger_critical("<renderer:%p> <implementation:%s> <instance:%p> VkDebugUtilsMessengerEXT destruction failed",
+                    renderer, renderer->implementation_string, renderer->instance);
+  }
+
+  logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkDebugUtilsMessengerEXT destroyed", renderer,
+               renderer->implementation_string, renderer->instance);
+
   platform_memory_deallocate(renderer);
 
   return true;
 }
 
 renderer_implementation_t renderer_implementation(renderer_t *renderer) {
-  if (!renderer) {
-    return RENDERER_IMPLEMENTATION_NONE;
-  }
-
   return renderer->implementation;
 }
 
 const char *renderer_implementation_string(renderer_t *renderer) {
-  if (!renderer) {
-    return "unknown";
-  }
-
   return renderer->implementation_string;
 }
 
 b8 renderer_vulkan_create_instance(renderer_t *renderer, application_t *application) {
-  if (renderer == NULL) {
-    return false;
-  }
-
   VkApplicationInfo application_info = (VkApplicationInfo){
       .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
       .pApplicationName = application->name,
@@ -137,11 +166,34 @@ b8 renderer_vulkan_create_instance(renderer_t *renderer, application_t *applicat
 }
 
 b8 renderer_vulkan_destroy_instance(renderer_t *renderer) {
-  if (renderer == NULL) {
+  vkDestroyInstance(renderer->instance, NULL);
+
+  return true;
+}
+
+b8 renderer_vulkan_create_debug_messenger(renderer_t *renderer) {
+  VkDebugUtilsMessengerCreateInfoEXT debug_messenger_create_info = (VkDebugUtilsMessengerCreateInfoEXT){
+      .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+      .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                         VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+      .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                     VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+      .pfnUserCallback = renderer_vulkan_debug_callback,
+      .pUserData = renderer};
+
+  VkResult result =
+      vkCreateDebugUtilsMessengerEXT(renderer->instance, &debug_messenger_create_info, NULL, &renderer->messenger);
+
+  if (result != VK_SUCCESS) {
     return false;
   }
 
-  vkDestroyInstance(renderer->instance, NULL);
+  return true;
+}
+
+b8 renderer_vulkan_destroy_debug_messenger(renderer_t *renderer) {
+  vkDestroyDebugUtilsMessengerEXT(renderer->instance, renderer->messenger, NULL);
 
   return true;
 }

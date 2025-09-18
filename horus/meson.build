@@ -26,6 +26,7 @@ horus_sources = [
   'src/renderer/general.c',
 
   # horus vulkan renderer layer
+  'src/renderer/vulkan/loader.c',
   'src/renderer/vulkan/renderer.c',
 ]
 
