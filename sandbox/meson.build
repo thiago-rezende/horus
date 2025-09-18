@@ -1,6 +1,6 @@
 # sandbox source files
 sandbox_sources = [
-  'src/sandbox.c',
+  'source/sandbox.c',
 ]
 
 # sandbox include directories

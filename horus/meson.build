@@ -1,52 +1,52 @@
 # horus source files
 horus_sources = [
   # horus base layer
-  'src/definitions.c',
+  'source/definitions.c',
 
   # horus core layer
-  'src/core/strings.c',
+  'source/core/strings.c',
 
   # horus containers layer
-  'src/containers/array.c',
+  'source/containers/array.c',
 
   # horus logger layer
-  'src/logger/logger.c',
+  'source/logger/logger.c',
 
   # horus input layer
-  'src/input/mouse.c',
-  'src/input/keyboard.c',
+  'source/input/mouse.c',
+  'source/input/keyboard.c',
 
   # horus events layer
-  'src/events/base.c',
+  'source/events/base.c',
 
   # horus application layer
-  'src/application/application.c',
+  'source/application/application.c',
 
   # horus renderer layer
-  'src/renderer/general.c',
+  'source/renderer/general.c',
 
   # horus vulkan renderer layer
-  'src/renderer/vulkan/debug.c',
-  'src/renderer/vulkan/loader.c',
-  'src/renderer/vulkan/instance.c',
-  'src/renderer/vulkan/renderer.c',
+  'source/renderer/vulkan/debug.c',
+  'source/renderer/vulkan/loader.c',
+  'source/renderer/vulkan/instance.c',
+  'source/renderer/vulkan/renderer.c',
 ]
 
 # horus source files [ linux ]
 if host_machine.system() == 'linux'
   horus_sources += [
     # horus platform layer [ linux ]
-    'src/platform/linux/time.c',
-    'src/platform/linux/memory.c',
-    'src/platform/linux/window.c',
-    'src/platform/linux/console.c',
+    'source/platform/linux/time.c',
+    'source/platform/linux/memory.c',
+    'source/platform/linux/window.c',
+    'source/platform/linux/console.c',
 
     # horus input layer [ linux ]
-    'src/platform/linux/input/mouse.c',
-    'src/platform/linux/input/keyboard.c',
+    'source/platform/linux/input/mouse.c',
+    'source/platform/linux/input/keyboard.c',
 
     # horus vulkan renderer layer
-    'src/renderer/vulkan/linux/platform.c',
+    'source/renderer/vulkan/linux/platform.c',
   ]
 endif
 
@@ -54,17 +54,17 @@ endif
 if host_machine.system() == 'windows'
   horus_sources += [
     # horus platform layer [ windows ]
-    'src/platform/windows/time.c',
-    'src/platform/windows/memory.c',
-    'src/platform/windows/window.c',
-    'src/platform/windows/console.c',
+    'source/platform/windows/time.c',
+    'source/platform/windows/memory.c',
+    'source/platform/windows/window.c',
+    'source/platform/windows/console.c',
 
     # horus input layer [ windows ]
-    'src/platform/windows/input/mouse.c',
-    'src/platform/windows/input/keyboard.c',
+    'source/platform/windows/input/mouse.c',
+    'source/platform/windows/input/keyboard.c',
 
     # horus vulkan renderer layer
-    'src/renderer/vulkan/windows/platform.c',
+    'source/renderer/vulkan/windows/platform.c',
   ]
 endif
 
