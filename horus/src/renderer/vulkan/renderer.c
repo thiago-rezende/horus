@@ -202,7 +202,8 @@ b8 renderer_vulkan_create_debug_messenger(renderer_t *renderer) {
       .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
       .pfnUserCallback = renderer_vulkan_debug_callback,
-      .pUserData = renderer};
+      .pUserData = renderer,
+  };
 
   VkResult result =
       vkCreateDebugUtilsMessengerEXT(renderer->instance, &debug_messenger_create_info, NULL, &renderer->messenger);
