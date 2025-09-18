@@ -19,7 +19,7 @@ const char *vk_khr_win32_surface_extension_name = VK_KHR_WIN32_SURFACE_EXTENSION
 
 const char *vk_ext_debug_utils_extension_name = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 
-array_t *renderer_vulkan_get_instance_required_layers(void) {
+array_t *renderer_vulkan_instance_get_required_layers(void) {
   array_t *array = array_create(VULKAN_LAYERS_COUNT, sizeof(char *));
 
   array_insert(array, &vk_khronos_validation_layer_name);
@@ -27,7 +27,7 @@ array_t *renderer_vulkan_get_instance_required_layers(void) {
   return array;
 }
 
-array_t *renderer_vulkan_get_instance_required_extensions(void) {
+array_t *renderer_vulkan_instance_get_required_extensions(void) {
   array_t *array = array_create(VULKAN_EXTENSIONS_COUNT, sizeof(char *));
 
   array_insert(array, &vk_khr_surface_extension_name);
