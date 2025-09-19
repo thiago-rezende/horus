@@ -42,8 +42,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL renderer_vulkan_debug_callback(VkDebugUtilsMessag
     }
   }
 
-  __logger_general(level, "<renderer:%p> <implementation:%s> %s", renderer, renderer->implementation_string,
-                   callback_data->pMessage);
+  __logger_general(level, "<renderer:%p> %s", renderer, callback_data->pMessage);
 
   return VK_FALSE;
 }

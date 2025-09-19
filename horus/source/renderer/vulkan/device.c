@@ -1,5 +1,6 @@
 /* horus vulkan renderer layer */
 #include <horus/renderer/vulkan/device.h>
+#include <horus/renderer/vulkan/platform.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
@@ -13,8 +14,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   vkEnumeratePhysicalDevices(renderer->instance, &physical_device_count, NULL);
 
   if (physical_device_count == 0) {
-    logger_critical("<renderer:%p> <implementation:%s> <instance:%p> no physical devices found", renderer,
-                    renderer->implementation_string, renderer->instance);
+    logger_critical("<renderer:%p> <instance:%p> no physical devices found", renderer, renderer->instance);
 
     return false;
   }
@@ -25,8 +25,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
   vkEnumeratePhysicalDevices(renderer->instance, &physical_device_count, devices->buffer);
 
-  logger_debug("<renderer:%p> <implementation:%s> <instance:%p> <count:%lu> physical devices", renderer,
-               renderer->implementation_string, renderer->instance, devices->count);
+  logger_debug("<renderer:%p> <count:%lu> physical devices", renderer, devices->count);
 
   physical_device_score_t current_physical_device_score = {
       .score = 0,
@@ -54,6 +53,8 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
       continue;
     }
 
+    device_score.queues = queue_family_indices;
+
     if (device_score.score > current_physical_device_score.score) {
       current_physical_device_score = device_score;
     }
@@ -62,8 +63,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   array_destroy(devices);
 
   if (current_physical_device_score.device == VK_NULL_HANDLE) {
-    logger_critical("<renderer:%p> <implementation:%s> <instance:%p> no suitable physical devices found", renderer,
-                    renderer->implementation_string, renderer->instance);
+    logger_critical("<renderer:%p> <instance:%p> no suitable physical devices found", renderer, renderer->instance);
 
     return false;
   }
@@ -71,6 +71,10 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   renderer->physical_device = current_physical_device_score.device;
   renderer->physical_device_features = current_physical_device_score.features;
   renderer->physical_device_properties = current_physical_device_score.properties;
+
+  renderer->compute_queue_family_index = current_physical_device_score.queues.compute_family_index;
+  renderer->graphics_queue_family_index = current_physical_device_score.queues.graphics_family_index;
+  renderer->transfer_queue_family_index = current_physical_device_score.queues.transfer_family_index;
 
   return true;
 }
@@ -214,4 +218,74 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
   array_destroy(families);
 
   return indices;
+}
+
+b8 renderer_vulkan_device_create(renderer_t *renderer) {
+  const static u64 queue_count = 3;
+  const static float queue_priority = 1.0f;
+
+  VkDeviceQueueCreateInfo compute_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->compute_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  VkDeviceQueueCreateInfo graphics_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->graphics_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  VkDeviceQueueCreateInfo transfer_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->transfer_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  array_t *queue_create_infos = array_create(queue_count, sizeof(VkDeviceQueueCreateInfo));
+
+  array_insert(queue_create_infos, &compute_queue_create_info);
+  array_insert(queue_create_infos, &graphics_queue_create_info);
+  array_insert(queue_create_infos, &transfer_queue_create_info);
+
+  VkPhysicalDeviceFeatures device_features = (VkPhysicalDeviceFeatures){
+      .wideLines = VK_TRUE,
+      .depthBounds = VK_TRUE,
+      .multiViewport = VK_TRUE,
+      .fillModeNonSolid = VK_TRUE,
+      .samplerAnisotropy = VK_TRUE,
+      .tessellationShader = VK_TRUE,
+  };
+
+  VkDeviceCreateInfo device_create_info = (VkDeviceCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+      .queueCreateInfoCount = queue_create_infos->count,
+      .pQueueCreateInfos = queue_create_infos->buffer,
+      .pEnabledFeatures = &device_features,
+  };
+
+  if (vkCreateDevice(renderer->physical_device, &device_create_info, NULL, &renderer->device) != VK_SUCCESS) {
+    logger_critical("<physical_device:%p> logical device creation failed", renderer->physical_device);
+
+    array_destroy(queue_create_infos);
+
+    return false;
+  }
+
+  vkGetDeviceQueue(renderer->device, renderer->compute_queue_family_index, 0, &renderer->compute_queue);
+  vkGetDeviceQueue(renderer->device, renderer->graphics_queue_family_index, 0, &renderer->graphics_queue);
+  vkGetDeviceQueue(renderer->device, renderer->transfer_queue_family_index, 0, &renderer->transfer_queue);
+
+  array_destroy(queue_create_infos);
+
+  return true;
+}
+
+b8 renderer_vulkan_device_destroy(renderer_t *renderer) {
+  vkDestroyDevice(renderer->device, NULL);
+
+  return true;
 }

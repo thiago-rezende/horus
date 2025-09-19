@@ -89,7 +89,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
   renderer_destroy(renderer);
 
-  logger_info("<renderer:%p> <implementation:%s> destroyed", renderer, renderer_implementation_string(renderer));
+  logger_info("<renderer:%p> destroyed", renderer);
 
   platform_window_destroy(window);
 

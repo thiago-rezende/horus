@@ -18,5 +18,15 @@ struct __renderer {
   VkPhysicalDeviceFeatures physical_device_features;
   VkPhysicalDeviceProperties physical_device_properties;
 
+  VkDevice device;
+
+  VkQueue compute_queue;
+  VkQueue graphics_queue;
+  VkQueue transfer_queue;
+
+  u32 compute_queue_family_index;
+  u32 graphics_queue_family_index;
+  u32 transfer_queue_family_index;
+
   VkDebugUtilsMessengerEXT messenger;
 };
