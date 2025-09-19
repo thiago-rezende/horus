@@ -3,7 +3,13 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_xcb.h>
 
-/* horus vulkan renderer layer */
+/* horus platform layer [ linux ] */
+#include <horus/platform/linux/window.h>
+
+/* horus logger layer */
+#include <horus/logger/logger.h>
+
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/platform.h>
 
 #define VULKAN_LAYERS_COUNT 1
@@ -35,4 +41,28 @@ array_t *renderer_vulkan_instance_get_required_extensions(void) {
   array_insert(array, &vk_ext_debug_utils_extension_name);
 
   return array;
+}
+
+b8 renderer_vulkan_surface_create(renderer_t *renderer, platform_window_t *window) {
+  platform_window_context_t *context = platform_window_context(window);
+
+  VkXcbSurfaceCreateInfoKHR surface_create_info = (VkXcbSurfaceCreateInfoKHR){
+      .sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,
+      .connection = context->connection,
+      .window = context->window,
+  };
+
+  if (vkCreateXcbSurfaceKHR(renderer->instance, &surface_create_info, NULL, &renderer->surface) != VK_SUCCESS) {
+    logger_critical("<renderer:%p> <instance:%p> surface creation failed", renderer, renderer->instance);
+
+    return false;
+  }
+
+  return true;
+}
+
+b8 renderer_vulkan_surface_destroy(renderer_t *renderer) {
+  vkDestroySurfaceKHR(renderer->instance, renderer->surface, NULL);
+
+  return true;
 }

@@ -4,11 +4,14 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_win32.h>
 
-/* horus vulkan renderer layer */
-#include <horus/renderer/vulkan/platform.h>
+/* horus platform layer [ windows ] */
+#include <horus/platform/windows/window.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
+
+/* horus renderer layer [ vulkan ] */
+#include <horus/renderer/vulkan/platform.h>
 
 #define VULKAN_LAYERS_COUNT 1
 #define VULKAN_EXTENSIONS_COUNT 3
@@ -41,7 +44,9 @@ array_t *renderer_vulkan_instance_get_required_extensions(void) {
   return array;
 }
 
-b8 renderer_vulkan_surface_create(renderer_t *renderer, platform_window_context_t *context) {
+b8 renderer_vulkan_surface_create(renderer_t *renderer, platform_window_t *window) {
+  platform_window_context_t *context = platform_window_context(window);
+
   VkWin32SurfaceCreateInfoKHR surface_create_info = (VkWin32SurfaceCreateInfoKHR){
       .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
       .hwnd = context->window,

@@ -1,6 +1,6 @@
 #pragma once
 
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/renderer.h>
 
 VkResult vkCreateDebugUtilsMessengerEXT(VkInstance instance,

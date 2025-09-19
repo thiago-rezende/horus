@@ -1,4 +1,4 @@
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/debug.h>
 
 /* horus logger layer */

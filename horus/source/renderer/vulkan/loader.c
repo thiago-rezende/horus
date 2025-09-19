@@ -1,4 +1,4 @@
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/loader.h>
 
 VkResult vkCreateDebugUtilsMessengerEXT(VkInstance instance,

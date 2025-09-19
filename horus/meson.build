@@ -25,7 +25,7 @@ horus_sources = [
   # horus renderer layer
   'source/renderer/general.c',
 
-  # horus vulkan renderer layer
+  # horus renderer layer [ vulkan ]
   'source/renderer/vulkan/debug.c',
   'source/renderer/vulkan/device.c',
   'source/renderer/vulkan/loader.c',
@@ -46,7 +46,7 @@ if host_machine.system() == 'linux'
     'source/platform/linux/input/mouse.c',
     'source/platform/linux/input/keyboard.c',
 
-    # horus vulkan renderer layer
+    # horus renderer layer [ vulkan ]
     'source/renderer/vulkan/linux/platform.c',
   ]
 endif
@@ -64,7 +64,7 @@ if host_machine.system() == 'windows'
     'source/platform/windows/input/mouse.c',
     'source/platform/windows/input/keyboard.c',
 
-    # horus vulkan renderer layer
+    # horus renderer layer [ vulkan ]
     'source/renderer/vulkan/windows/platform.c',
   ]
 endif

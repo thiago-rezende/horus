@@ -1,4 +1,4 @@
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/instance.h>
 #include <horus/renderer/vulkan/platform.h>
 

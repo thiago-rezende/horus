@@ -3,7 +3,7 @@
 /* horus renderer layer */
 #include <horus/renderer/renderer.h>
 
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/debug.h>
 #include <horus/renderer/vulkan/device.h>
 #include <horus/renderer/vulkan/loader.h>
@@ -47,7 +47,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 
   logger_debug("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT created", renderer, renderer->messenger);
 
-  if (!renderer_vulkan_surface_create(renderer, platform_window_context(window))) {
+  if (!renderer_vulkan_surface_create(renderer, window)) {
     logger_critical("<renderer:%p> VkSurfaceKHR creation failed", renderer);
 
     renderer_vulkan_debug_messenger_destroy(renderer);

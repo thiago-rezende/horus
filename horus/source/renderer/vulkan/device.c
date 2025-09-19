@@ -1,4 +1,4 @@
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/device.h>
 
 /* horus logger layer */
@@ -213,7 +213,7 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, families->buffer);
 
-  logger_debug("<device:%p> <count:%lu> physical device queue families", device, families->count);
+  logger_debug("|- |- [ queue families ] <count:%lu>", device, families->count);
 
   /* TODO: improve queue family selection to prioritize dedicated queues and fallback for the general one */
   for (u64 i = 0; i < families->count; i++) {
@@ -244,7 +244,7 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
       indices.has_transfer_family_index = true;
     }
 
-    logger_debug("|- [ queue ] <index:%lu> <compute:%s> <present:%s> <graphics:%s> <transfer:%s>", i,
+    logger_debug("|- |- |- [ queue ] <index:%lu> <compute:%s> <present:%s> <graphics:%s> <transfer:%s>", i,
                  family.queueFlags & VK_QUEUE_COMPUTE_BIT ? "true" : "false", has_present_support ? "true" : "false",
                  family.queueFlags & VK_QUEUE_GRAPHICS_BIT ? "true" : "false",
                  family.queueFlags & VK_QUEUE_TRANSFER_BIT ? "true" : "false");

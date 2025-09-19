@@ -1,6 +1,6 @@
 #pragma once
 
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/renderer.h>
 
 typedef struct __queue_family_indices {

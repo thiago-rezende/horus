@@ -1,6 +1,6 @@
 #pragma once
 
-/* horus vulkan renderer layer */
+/* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/renderer.h>
 
 b8 renderer_vulkan_instance_create(renderer_t *renderer, application_t *application);

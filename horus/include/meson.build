@@ -49,7 +49,7 @@ horus_headers = [
   'horus/renderer/general.h',
   'horus/renderer/renderer.h',
 
-  # horus vulkan renderer layer
+  # horus renderer layer [ vulkan ]
   'horus/renderer/vulkan/debug.h',
   'horus/renderer/vulkan/device.h',
   'horus/renderer/vulkan/loader.h',
