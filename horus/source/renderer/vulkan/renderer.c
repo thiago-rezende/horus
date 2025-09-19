@@ -5,6 +5,7 @@
 
 /* horus vulkan renderer layer */
 #include <horus/renderer/vulkan/debug.h>
+#include <horus/renderer/vulkan/device.h>
 #include <horus/renderer/vulkan/loader.h>
 #include <horus/renderer/vulkan/instance.h>
 #include <horus/renderer/vulkan/renderer.h>
@@ -46,6 +47,15 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 
   logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkDebugUtilsMessengerEXT created", renderer,
                renderer->implementation_string, renderer->instance);
+
+  if (!renderer_vulkan_physical_device_select(renderer)) {
+    logger_critical("<renderer:%p> <implementation:%s> VkPhysicalDevice selection failed", renderer,
+                    renderer->implementation_string);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
 
   return renderer;
 }

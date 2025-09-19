@@ -51,6 +51,7 @@ horus_headers = [
 
   # horus vulkan renderer layer
   'horus/renderer/vulkan/debug.h',
+  'horus/renderer/vulkan/device.h',
   'horus/renderer/vulkan/loader.h',
   'horus/renderer/vulkan/instance.h',
   'horus/renderer/vulkan/renderer.h',
