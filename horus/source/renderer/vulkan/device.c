@@ -141,3 +141,63 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
       .device_type_string = device_type_string,
   };
 }
+
+queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(VkPhysicalDevice device) {
+  queue_family_indices_t indices = (queue_family_indices_t){
+      .compute_family_index = 0,
+      .graphics_family_index = 0,
+      .transfer_family_index = 0,
+      .has_compute_family_index = false,
+      .has_graphics_family_index = false,
+      .has_transfer_family_index = false,
+  };
+
+  u32 queue_family_count = 0;
+
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, NULL);
+
+  if (queue_family_count == 0) {
+    logger_critical("<device:%p> no queue families found for device", device);
+
+    return indices;
+  }
+
+  array_t *families = array_create(queue_family_count, sizeof(VkQueueFamilyProperties));
+
+  families->count = queue_family_count;
+
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, families->buffer);
+
+  logger_debug("<device:%p> <count:%lu> physical devices queue families", device, families->count);
+
+  /* TODO: improve queue family selection to prioritize dedicated queues and fallback for the general one */
+  for (u64 i = 0; i < families->count; i++) {
+    VkQueueFamilyProperties family;
+
+    array_retrieve(families, i, (void *)&family);
+
+    if (family.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+      indices.compute_family_index = i;
+      indices.has_compute_family_index = true;
+    }
+
+    if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+      indices.graphics_family_index = i;
+      indices.has_graphics_family_index = true;
+    }
+
+    if (family.queueFlags & VK_QUEUE_TRANSFER_BIT) {
+      indices.transfer_family_index = i;
+      indices.has_transfer_family_index = true;
+    }
+
+    logger_debug("|- [ queue ] <index:%lu>", i);
+    logger_debug("|- |- [ compute ] %s", family.queueFlags & VK_QUEUE_COMPUTE_BIT ? "true" : "false");
+    logger_debug("|- |- [ graphics ] %s", family.queueFlags & VK_QUEUE_GRAPHICS_BIT ? "true" : "false");
+    logger_debug("|- |- [ transfer ] %s", family.queueFlags & VK_QUEUE_TRANSFER_BIT ? "true" : "false");
+  }
+
+  array_destroy(families);
+
+  return indices;
+}
