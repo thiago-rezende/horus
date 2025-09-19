@@ -14,5 +14,9 @@ struct __renderer {
 
   VkInstance instance;
 
+  VkPhysicalDevice physical_device;
+  VkPhysicalDeviceFeatures physical_device_features;
+  VkPhysicalDeviceProperties physical_device_properties;
+
   VkDebugUtilsMessengerEXT messenger;
 };
