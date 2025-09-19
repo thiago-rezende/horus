@@ -21,12 +21,16 @@ struct __renderer {
   VkDevice device;
 
   VkQueue compute_queue;
+  VkQueue present_queue;
   VkQueue graphics_queue;
   VkQueue transfer_queue;
 
   u32 compute_queue_family_index;
+  u32 present_queue_family_index;
   u32 graphics_queue_family_index;
   u32 transfer_queue_family_index;
+
+  VkSurfaceKHR surface;
 
   VkDebugUtilsMessengerEXT messenger;
 };

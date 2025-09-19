@@ -7,6 +7,9 @@
 /* horus vulkan renderer layer */
 #include <horus/renderer/vulkan/platform.h>
 
+/* horus logger layer */
+#include <horus/logger/logger.h>
+
 #define VULKAN_LAYERS_COUNT 1
 #define VULKAN_EXTENSIONS_COUNT 3
 
@@ -36,4 +39,26 @@ array_t *renderer_vulkan_instance_get_required_extensions(void) {
   array_insert(array, &vk_ext_debug_utils_extension_name);
 
   return array;
+}
+
+b8 renderer_vulkan_surface_create(renderer_t *renderer, platform_window_context_t *context) {
+  VkWin32SurfaceCreateInfoKHR surface_create_info = (VkWin32SurfaceCreateInfoKHR){
+      .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+      .hwnd = context->window,
+      .hinstance = context->hinstance,
+  };
+
+  if (vkCreateWin32SurfaceKHR(renderer->instance, &surface_create_info, NULL, &renderer->surface) != VK_SUCCESS) {
+    logger_critical("<renderer:%p> <instance:%p> surface creation failed", renderer, renderer->instance);
+
+    return false;
+  }
+
+  return true;
+}
+
+b8 renderer_vulkan_surface_destroy(renderer_t *renderer) {
+  vkDestroySurfaceKHR(renderer->instance, renderer->surface, NULL);
+
+  return true;
 }

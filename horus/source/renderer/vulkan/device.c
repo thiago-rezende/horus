@@ -40,9 +40,14 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
     physical_device_score_t device_score = renderer_vulkan_physical_device_get_score(device);
 
-    queue_family_indices_t queue_family_indices = renderer_vulkan_physical_device_get_queue_family_indices(device);
+    queue_family_indices_t queue_family_indices =
+        renderer_vulkan_physical_device_get_queue_family_indices(device, renderer->surface);
 
     if (!queue_family_indices.has_compute_family_index) {
+      continue;
+    }
+
+    if (!queue_family_indices.has_present_family_index) {
       continue;
     }
 
@@ -74,6 +79,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   renderer->physical_device_properties = current_physical_device_score.properties;
 
   renderer->compute_queue_family_index = current_physical_device_score.queues.compute_family_index;
+  renderer->present_queue_family_index = current_physical_device_score.queues.present_family_index;
   renderer->graphics_queue_family_index = current_physical_device_score.queues.graphics_family_index;
   renderer->transfer_queue_family_index = current_physical_device_score.queues.transfer_family_index;
 
@@ -178,12 +184,15 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
   };
 }
 
-queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(VkPhysicalDevice device) {
+queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(VkPhysicalDevice device,
+                                                                                VkSurfaceKHR surface) {
   queue_family_indices_t indices = (queue_family_indices_t){
       .compute_family_index = 0,
+      .present_family_index = 0,
       .graphics_family_index = 0,
       .transfer_family_index = 0,
       .has_compute_family_index = false,
+      .has_present_family_index = false,
       .has_graphics_family_index = false,
       .has_transfer_family_index = false,
   };
@@ -212,9 +221,17 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 
     array_retrieve(families, i, (void *)&family);
 
+    VkBool32 has_present_support = false;
+    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &has_present_support);
+
     if (!indices.has_compute_family_index && family.queueFlags & VK_QUEUE_COMPUTE_BIT) {
       indices.compute_family_index = i;
       indices.has_compute_family_index = true;
+    }
+
+    if (!indices.has_present_family_index && has_present_support) {
+      indices.present_family_index = i;
+      indices.has_present_family_index = true;
     }
 
     if (!indices.has_graphics_family_index && family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
@@ -227,8 +244,8 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
       indices.has_transfer_family_index = true;
     }
 
-    logger_debug("|- [ queue ] <index:%lu> <compute:%s> <graphics:%s> <transfer:%s>", i,
-                 family.queueFlags & VK_QUEUE_COMPUTE_BIT ? "true" : "false",
+    logger_debug("|- [ queue ] <index:%lu> <compute:%s> <present:%s> <graphics:%s> <transfer:%s>", i,
+                 family.queueFlags & VK_QUEUE_COMPUTE_BIT ? "true" : "false", has_present_support ? "true" : "false",
                  family.queueFlags & VK_QUEUE_GRAPHICS_BIT ? "true" : "false",
                  family.queueFlags & VK_QUEUE_TRANSFER_BIT ? "true" : "false");
   }
@@ -239,13 +256,20 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 }
 
 b8 renderer_vulkan_device_create(renderer_t *renderer) {
-  const static u64 queue_count = 3;
+  const static u64 queue_count = 4;
   const static float queue_priority = 1.0f;
 
   VkDeviceQueueCreateInfo compute_queue_create_info = (VkDeviceQueueCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
       .queueCount = 1,
       .queueFamilyIndex = renderer->compute_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  VkDeviceQueueCreateInfo present_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->present_queue_family_index,
       .pQueuePriorities = &queue_priority,
   };
 
@@ -267,18 +291,30 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
 
   u8 queue_others_count = 2;
 
-  /* 32 compute_queue_others[] = {renderer->graphics_queue_family_index, renderer->transfer_queue_family_index}; */
-  u32 graphics_queue_others[] = {renderer->compute_queue_family_index, renderer->transfer_queue_family_index};
-  u32 transfer_queue_others[] = {renderer->compute_queue_family_index, renderer->graphics_queue_family_index};
+  u32 present_queue_others[] = {renderer->compute_queue_family_index, renderer->graphics_queue_family_index,
+                                renderer->transfer_queue_family_index};
+  u32 graphics_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
+                                 renderer->transfer_queue_family_index};
+  u32 transfer_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
+                                 renderer->graphics_queue_family_index};
 
   b8 should_include_compute_queue = true;
+
+  b8 should_include_present_queue =
+      __queue_family_index_is_unique(renderer->present_queue_family_index, present_queue_others, queue_others_count);
+
   b8 should_include_graphics_queue =
       __queue_family_index_is_unique(renderer->graphics_queue_family_index, graphics_queue_others, queue_others_count);
+
   b8 should_include_transfer_queue =
       __queue_family_index_is_unique(renderer->transfer_queue_family_index, transfer_queue_others, queue_others_count);
 
   if (should_include_compute_queue) {
     array_insert(queue_create_infos, &compute_queue_create_info);
+  }
+
+  if (should_include_present_queue) {
+    array_insert(queue_create_infos, &present_queue_create_info);
   }
 
   if (should_include_graphics_queue) {
@@ -314,6 +350,7 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
   }
 
   vkGetDeviceQueue(renderer->device, renderer->compute_queue_family_index, 0, &renderer->compute_queue);
+  vkGetDeviceQueue(renderer->device, renderer->present_queue_family_index, 0, &renderer->present_queue);
   vkGetDeviceQueue(renderer->device, renderer->graphics_queue_family_index, 0, &renderer->graphics_queue);
   vkGetDeviceQueue(renderer->device, renderer->transfer_queue_family_index, 0, &renderer->transfer_queue);
 

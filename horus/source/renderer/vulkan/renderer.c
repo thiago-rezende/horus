@@ -47,9 +47,23 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 
   logger_debug("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT created", renderer, renderer->messenger);
 
+  if (!renderer_vulkan_surface_create(renderer, platform_window_context(window))) {
+    logger_critical("<renderer:%p> VkSurfaceKHR creation failed", renderer);
+
+    renderer_vulkan_debug_messenger_destroy(renderer);
+    renderer_vulkan_instance_destroy(renderer);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
+
+  logger_debug("<renderer:%p> <surface:%p> VkSurfaceKHR created", renderer, renderer->surface);
+
   if (!renderer_vulkan_physical_device_select(renderer)) {
     logger_critical("<renderer:%p> VkPhysicalDevice selection failed", renderer);
 
+    renderer_vulkan_surface_destroy(renderer);
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
@@ -61,13 +75,14 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
   logger_debug("<renderer:%p> <physical_device:%p> VkPhysicalDevice selected", renderer, renderer->physical_device);
   logger_debug("|- [ %lu ] %s", renderer->physical_device_properties.deviceID,
                renderer->physical_device_properties.deviceName);
-  logger_debug("|- |- [ queues family indices ] <compute:%lu> <graphics:%lu> <transfer:%lu>",
-               renderer->compute_queue_family_index, renderer->graphics_queue_family_index,
-               renderer->transfer_queue_family_index);
+  logger_debug("|- |- [ queues family indices ] <compute:%lu> <present:%lu> <graphics:%lu> <transfer:%lu>",
+               renderer->compute_queue_family_index, renderer->present_queue_family_index,
+               renderer->graphics_queue_family_index, renderer->transfer_queue_family_index);
 
   if (!renderer_vulkan_device_create(renderer)) {
     logger_critical("<renderer:%p> VkDevice creation failed", renderer);
 
+    renderer_vulkan_surface_destroy(renderer);
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
@@ -75,8 +90,6 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 
     return NULL;
   }
-
-  logger_debug("<renderer:%p> <device:%p> VkDevice created", renderer, renderer->device);
 
   return renderer;
 }
@@ -89,6 +102,14 @@ b8 renderer_destroy(renderer_t *renderer) {
   }
 
   logger_debug("<renderer:%p> <device:%p> VkDevice destroyed", renderer, renderer->device);
+
+  if (!renderer_vulkan_surface_destroy(renderer)) {
+    logger_critical("<renderer:%p> <surface:%p> VkSurfaceKHR destruction failed", renderer, renderer->surface);
+
+    return false;
+  }
+
+  logger_debug("<renderer:%p> <surface:%p> VkSurfaceKHR destroyed", renderer, renderer->surface);
 
   if (!renderer_vulkan_debug_messenger_destroy(renderer)) {
     logger_critical("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT destruction failed", renderer,
