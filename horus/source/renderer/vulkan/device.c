@@ -40,6 +40,20 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
     physical_device_score_t device_score = renderer_vulkan_physical_device_get_score(device);
 
+    queue_family_indices_t queue_family_indices = renderer_vulkan_physical_device_get_queue_family_indices(device);
+
+    if (!queue_family_indices.has_compute_family_index) {
+      continue;
+    }
+
+    if (!queue_family_indices.has_graphics_family_index) {
+      continue;
+    }
+
+    if (!queue_family_indices.has_transfer_family_index) {
+      continue;
+    }
+
     if (device_score.score > current_physical_device_score.score) {
       current_physical_device_score = device_score;
     }
@@ -168,7 +182,7 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, families->buffer);
 
-  logger_debug("<device:%p> <count:%lu> physical devices queue families", device, families->count);
+  logger_debug("<device:%p> <count:%lu> physical device queue families", device, families->count);
 
   /* TODO: improve queue family selection to prioritize dedicated queues and fallback for the general one */
   for (u64 i = 0; i < families->count; i++) {
