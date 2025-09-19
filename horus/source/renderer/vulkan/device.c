@@ -1,12 +1,13 @@
 /* horus vulkan renderer layer */
 #include <horus/renderer/vulkan/device.h>
-#include <horus/renderer/vulkan/platform.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
 /* horus containers layer */
 #include <horus/containers/array.h>
+
+b8 __queue_family_index_is_unique(u32 index, u32 others[], u8 others_count);
 
 b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   u32 physical_device_count = 0;
@@ -114,13 +115,6 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
     device_type_string = "discrete_gpu";
   }
 
-  score += features.wideLines ? 50 : 0;
-  score += features.depthBounds ? 150 : 0;
-  score += features.multiViewport ? 10 : 0;
-  score += features.fillModeNonSolid ? 50 : 0;
-  score += features.samplerAnisotropy ? 200 : 0;
-  score += features.tessellationShader ? 10 : 0;
-
   score += properties.limits.maxImageDimension1D / 1024;
   score += properties.limits.maxImageDimension2D / 1024;
   score += properties.limits.maxImageDimension3D / 128;
@@ -131,7 +125,7 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
 
   logger_debug("|- [ %lu ] <score:%lu> <type:%s> %s", properties.deviceID, score, device_type_string,
                properties.deviceName);
-  logger_debug("|- |- [ properties ]");
+  logger_debug("|- |- [ features ]");
   logger_debug("|- |- |- [ wide lines ] %s", features.wideLines ? "true" : "false");
   logger_debug("|- |- |- [ depth bounds ] %s", features.depthBounds ? "true" : "false");
   logger_debug("|- |- |- [ multi viewport ] %s", features.multiViewport ? "true" : "false");
@@ -148,6 +142,30 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
   logger_debug("|- |- |- [ max vertex input attributes ] %lu", properties.limits.maxVertexInputAttributes);
 
   if (!features.geometryShader) {
+    score = 0;
+  }
+
+  if (!features.wideLines) {
+    score = 0;
+  }
+
+  if (!features.depthBounds) {
+    score = 0;
+  }
+
+  if (!features.multiViewport) {
+    score = 0;
+  }
+
+  if (!features.fillModeNonSolid) {
+    score = 0;
+  }
+
+  if (!features.samplerAnisotropy) {
+    score = 0;
+  }
+
+  if (!features.tessellationShader) {
     score = 0;
   }
 
@@ -194,25 +212,25 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 
     array_retrieve(families, i, (void *)&family);
 
-    if (family.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+    if (!indices.has_compute_family_index && family.queueFlags & VK_QUEUE_COMPUTE_BIT) {
       indices.compute_family_index = i;
       indices.has_compute_family_index = true;
     }
 
-    if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+    if (!indices.has_graphics_family_index && family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
       indices.graphics_family_index = i;
       indices.has_graphics_family_index = true;
     }
 
-    if (family.queueFlags & VK_QUEUE_TRANSFER_BIT) {
+    if (!indices.has_transfer_family_index && family.queueFlags & VK_QUEUE_TRANSFER_BIT) {
       indices.transfer_family_index = i;
       indices.has_transfer_family_index = true;
     }
 
-    logger_debug("|- [ queue ] <index:%lu>", i);
-    logger_debug("|- |- [ compute ] %s", family.queueFlags & VK_QUEUE_COMPUTE_BIT ? "true" : "false");
-    logger_debug("|- |- [ graphics ] %s", family.queueFlags & VK_QUEUE_GRAPHICS_BIT ? "true" : "false");
-    logger_debug("|- |- [ transfer ] %s", family.queueFlags & VK_QUEUE_TRANSFER_BIT ? "true" : "false");
+    logger_debug("|- [ queue ] <index:%lu> <compute:%s> <graphics:%s> <transfer:%s>", i,
+                 family.queueFlags & VK_QUEUE_COMPUTE_BIT ? "true" : "false",
+                 family.queueFlags & VK_QUEUE_GRAPHICS_BIT ? "true" : "false",
+                 family.queueFlags & VK_QUEUE_TRANSFER_BIT ? "true" : "false");
   }
 
   array_destroy(families);
@@ -247,9 +265,29 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
 
   array_t *queue_create_infos = array_create(queue_count, sizeof(VkDeviceQueueCreateInfo));
 
-  array_insert(queue_create_infos, &compute_queue_create_info);
-  array_insert(queue_create_infos, &graphics_queue_create_info);
-  array_insert(queue_create_infos, &transfer_queue_create_info);
+  u8 queue_others_count = 2;
+
+  /* 32 compute_queue_others[] = {renderer->graphics_queue_family_index, renderer->transfer_queue_family_index}; */
+  u32 graphics_queue_others[] = {renderer->compute_queue_family_index, renderer->transfer_queue_family_index};
+  u32 transfer_queue_others[] = {renderer->compute_queue_family_index, renderer->graphics_queue_family_index};
+
+  b8 should_include_compute_queue = true;
+  b8 should_include_graphics_queue =
+      __queue_family_index_is_unique(renderer->graphics_queue_family_index, graphics_queue_others, queue_others_count);
+  b8 should_include_transfer_queue =
+      __queue_family_index_is_unique(renderer->transfer_queue_family_index, transfer_queue_others, queue_others_count);
+
+  if (should_include_compute_queue) {
+    array_insert(queue_create_infos, &compute_queue_create_info);
+  }
+
+  if (should_include_graphics_queue) {
+    array_insert(queue_create_infos, &graphics_queue_create_info);
+  }
+
+  if (should_include_transfer_queue) {
+    array_insert(queue_create_infos, &transfer_queue_create_info);
+  }
 
   VkPhysicalDeviceFeatures device_features = (VkPhysicalDeviceFeatures){
       .wideLines = VK_TRUE,
@@ -286,6 +324,16 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
 
 b8 renderer_vulkan_device_destroy(renderer_t *renderer) {
   vkDestroyDevice(renderer->device, NULL);
+
+  return true;
+}
+
+b8 __queue_family_index_is_unique(u32 index, u32 others[], u8 others_count) {
+  for (u8 i = 0; i < others_count; i++) {
+    if (index == others[i]) {
+      return false;
+    }
+  }
 
   return true;
 }

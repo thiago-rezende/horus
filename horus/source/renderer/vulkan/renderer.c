@@ -8,6 +8,7 @@
 #include <horus/renderer/vulkan/device.h>
 #include <horus/renderer/vulkan/loader.h>
 #include <horus/renderer/vulkan/instance.h>
+#include <horus/renderer/vulkan/platform.h>
 #include <horus/renderer/vulkan/renderer.h>
 
 /* horus platform layer */
@@ -60,6 +61,9 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
   logger_debug("<renderer:%p> <physical_device:%p> VkPhysicalDevice selected", renderer, renderer->physical_device);
   logger_debug("|- [ %lu ] %s", renderer->physical_device_properties.deviceID,
                renderer->physical_device_properties.deviceName);
+  logger_debug("|- |- [ queues family indices ] <compute:%lu> <graphics:%lu> <transfer:%lu>",
+               renderer->compute_queue_family_index, renderer->graphics_queue_family_index,
+               renderer->transfer_queue_family_index);
 
   if (!renderer_vulkan_device_create(renderer)) {
     logger_critical("<renderer:%p> VkDevice creation failed", renderer);
