@@ -32,7 +32,7 @@ b8 renderer_vulkan_instance_create(renderer_t *renderer, application_t *applicat
 
     array_retrieve(layers, i, (void *)&name);
 
-    logger_debug("| [ %s ]", name);
+    logger_debug("|- [ %s ]", name);
   }
 
   logger_debug("<renderer:%p> <implementation:%s> <count:%lu> required instance extensions", renderer,
@@ -43,7 +43,7 @@ b8 renderer_vulkan_instance_create(renderer_t *renderer, application_t *applicat
 
     array_retrieve(extensions, i, (void *)&name);
 
-    logger_debug("| [ %s ]", name);
+    logger_debug("|- [ %s ]", name);
   }
 
   VkInstanceCreateInfo instance_create_info = (VkInstanceCreateInfo){

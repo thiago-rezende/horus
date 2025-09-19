@@ -59,7 +59,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 
   logger_debug("<renderer:%p> <implementation:%s> <instance:%p> VkPhysicalDevice selected", renderer,
                renderer->implementation_string, renderer->instance);
-  logger_debug("| [ %lu ] %s", renderer->physical_device_properties.deviceID,
+  logger_debug("|- [ %lu ] %s", renderer->physical_device_properties.deviceID,
                renderer->physical_device_properties.deviceName);
 
   return renderer;
