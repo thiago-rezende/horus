@@ -132,7 +132,7 @@ setup__logging() {
   fi
 }
 
-# changelog handler
+# generate handler
 generate__handler() {
   setup__logging
 
@@ -181,9 +181,9 @@ generate__tagged() {
   local tags=$(git tag --sort=-v:refname)
 
   if [ -z ${tags[*]} ]; then
-    echo "repository doesn't have any git tags" > ${script_logs_directory}/changelog__tagged__validation.log
+    echo "repository doesn't have any git tags" > ${script_logs_directory}/changelog__generate__tagged__validation.log
 
-    failure "generate" "tagged" ${script_logs_directory}/changelog__tagged__validation.log
+    failure "generate" "tagged" "${script_logs_directory}/changelog__generate__tagged__validation.log"
   fi
 
   echo >&3 -e "[$ansi_white generate $ansi_reset] generating a '$ansi_blue tagged $ansi_reset' changelog in '$ansi_blue $file $ansi_reset'"
