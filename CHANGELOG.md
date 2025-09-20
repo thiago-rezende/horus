@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+ - [53c128e] feat(renderer|vulkan|linux): add surface creation implementation (Thiago Rezende)
+ - [627a741] feat(renderer|vulkan) add surface creation logic with windows implementation and presentation queue retrieval (Thiago Rezende)
+ - [74ed641] refactor(renderer|vulkan): update queue family index selection to keep the first found for each type and update logical device creation to pevent queue colision (Thiago Rezende)
+ - [3d0ca20] feat(renderer|vulkan): add logical device and queues creation (Thiago Rezende)
+ - [c119e58] feat(renderer|vulkan): add queue family validation during physical devise selection (Thiago Rezende)
+ - [df69bf7] feat(renderer|vulkan): add initial implementation of physical device queue families detection and selection (Thiago Rezende)
+ - [a130110] refactor(renderer|vulkan): split the physical devise selection code into multiple functions (Thiago Rezende)
+ - [8d1f10f] feat(renderer|vulkan): add physical device rnaking and selection logic (Thiago Rezende)
+ - [93b5e6a] feat(renderer|vulkan): add initial boilerplate for physical device selection (Thiago Rezende)
+ - [f794734] docs: update changelog file (Thiago Rezende)
  - [93500f8] chore: update the src folders naming to source (Thiago Rezende)
  - [8dbcdea] refactor(renderer|vulkan): split instance and debug messenger creation to their own files (Thiago Rezende)
  - [f4ee49b] style(renderer|vulkan): update named strict initialization on debug messenger creation to follow the standard of the project (Thiago Rezende)
