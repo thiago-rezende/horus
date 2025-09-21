@@ -1,13 +1,15 @@
 /* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/device.h>
+#include <horus/renderer/vulkan/platform.h>
+
+/* horus core layer */
+#include <horus/core/strings.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
-/* horus containers layer */
-#include <horus/containers/array.h>
-
 b8 __queue_family_index_is_unique(u32 index, u32 others[], u8 others_count);
+b8 __physical_device_has_required_extensions(VkPhysicalDevice device, array_t *extensions);
 
 b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   u32 physical_device_count = 0;
@@ -18,6 +20,18 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
     logger_critical("<renderer:%p> <instance:%p> no physical devices found", renderer, renderer->instance);
 
     return false;
+  }
+
+  array_t *extensions = renderer_vulkan_device_get_required_extensions();
+
+  logger_debug("<renderer:%p> <count:%lu> required device extensions", renderer, extensions->count);
+
+  for (u64 i = 0; i < extensions->count; i++) {
+    char *name;
+
+    array_retrieve(extensions, i, (void *)&name);
+
+    logger_debug("|- [ %s ]", name);
   }
 
   array_t *devices = array_create(physical_device_count, sizeof(VkPhysicalDevice));
@@ -38,7 +52,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
     array_retrieve(devices, i, (void *)&device);
 
-    physical_device_score_t device_score = renderer_vulkan_physical_device_get_score(device);
+    physical_device_score_t device_score = renderer_vulkan_physical_device_get_score(device, extensions);
 
     queue_family_indices_t queue_family_indices =
         renderer_vulkan_physical_device_get_queue_family_indices(device, renderer->surface);
@@ -67,6 +81,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   }
 
   array_destroy(devices);
+  array_destroy(extensions);
 
   if (current_physical_device_score.device == VK_NULL_HANDLE) {
     logger_critical("<renderer:%p> <instance:%p> no suitable physical devices found", renderer, renderer->instance);
@@ -86,7 +101,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   return true;
 }
 
-physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device) {
+physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device, array_t *extensions) {
   u64 score = 0;
 
   VkPhysicalDeviceFeatures features;
@@ -147,10 +162,6 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
   logger_debug("|- |- |- [ max memory allocation count ] %lu", properties.limits.maxMemoryAllocationCount);
   logger_debug("|- |- |- [ max vertex input attributes ] %lu", properties.limits.maxVertexInputAttributes);
 
-  if (!features.geometryShader) {
-    score = 0;
-  }
-
   if (!features.wideLines) {
     score = 0;
   }
@@ -163,6 +174,10 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
     score = 0;
   }
 
+  if (!features.geometryShader) {
+    score = 0;
+  }
+
   if (!features.fillModeNonSolid) {
     score = 0;
   }
@@ -172,6 +187,10 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
   }
 
   if (!features.tessellationShader) {
+    score = 0;
+  }
+
+  if (!__physical_device_has_required_extensions(device, extensions)) {
     score = 0;
   }
 
@@ -334,16 +353,21 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
       .tessellationShader = VK_TRUE,
   };
 
+  array_t *extensions = renderer_vulkan_device_get_required_extensions();
+
   VkDeviceCreateInfo device_create_info = (VkDeviceCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
       .queueCreateInfoCount = queue_create_infos->count,
       .pQueueCreateInfos = queue_create_infos->buffer,
       .pEnabledFeatures = &device_features,
+      .enabledExtensionCount = extensions->count,
+      .ppEnabledExtensionNames = extensions->buffer,
   };
 
   if (vkCreateDevice(renderer->physical_device, &device_create_info, NULL, &renderer->device) != VK_SUCCESS) {
     logger_critical("<physical_device:%p> logical device creation failed", renderer->physical_device);
 
+    array_destroy(extensions);
     array_destroy(queue_create_infos);
 
     return false;
@@ -354,6 +378,7 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
   vkGetDeviceQueue(renderer->device, renderer->graphics_queue_family_index, 0, &renderer->graphics_queue);
   vkGetDeviceQueue(renderer->device, renderer->transfer_queue_family_index, 0, &renderer->transfer_queue);
 
+  array_destroy(extensions);
   array_destroy(queue_create_infos);
 
   return true;
@@ -371,6 +396,46 @@ b8 __queue_family_index_is_unique(u32 index, u32 others[], u8 others_count) {
       return false;
     }
   }
+
+  return true;
+}
+
+b8 __physical_device_has_required_extensions(VkPhysicalDevice device, array_t *extensions) {
+  u32 device_extension_property_count = 0;
+
+  vkEnumerateDeviceExtensionProperties(device, NULL, &device_extension_property_count, NULL);
+
+  array_t *device_extensions = array_create(device_extension_property_count, sizeof(VkExtensionProperties));
+  device_extensions->count = device_extension_property_count;
+
+  vkEnumerateDeviceExtensionProperties(device, NULL, &device_extension_property_count, device_extensions->buffer);
+
+  for (u64 i = 0; i < extensions->count; i++) {
+    b8 found = false;
+    char *name;
+
+    array_retrieve(extensions, i, &name);
+
+    for (u64 j = 0; j < device_extensions->count; j++) {
+      VkExtensionProperties properties;
+
+      array_retrieve(device_extensions, j, &properties);
+
+      if (string_compare_secure(properties.extensionName, name, VK_MAX_EXTENSION_NAME_SIZE)) {
+        found = true;
+
+        break;
+      }
+    }
+
+    if (!found) {
+      array_destroy(device_extensions);
+
+      return false;
+    }
+  }
+
+  array_destroy(device_extensions);
 
   return true;
 }

@@ -12,20 +12,23 @@
 /* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/platform.h>
 
-#define VULKAN_LAYERS_COUNT 1
-#define VULKAN_EXTENSIONS_COUNT 3
+#define VULKAN_INSTANCE_LAYERS_COUNT 1
+#define VULKAN_INSTANCE_EXTENSIONS_COUNT 3
+
+#define VULKAN_DEVICE_EXTENSIONS_COUNT 1
 
 #define VK_KHRONOS_VALIDATION_LAYER_NAME "VK_LAYER_KHRONOS_validation"
 
 const char *vk_khronos_validation_layer_name = VK_KHRONOS_VALIDATION_LAYER_NAME;
 
 const char *vk_khr_surface_extension_name = VK_KHR_SURFACE_EXTENSION_NAME;
+const char *vk_khr_swapchain_extension_name = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 const char *vk_khr_xcb_surface_extension_name = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
 
 const char *vk_ext_debug_utils_extension_name = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 
 array_t *renderer_vulkan_instance_get_required_layers(void) {
-  array_t *array = array_create(VULKAN_LAYERS_COUNT, sizeof(char *));
+  array_t *array = array_create(VULKAN_INSTANCE_LAYERS_COUNT, sizeof(char *));
 
   array_insert(array, &vk_khronos_validation_layer_name);
 
@@ -33,12 +36,20 @@ array_t *renderer_vulkan_instance_get_required_layers(void) {
 }
 
 array_t *renderer_vulkan_instance_get_required_extensions(void) {
-  array_t *array = array_create(VULKAN_EXTENSIONS_COUNT, sizeof(char *));
+  array_t *array = array_create(VULKAN_INSTANCE_EXTENSIONS_COUNT, sizeof(char *));
 
   array_insert(array, &vk_khr_surface_extension_name);
   array_insert(array, &vk_khr_xcb_surface_extension_name);
 
   array_insert(array, &vk_ext_debug_utils_extension_name);
+
+  return array;
+}
+
+array_t *renderer_vulkan_device_get_required_extensions(void) {
+  array_t *array = array_create(VULKAN_DEVICE_EXTENSIONS_COUNT, sizeof(char *));
+
+  array_insert(array, &vk_khr_swapchain_extension_name);
 
   return array;
 }

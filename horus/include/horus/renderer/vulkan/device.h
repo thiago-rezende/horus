@@ -3,6 +3,9 @@
 /* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/renderer.h>
 
+/* horus containers layer */
+#include <horus/containers/array.h>
+
 typedef struct __queue_family_indices {
   u32 compute_family_index;
   u32 present_family_index;
@@ -29,7 +32,7 @@ typedef struct __physical_device_score {
 
 b8 renderer_vulkan_physical_device_select(renderer_t *renderer);
 
-physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device);
+physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device, array_t *extensions);
 queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(VkPhysicalDevice device,
                                                                                 VkSurfaceKHR surface);
 
