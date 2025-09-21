@@ -23,7 +23,7 @@ b8 renderer_vulkan_instance_create(renderer_t *renderer, application_t *applicat
           VK_MAKE_VERSION(application->version.major, application->version.minor, application->version.patch),
       .pEngineName = horus_project_name(),
       .engineVersion = VK_MAKE_VERSION(engine_version_major, engine_version_minor, engine_version_patch),
-      .apiVersion = VK_API_VERSION_1_2,
+      .apiVersion = VK_API_VERSION_1_3,
   };
 
   array_t *layers = renderer_vulkan_instance_get_required_layers();
