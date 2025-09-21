@@ -7,10 +7,13 @@
 #include <horus/events/base.h>
 
 /* horus application layer */
+#include <horus/application/version.h>
 #include <horus/application/configuration.h>
 
 typedef struct __application {
   char *name;
+
+  version_t version;
 
   configuration_t configuration;
 

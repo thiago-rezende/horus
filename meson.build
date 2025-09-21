@@ -11,6 +11,11 @@ project(
   ],
 )
 
+project_version_parts = meson.project_version().split('.')
+project_version_major = project_version_parts[0].to_int()
+project_version_minor = project_version_parts[1].to_int()
+project_version_patch = project_version_parts[2].to_int()
+
 project_description = 'A simple closs-platform application development framework'
 
 # horus target

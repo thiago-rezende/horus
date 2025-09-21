@@ -114,6 +114,9 @@ horus_configuration = configuration_data(
   {
     'HORUS_PROJECT_NAME': meson.project_name(),
     'HORUS_PROJECT_VERSION': meson.project_version(),
+    'HORUS_PROJECT_VERSION_MAJOR': project_version_major,
+    'HORUS_PROJECT_VERSION_MINOR': project_version_minor,
+    'HORUS_PROJECT_VERSION_PATCH': project_version_patch,
     'HORUS_PROJECT_DESCRIPTION': project_description,
     'HORUS_PROJECT_LICENSE': meson.project_license()[0],
     'HORUS_PLATFORM': host_machine.system(),
