@@ -363,22 +363,39 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
 
   array_t *extensions = renderer_vulkan_device_get_required_extensions();
 
-  VkPhysicalDeviceFeatures device_features = (VkPhysicalDeviceFeatures){
-      .wideLines = VK_TRUE,
-      .depthBounds = VK_TRUE,
-      .multiViewport = VK_TRUE,
-      .fillModeNonSolid = VK_TRUE,
-      .samplerAnisotropy = VK_TRUE,
-      .tessellationShader = VK_TRUE,
+  VkPhysicalDeviceFeatures2 device_features_2 = {
+      .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+      .features =
+          (VkPhysicalDeviceFeatures){
+              .wideLines = VK_TRUE,
+              .depthBounds = VK_TRUE,
+              .multiViewport = VK_TRUE,
+              .fillModeNonSolid = VK_TRUE,
+              .samplerAnisotropy = VK_TRUE,
+              .tessellationShader = VK_TRUE,
+          },
   };
+
+  VkPhysicalDeviceVulkan13Features device_features_vulkan_13 = {
+      .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
+      .dynamicRendering = true,
+  };
+
+  VkPhysicalDeviceExtendedDynamicStateFeaturesEXT device_features_dynamic_state = {
+      .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT,
+      .extendedDynamicState = true,
+  };
+
+  device_features_2.pNext = &device_features_vulkan_13;
+  device_features_vulkan_13.pNext = &device_features_dynamic_state;
 
   VkDeviceCreateInfo device_create_info = (VkDeviceCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
       .queueCreateInfoCount = queue_create_infos->count,
       .pQueueCreateInfos = queue_create_infos->buffer,
-      .pEnabledFeatures = &device_features,
       .enabledExtensionCount = extensions->count,
       .ppEnabledExtensionNames = extensions->buffer,
+      .pNext = &device_features_2,
   };
 
   if (vkCreateDevice(renderer->physical_device, &device_create_info, NULL, &renderer->device) != VK_SUCCESS) {
