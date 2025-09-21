@@ -32,5 +32,9 @@ struct __renderer {
 
   VkSurfaceKHR surface;
 
+  VkPresentModeKHR surface_present_mode;
+  VkSurfaceFormatKHR surface_format;
+  VkSurfaceCapabilitiesKHR surface_capabilities;
+
   VkDebugUtilsMessengerEXT messenger;
 };

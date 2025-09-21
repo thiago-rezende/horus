@@ -8,6 +8,8 @@
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
+#define MINIMUM_EXTRA_DESIRED_SURFACE_IMAGES 1
+
 b8 __queue_family_index_is_unique(u32 index, u32 others[], u8 others_count);
 b8 __physical_device_has_required_extensions(VkPhysicalDevice device, array_t *extensions);
 
@@ -54,28 +56,8 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
     array_retrieve(devices, i, (void *)&device);
 
-    physical_device_score_t device_score = renderer_vulkan_physical_device_get_score(device, extensions);
-
-    queue_family_indices_t queue_family_indices =
-        renderer_vulkan_physical_device_get_queue_family_indices(device, renderer->surface);
-
-    if (!queue_family_indices.has_compute_family_index) {
-      continue;
-    }
-
-    if (!queue_family_indices.has_present_family_index) {
-      continue;
-    }
-
-    if (!queue_family_indices.has_graphics_family_index) {
-      continue;
-    }
-
-    if (!queue_family_indices.has_transfer_family_index) {
-      continue;
-    }
-
-    device_score.queues = queue_family_indices;
+    physical_device_score_t device_score =
+        renderer_vulkan_physical_device_get_score(device, renderer->surface, extensions);
 
     if (device_score.score > current_physical_device_score.score) {
       current_physical_device_score = device_score;
@@ -100,14 +82,27 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   renderer->graphics_queue_family_index = current_physical_device_score.queues.graphics_family_index;
   renderer->transfer_queue_family_index = current_physical_device_score.queues.transfer_family_index;
 
+  renderer->surface_format = current_physical_device_score.surface_information.format;
+  renderer->surface_capabilities = current_physical_device_score.surface_information.capabilities;
+  renderer->surface_present_mode = current_physical_device_score.surface_information.present_mode;
+
   return true;
 }
 
-physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device, array_t *extensions) {
+physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device,
+                                                                  VkSurfaceKHR surface,
+                                                                  array_t *extensions) {
   u64 score = 0;
 
   VkPhysicalDeviceFeatures features;
   VkPhysicalDeviceProperties properties;
+
+  surface_information_t surface_information = {0};
+
+  b8 has_required_extensions = __physical_device_has_required_extensions(device, extensions);
+
+  queue_family_indices_t queue_family_indices =
+      renderer_vulkan_physical_device_get_queue_family_indices(device, surface);
 
   char *device_type_string = "unknown";
 
@@ -146,23 +141,21 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
   score += properties.limits.maxMemoryAllocationCount / 1000;
   score += properties.limits.maxVertexInputAttributes > 16 ? 100 : 0;
 
-  logger_debug("|- [ %lu ] <score:%lu> <type:%s> %s", properties.deviceID, score, device_type_string,
-               properties.deviceName);
-  logger_debug("|- |- [ features ]");
-  logger_debug("|- |- |- [ wide lines ] %s", features.wideLines ? "true" : "false");
-  logger_debug("|- |- |- [ depth bounds ] %s", features.depthBounds ? "true" : "false");
-  logger_debug("|- |- |- [ multi viewport ] %s", features.multiViewport ? "true" : "false");
-  logger_debug("|- |- |- [ fill mode non solid ] %s", features.fillModeNonSolid ? "true" : "false");
-  logger_debug("|- |- |- [ sampler anisotropy ] %s", features.samplerAnisotropy ? "true" : "false");
-  logger_debug("|- |- |- [ tessellation shader ] %s", features.tessellationShader ? "true" : "false");
-  logger_debug("|- |- [ limits ]");
-  logger_debug("|- |- |- [ max image dimension 1D ] %lu", properties.limits.maxImageDimension1D);
-  logger_debug("|- |- |- [ max image dimension 2D ] %lu", properties.limits.maxImageDimension2D);
-  logger_debug("|- |- |- [ max image dimension 3D ] %lu", properties.limits.maxImageDimension3D);
-  logger_debug("|- |- |- [ max sampler anisotropy ] %lu", properties.limits.maxSamplerAnisotropy);
-  logger_debug("|- |- |- [ max push constants size ] %lu", properties.limits.maxPushConstantsSize);
-  logger_debug("|- |- |- [ max memory allocation count ] %lu", properties.limits.maxMemoryAllocationCount);
-  logger_debug("|- |- |- [ max vertex input attributes ] %lu", properties.limits.maxVertexInputAttributes);
+  if (has_required_extensions) {
+    surface_information = renderer_vulkan_physical_device_get_surface_information(device, surface);
+
+    if (surface_information.has_desired_format) {
+      score += 10;
+    }
+
+    if (surface_information.has_desired_capabilities) {
+      score += 10;
+    }
+
+    if (surface_information.has_desired_present_mode) {
+      score += 10;
+    }
+  }
 
   if (!features.wideLines) {
     score = 0;
@@ -192,16 +185,37 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
     score = 0;
   }
 
-  if (!__physical_device_has_required_extensions(device, extensions)) {
+  if (!has_required_extensions) {
     score = 0;
   }
+
+  if (!queue_family_indices.has_compute_family_index) {
+    score = 0;
+  }
+
+  if (!queue_family_indices.has_present_family_index) {
+    score = 0;
+  }
+
+  if (!queue_family_indices.has_graphics_family_index) {
+    score = 0;
+  }
+
+  if (!queue_family_indices.has_transfer_family_index) {
+    score = 0;
+  }
+
+  logger_debug("|- [ %lu ] <score:%lu> <type:%s> %s", properties.deviceID, score, device_type_string,
+               properties.deviceName);
 
   return (physical_device_score_t){
       .score = score,
       .device = device,
+      .queues = queue_family_indices,
       .features = features,
       .properties = properties,
       .device_type_string = device_type_string,
+      .surface_information = surface_information,
   };
 }
 
@@ -234,8 +248,6 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, families->buffer);
 
-  logger_debug("|- |- [ queue families ] <count:%lu>", device, families->count);
-
   /* TODO: improve queue family selection to prioritize dedicated queues and fallback for the general one */
   for (u64 i = 0; i < families->count; i++) {
     VkQueueFamilyProperties family;
@@ -264,16 +276,86 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
       indices.transfer_family_index = i;
       indices.has_transfer_family_index = true;
     }
-
-    logger_debug("|- |- |- [ queue ] <index:%lu> <compute:%s> <present:%s> <graphics:%s> <transfer:%s>", i,
-                 family.queueFlags & VK_QUEUE_COMPUTE_BIT ? "true" : "false", has_present_support ? "true" : "false",
-                 family.queueFlags & VK_QUEUE_GRAPHICS_BIT ? "true" : "false",
-                 family.queueFlags & VK_QUEUE_TRANSFER_BIT ? "true" : "false");
   }
 
   array_destroy(families);
 
   return indices;
+}
+
+surface_information_t renderer_vulkan_physical_device_get_surface_information(VkPhysicalDevice device,
+                                                                              VkSurfaceKHR surface) {
+  VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
+  VkSurfaceFormatKHR format;
+  VkSurfaceCapabilitiesKHR capabilities;
+
+  b8 has_desired_format = false;
+  b8 has_desired_capabilities = false;
+  b8 has_desired_present_mode = false;
+
+  u32 format_count = 0;
+  u32 present_mode_count = 0;
+
+  u32 minimum_desired_images = 0;
+
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &format_count, NULL);
+  vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_mode_count, NULL);
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &capabilities);
+
+  array_t *formats = array_create(format_count, sizeof(VkSurfaceFormatKHR));
+  array_t *present_modes = array_create(format_count, sizeof(VkPresentModeKHR));
+
+  formats->count = format_count;
+  present_modes->count = present_mode_count;
+
+  /* TODO: rank the available formats in case of desired format is missing */
+  array_retrieve(formats, 0, (void *)&format);
+
+  for (u64 i = 0; i < formats->count; i++) {
+    VkSurfaceFormatKHR current;
+
+    array_retrieve(formats, i, (void *)&current);
+
+    if (current.format == VK_FORMAT_B8G8R8A8_SRGB && current.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+      format = current;
+
+      has_desired_format = true;
+
+      break;
+    }
+  }
+
+  for (u64 i = 0; i < present_modes->count; i++) {
+    VkPresentModeKHR current;
+
+    array_retrieve(present_modes, i, (void *)&current);
+
+    if (current == VK_PRESENT_MODE_MAILBOX_KHR) {
+      present_mode = current;
+
+      has_desired_present_mode = true;
+
+      break;
+    }
+  }
+
+  minimum_desired_images = capabilities.minImageCount + MINIMUM_EXTRA_DESIRED_SURFACE_IMAGES;
+
+  if (capabilities.maxImageCount > 0 && minimum_desired_images <= capabilities.maxImageCount) {
+    has_desired_capabilities = true;
+  }
+
+  array_destroy(formats);
+  array_destroy(present_modes);
+
+  return (surface_information_t){
+      .format = format,
+      .capabilities = capabilities,
+      .present_mode = present_mode,
+      .has_desired_format = has_desired_format,
+      .has_desired_capabilities = has_desired_capabilities,
+      .has_desired_present_mode = has_desired_present_mode,
+  };
 }
 
 b8 renderer_vulkan_device_create(renderer_t *renderer) {
@@ -349,12 +431,12 @@ b8 __physical_device_has_required_extensions(VkPhysicalDevice device, array_t *e
     b8 found = false;
     char *name;
 
-    array_retrieve(extensions, i, &name);
+    array_retrieve(extensions, i, (void *)&name);
 
     for (u64 j = 0; j < device_extensions->count; j++) {
       VkExtensionProperties properties;
 
-      array_retrieve(device_extensions, j, &properties);
+      array_retrieve(device_extensions, j, (void *)&properties);
 
       if (string_compare_secure(properties.extensionName, name, VK_MAX_EXTENSION_NAME_SIZE)) {
         found = true;

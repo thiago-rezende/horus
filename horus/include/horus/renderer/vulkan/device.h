@@ -18,6 +18,16 @@ typedef struct __queue_family_indices {
   b8 has_transfer_family_index;
 } queue_family_indices_t;
 
+typedef struct __surface_information {
+  VkPresentModeKHR present_mode;
+  VkSurfaceFormatKHR format;
+  VkSurfaceCapabilitiesKHR capabilities;
+
+  b8 has_desired_format;
+  b8 has_desired_capabilities;
+  b8 has_desired_present_mode;
+} surface_information_t;
+
 typedef struct __physical_device_score {
   u64 score;
 
@@ -27,14 +37,22 @@ typedef struct __physical_device_score {
 
   queue_family_indices_t queues;
 
+  surface_information_t surface_information;
+
   char *device_type_string;
 } physical_device_score_t;
 
 b8 renderer_vulkan_physical_device_select(renderer_t *renderer);
 
-physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device, array_t *extensions);
+physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevice device,
+                                                                  VkSurfaceKHR surface,
+                                                                  array_t *extensions);
+
 queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(VkPhysicalDevice device,
                                                                                 VkSurfaceKHR surface);
+
+surface_information_t renderer_vulkan_physical_device_get_surface_information(VkPhysicalDevice device,
+                                                                              VkSurfaceKHR surface);
 
 b8 renderer_vulkan_device_create(renderer_t *renderer);
 b8 renderer_vulkan_device_destroy(renderer_t *renderer);
