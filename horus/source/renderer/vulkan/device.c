@@ -11,6 +11,8 @@
 b8 __queue_family_index_is_unique(u32 index, u32 others[], u8 others_count);
 b8 __physical_device_has_required_extensions(VkPhysicalDevice device, array_t *extensions);
 
+array_t *__build_queue_create_infos(renderer_t *renderer);
+
 b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   u32 physical_device_count = 0;
 
@@ -275,74 +277,9 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 }
 
 b8 renderer_vulkan_device_create(renderer_t *renderer) {
-  const static u64 queue_count = 4;
-  const static float queue_priority = 1.0f;
+  array_t *queue_create_infos = __build_queue_create_infos(renderer);
 
-  VkDeviceQueueCreateInfo compute_queue_create_info = (VkDeviceQueueCreateInfo){
-      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-      .queueCount = 1,
-      .queueFamilyIndex = renderer->compute_queue_family_index,
-      .pQueuePriorities = &queue_priority,
-  };
-
-  VkDeviceQueueCreateInfo present_queue_create_info = (VkDeviceQueueCreateInfo){
-      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-      .queueCount = 1,
-      .queueFamilyIndex = renderer->present_queue_family_index,
-      .pQueuePriorities = &queue_priority,
-  };
-
-  VkDeviceQueueCreateInfo graphics_queue_create_info = (VkDeviceQueueCreateInfo){
-      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-      .queueCount = 1,
-      .queueFamilyIndex = renderer->graphics_queue_family_index,
-      .pQueuePriorities = &queue_priority,
-  };
-
-  VkDeviceQueueCreateInfo transfer_queue_create_info = (VkDeviceQueueCreateInfo){
-      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-      .queueCount = 1,
-      .queueFamilyIndex = renderer->transfer_queue_family_index,
-      .pQueuePriorities = &queue_priority,
-  };
-
-  array_t *queue_create_infos = array_create(queue_count, sizeof(VkDeviceQueueCreateInfo));
-
-  u8 queue_others_count = 2;
-
-  u32 present_queue_others[] = {renderer->compute_queue_family_index, renderer->graphics_queue_family_index,
-                                renderer->transfer_queue_family_index};
-  u32 graphics_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
-                                 renderer->transfer_queue_family_index};
-  u32 transfer_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
-                                 renderer->graphics_queue_family_index};
-
-  b8 should_include_compute_queue = true;
-
-  b8 should_include_present_queue =
-      __queue_family_index_is_unique(renderer->present_queue_family_index, present_queue_others, queue_others_count);
-
-  b8 should_include_graphics_queue =
-      __queue_family_index_is_unique(renderer->graphics_queue_family_index, graphics_queue_others, queue_others_count);
-
-  b8 should_include_transfer_queue =
-      __queue_family_index_is_unique(renderer->transfer_queue_family_index, transfer_queue_others, queue_others_count);
-
-  if (should_include_compute_queue) {
-    array_insert(queue_create_infos, &compute_queue_create_info);
-  }
-
-  if (should_include_present_queue) {
-    array_insert(queue_create_infos, &present_queue_create_info);
-  }
-
-  if (should_include_graphics_queue) {
-    array_insert(queue_create_infos, &graphics_queue_create_info);
-  }
-
-  if (should_include_transfer_queue) {
-    array_insert(queue_create_infos, &transfer_queue_create_info);
-  }
+  array_t *extensions = renderer_vulkan_device_get_required_extensions();
 
   VkPhysicalDeviceFeatures device_features = (VkPhysicalDeviceFeatures){
       .wideLines = VK_TRUE,
@@ -352,8 +289,6 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
       .samplerAnisotropy = VK_TRUE,
       .tessellationShader = VK_TRUE,
   };
-
-  array_t *extensions = renderer_vulkan_device_get_required_extensions();
 
   VkDeviceCreateInfo device_create_info = (VkDeviceCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -438,4 +373,77 @@ b8 __physical_device_has_required_extensions(VkPhysicalDevice device, array_t *e
   array_destroy(device_extensions);
 
   return true;
+}
+
+array_t *__build_queue_create_infos(renderer_t *renderer) {
+  const static u64 queue_count = 4;
+  const static float queue_priority = 1.0f;
+
+  VkDeviceQueueCreateInfo compute_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->compute_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  VkDeviceQueueCreateInfo present_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->present_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  VkDeviceQueueCreateInfo graphics_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->graphics_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  VkDeviceQueueCreateInfo transfer_queue_create_info = (VkDeviceQueueCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+      .queueCount = 1,
+      .queueFamilyIndex = renderer->transfer_queue_family_index,
+      .pQueuePriorities = &queue_priority,
+  };
+
+  array_t *queue_create_infos = array_create(queue_count, sizeof(VkDeviceQueueCreateInfo));
+
+  u8 queue_others_count = 2;
+
+  u32 present_queue_others[] = {renderer->compute_queue_family_index, renderer->graphics_queue_family_index,
+                                renderer->transfer_queue_family_index};
+  u32 graphics_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
+                                 renderer->transfer_queue_family_index};
+  u32 transfer_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
+                                 renderer->graphics_queue_family_index};
+
+  b8 should_include_compute_queue = true;
+
+  b8 should_include_present_queue =
+      __queue_family_index_is_unique(renderer->present_queue_family_index, present_queue_others, queue_others_count);
+
+  b8 should_include_graphics_queue =
+      __queue_family_index_is_unique(renderer->graphics_queue_family_index, graphics_queue_others, queue_others_count);
+
+  b8 should_include_transfer_queue =
+      __queue_family_index_is_unique(renderer->transfer_queue_family_index, transfer_queue_others, queue_others_count);
+
+  if (should_include_compute_queue) {
+    array_insert(queue_create_infos, &compute_queue_create_info);
+  }
+
+  if (should_include_present_queue) {
+    array_insert(queue_create_infos, &present_queue_create_info);
+  }
+
+  if (should_include_graphics_queue) {
+    array_insert(queue_create_infos, &graphics_queue_create_info);
+  }
+
+  if (should_include_transfer_queue) {
+    array_insert(queue_create_infos, &transfer_queue_create_info);
+  }
+
+  return queue_create_infos;
 }
