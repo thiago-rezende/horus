@@ -9,7 +9,7 @@
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
 
-static const char *logger_prefixes[LOGGER_LEVEL_COUNT] = {
+static const char *logger_prefix_strings[LOGGER_LEVEL_COUNT] = {
     [LOGGER_LEVEL_CRITICAL] = "[ " ansi_magenta "critical" ansi_reset " ] ",
     [LOGGER_LEVEL_ERROR] = "[ " ansi_red "error" ansi_reset "    ] ",
     [LOGGER_LEVEL_WARNING] = "[ " ansi_yellow "warning" ansi_reset "  ] ",
@@ -18,27 +18,28 @@ static const char *logger_prefixes[LOGGER_LEVEL_COUNT] = {
     [LOGGER_LEVEL_DEBUG] = "[ " ansi_blue "debug" ansi_reset "    ] ",
 };
 
-static const u8 prefix_size = 13 + ansi_size * 2;
-static const u16 buffer_size = 1024;
-static const u32 total_buffer_size = prefix_size + buffer_size;
+static const u8 logger_prefix_string_size = 13 + ansi_string_size * 2;
+static const u16 logger_message_buffer_size = 1024;
+static const u32 total_logger_message_buffer_size = logger_prefix_string_size + logger_message_buffer_size;
 
 b8 __logger_general(logger_level_t level, const char *message, ...) {
   va_list args;
 
-  char buffer[total_buffer_size];
-  platform_memory_clear(buffer, total_buffer_size);
+  char buffer[total_logger_message_buffer_size];
 
-  platform_memory_copy(buffer, (void *)logger_prefixes[level], prefix_size);
+  platform_memory_clear(buffer, total_logger_message_buffer_size);
+
+  platform_memory_copy(buffer, (void *)logger_prefix_strings[level], logger_prefix_string_size);
 
   va_start(args, message);
 
-  i64 written = vsnprintf(buffer + prefix_size, buffer_size, message, args);
+  i64 written = vsnprintf(buffer + logger_prefix_string_size, logger_message_buffer_size, message, args);
 
   va_end(args);
 
-  written += prefix_size;
+  written += logger_prefix_string_size;
 
-  buffer[written < total_buffer_size ? written : total_buffer_size - 1] = '\n';
+  buffer[written < total_logger_message_buffer_size ? written : total_logger_message_buffer_size - 1] = '\n';
 
   if (level <= LOGGER_LEVEL_ERROR) {
     return platform_console_write_error(buffer);

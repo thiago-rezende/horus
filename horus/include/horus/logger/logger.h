@@ -10,7 +10,7 @@ typedef enum __logger_level {
   LOGGER_LEVEL_INFO,
   LOGGER_LEVEL_TRACE,
   LOGGER_LEVEL_DEBUG,
-  LOGGER_LEVEL_COUNT
+  LOGGER_LEVEL_COUNT,
 } logger_level_t;
 
 b8 __logger_general(logger_level_t level, const char *message, ...);

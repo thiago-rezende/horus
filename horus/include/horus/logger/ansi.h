@@ -3,7 +3,7 @@
 /* horus core layer */
 #include <horus/core/types.h>
 
-static const u8 ansi_size = 5;
+static const u8 ansi_string_size = 5;
 
 #define ansi_red "\e[31m"
 #define ansi_blue "\e[34m"
