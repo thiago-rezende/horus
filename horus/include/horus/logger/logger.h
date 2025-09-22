@@ -13,7 +13,7 @@ typedef enum __logger_level {
   LOGGER_LEVEL_COUNT,
 } logger_level_t;
 
-b8 __logger_general(logger_level_t level, const char *message, ...);
+b8 __logger_general(logger_level_t level, const char *message, ...) __attribute__((format(printf, 2, 3)));
 
 #define logger_critical(message, ...) __logger_general(LOGGER_LEVEL_CRITICAL, message __VA_OPT__(, ) __VA_ARGS__)
 

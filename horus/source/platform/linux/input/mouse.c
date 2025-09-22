@@ -126,7 +126,7 @@ b8 __platform_input_mouse_position_clear_state(void) {
 
   b8 result = __platform_input_mouse_set_previous_position(current_position);
 
-  assert_message(result == true, "__platform_input_mouse_set_previous_position failed", result);
+  assert_message(result == true, "__platform_input_mouse_set_previous_position failed");
 
   return true;
 }

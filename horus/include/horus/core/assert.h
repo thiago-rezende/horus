@@ -15,6 +15,6 @@
 #define assert_message(expression, message, ...)                                                           \
   if (!(expression)) {                                                                                     \
     logger_critical("<assertion:failed> <file:%s> <line:%d> <expression:%s> " message, __FILE__, __LINE__, \
-                    #expression, __VA_ARGS__);                                                             \
+                    #expression __VA_OPT__(, ) __VA_ARGS__);                                               \
     platform_debugger_break();                                                                             \
   }

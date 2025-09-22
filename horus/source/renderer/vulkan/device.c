@@ -28,7 +28,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
   array_t *extensions = renderer_vulkan_device_get_required_extensions();
 
-  logger_debug("<renderer:%p> <count:%lu> required device extensions", renderer, extensions->count);
+  logger_debug("<renderer:%p> <count:%llu> required device extensions", renderer, extensions->count);
 
   for (u64 i = 0; i < extensions->count; i++) {
     char *name;
@@ -44,7 +44,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
   vkEnumeratePhysicalDevices(renderer->instance, &physical_device_count, devices->buffer);
 
-  logger_debug("<renderer:%p> <count:%lu> physical devices", renderer, devices->count);
+  logger_debug("<renderer:%p> <count:%llu> physical devices", renderer, devices->count);
 
   physical_device_score_t current_physical_device_score = {
       .score = 0,
@@ -205,7 +205,7 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
     score = 0;
   }
 
-  logger_debug("|- [ %lu ] <score:%lu> <type:%s> %s", properties.deviceID, score, device_type_string,
+  logger_debug("|- [ %u ] <score:%llu> <type:%s> %s", properties.deviceID, score, device_type_string,
                properties.deviceName);
 
   return (physical_device_score_t){
