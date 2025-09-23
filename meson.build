@@ -18,24 +18,6 @@ project_version_patch = project_version_parts[2].to_int()
 
 project_description = 'A simple closs-platform application development framework'
 
-# default properties
-default_c_args = [
-  '-Wunused-label',
-  '-Wunused-value',
-  '-Wunused-result',
-  '-Wunused-function',
-  '-Wunused-variable',
-  '-Wunused-parameter',
-  '-Wunused-local-typedefs',
-  '-Wunused-but-set-variable',
-]
-
-default_override_options = [
-  'c_std=c99',
-  'werror=true',
-  'warning_level=3',
-]
-
 # horus target
 subdir('horus')
 
