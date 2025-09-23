@@ -23,19 +23,25 @@ extern application_t *application_create(void);
 extern b8 application_destroy(application_t *application);
 
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow) {
-  logger_info("<%s:v%s> <platform:%s> initializing", horus_project_name(), horus_project_version(), horus_platform());
+  (void)hInst;     /* unused */
+  (void)hInstPrev; /* unused */
+  (void)cmdline;   /* unused */
+  (void)cmdshow;   /* unused */
+
+  logger_info_format("<%s:v%s> <platform:%s> initializing", horus_project_name(), horus_project_version(),
+                     horus_platform());
 
   application_t *application = application_create();
 
   if (!application) {
-    logger_critical("<application:%p> creation failed", application);
+    logger_critical_format("<application:%p> creation failed", (void *)application);
 
     return 1;
   }
 
   __application_set_global_instance(application);
 
-  logger_info("<application:%p> <name:%s> created", application, application->name);
+  logger_info_format("<application:%p> <name:%s> created", (void *)application, application->name);
 
   configuration_t *configuration = &application->configuration;
   resolution_t *resolution = &configuration->resolution;
@@ -49,16 +55,17 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
   __platform_window_set_global_instance(window);
 
-  logger_info("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", window, application->name,
-              resolution->width, resolution->height, configuration->fullscreen);
+  logger_info_format("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", (void *)window,
+                     application->name, resolution->width, resolution->height, configuration->fullscreen);
 
   renderer_t *renderer = renderer_create(application, window);
 
-  logger_info("<renderer:%p> <implementation:%s> created", renderer, renderer_implementation_string(renderer));
+  logger_info_format("<renderer:%p> <implementation:%s> created", (void *)renderer,
+                     renderer_implementation_string(renderer));
 
   if (application->on_event) {
     if (!platform_window_set_event_callback(window, application->on_event)) {
-      logger_error("<application:%p> <on_event> failed", application);
+      logger_error_format("<application:%p> <on_event> failed", (void *)application);
     }
   }
 
@@ -74,13 +81,13 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
     if (application->on_update) {
       if (!application->on_update(timestep)) {
-        logger_error("<application:%p> <on_update> failed", application);
+        logger_error_format("<application:%p> <on_update> failed", (void *)application);
       }
     }
 
     if (application->on_render) {
       if (!application->on_render()) {
-        logger_error("<application:%p> <on_render> failed", application);
+        logger_error_format("<application:%p> <on_render> failed", (void *)application);
       }
     }
 
@@ -89,21 +96,22 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
   renderer_destroy(renderer);
 
-  logger_info("<renderer:%p> destroyed", renderer);
+  logger_info_format("<renderer:%p> destroyed", (void *)renderer);
 
   platform_window_destroy(window);
 
-  logger_info("<window:%p> destroyed", window);
+  logger_info_format("<window:%p> destroyed", (void *)window);
 
   if (!application_destroy(application)) {
-    logger_critical("<application:%p> destruction failed", application);
+    logger_critical_format("<application:%p> destruction failed", (void *)application);
 
     return 1;
   }
 
-  logger_info("<application:%p> destroyed", application);
+  logger_info_format("<application:%p> destroyed", (void *)application);
 
-  logger_info("<%s:v%s> <platform:%s> terminating", horus_project_name(), horus_project_version(), horus_platform());
+  logger_info_format("<%s:v%s> <platform:%s> terminating", horus_project_name(), horus_project_version(),
+                     horus_platform());
 
   return 0;
 }

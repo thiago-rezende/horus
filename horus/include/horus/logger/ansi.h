@@ -5,13 +5,13 @@
 
 static const u8 ansi_string_size = 5;
 
-#define ansi_red "\e[31m"
-#define ansi_blue "\e[34m"
-#define ansi_grey "\e[30m"
-#define ansi_cyan "\e[36m"
-#define ansi_green "\e[32m"
-#define ansi_white "\e[37m"
-#define ansi_yellow "\e[33m"
-#define ansi_magenta "\e[35m"
+#define ansi_red "\033[31m"
+#define ansi_blue "\033[34m"
+#define ansi_grey "\033[30m"
+#define ansi_cyan "\033[36m"
+#define ansi_green "\033[32m"
+#define ansi_white "\033[37m"
+#define ansi_yellow "\033[33m"
+#define ansi_magenta "\033[35m"
 
-#define ansi_reset "\e[00m"
+#define ansi_reset "\033[00m"

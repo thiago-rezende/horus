@@ -4,8 +4,6 @@
 /* horus input layer [ windows ] */
 #include <horus/platform/windows/input/mouse.h>
 
-#define PLATFORM_INPUT_MOUSE_BUTTON_COUNT 256
-
 static const mouse_scroll_state_t platform_input_mouse_scroll_direction_to_state_mapping[MOUSE_SCROLL_DIRECTION_COUNT] =
     {
         [MOUSE_SCROLL_DIRECTION_NONE] = MOUSE_SCROLL_STATE_NONE, /* */

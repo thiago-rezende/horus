@@ -21,21 +21,22 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   vkEnumeratePhysicalDevices(renderer->instance, &physical_device_count, NULL);
 
   if (physical_device_count == 0) {
-    logger_critical("<renderer:%p> <instance:%p> no physical devices found", renderer, renderer->instance);
+    logger_critical_format("<renderer:%p> <instance:%p> no physical devices found", (void *)renderer,
+                           (void *)renderer->instance);
 
     return false;
   }
 
   array_t *extensions = renderer_vulkan_device_get_required_extensions();
 
-  logger_debug("<renderer:%p> <count:%llu> required device extensions", renderer, extensions->count);
+  logger_debug_format("<renderer:%p> <count:%llu> required device extensions", (void *)renderer, extensions->count);
 
   for (u64 i = 0; i < extensions->count; i++) {
     char *name;
 
     array_retrieve(extensions, i, (void *)&name);
 
-    logger_debug("|- [ %s ]", name);
+    logger_debug_format("|- [ %s ]", name);
   }
 
   array_t *devices = array_create(physical_device_count, sizeof(VkPhysicalDevice));
@@ -44,7 +45,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
   vkEnumeratePhysicalDevices(renderer->instance, &physical_device_count, devices->buffer);
 
-  logger_debug("<renderer:%p> <count:%llu> physical devices", renderer, devices->count);
+  logger_debug_format("<renderer:%p> <count:%llu> physical devices", (void *)renderer, devices->count);
 
   physical_device_score_t current_physical_device_score = {
       .score = 0,
@@ -68,7 +69,8 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   array_destroy(extensions);
 
   if (current_physical_device_score.device == VK_NULL_HANDLE) {
-    logger_critical("<renderer:%p> <instance:%p> no suitable physical devices found", renderer, renderer->instance);
+    logger_critical_format("<renderer:%p> <instance:%p> no suitable physical devices found", (void *)renderer,
+                           (void *)renderer->instance);
 
     return false;
   }
@@ -205,8 +207,8 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
     score = 0;
   }
 
-  logger_debug("|- [ %u ] <score:%llu> <type:%s> %s", properties.deviceID, score, device_type_string,
-               properties.deviceName);
+  logger_debug_format("|- [ %u ] <score:%llu> <type:%s> %s", properties.deviceID, score, device_type_string,
+                      properties.deviceName);
 
   return (physical_device_score_t){
       .score = score,
@@ -237,7 +239,7 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, NULL);
 
   if (queue_family_count == 0) {
-    logger_critical("<device:%p> no queue families found for device", device);
+    logger_critical_format("<device:%p> no queue families found for device", (void *)device);
 
     return indices;
   }
@@ -399,7 +401,7 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
   };
 
   if (vkCreateDevice(renderer->physical_device, &device_create_info, NULL, &renderer->device) != VK_SUCCESS) {
-    logger_critical("<physical_device:%p> logical device creation failed", renderer->physical_device);
+    logger_critical_format("<physical_device:%p> logical device creation failed", (void *)renderer->physical_device);
 
     array_destroy(extensions);
     array_destroy(queue_create_infos);

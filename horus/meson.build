@@ -142,9 +142,11 @@ configure_file(
 # horus library
 horus_lib = static_library(
   'horus',
+  c_args: default_c_args,
   sources: horus_sources,
-  include_directories: horus_includes,
   dependencies: horus_dependencies,
+  override_options: default_override_options,
+  include_directories: horus_includes,
   install: true,
 )
 

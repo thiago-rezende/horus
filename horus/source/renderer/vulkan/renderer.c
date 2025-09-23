@@ -26,17 +26,17 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
   };
 
   if (!renderer_vulkan_instance_create(renderer, application)) {
-    logger_critical("<renderer:%p> VkInstance creation failed", renderer);
+    logger_critical_format("<renderer:%p> VkInstance creation failed", (void *)renderer);
 
     platform_memory_deallocate(renderer);
 
     return NULL;
   }
 
-  logger_debug("<renderer:%p> <instance:%p> VkInstance created", renderer, renderer->instance);
+  logger_debug_format("<renderer:%p> <instance:%p> VkInstance created", (void *)renderer, (void *)renderer->instance);
 
   if (!renderer_vulkan_debug_messenger_create(renderer)) {
-    logger_critical("<renderer:%p> VkDebugUtilsMessengerEXT creation failed", renderer);
+    logger_critical_format("<renderer:%p> VkDebugUtilsMessengerEXT creation failed", (void *)renderer);
 
     renderer_vulkan_instance_destroy(renderer);
 
@@ -45,10 +45,11 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
     return NULL;
   }
 
-  logger_debug("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT created", renderer, renderer->messenger);
+  logger_debug_format("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT created", (void *)renderer,
+                      (void *)renderer->messenger);
 
   if (!renderer_vulkan_surface_create(renderer, window)) {
-    logger_critical("<renderer:%p> VkSurfaceKHR creation failed", renderer);
+    logger_critical_format("<renderer:%p> VkSurfaceKHR creation failed", (void *)renderer);
 
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
@@ -58,10 +59,10 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
     return NULL;
   }
 
-  logger_debug("<renderer:%p> <surface:%p> VkSurfaceKHR created", renderer, renderer->surface);
+  logger_debug_format("<renderer:%p> <surface:%p> VkSurfaceKHR created", (void *)renderer, (void *)renderer->surface);
 
   if (!renderer_vulkan_physical_device_select(renderer)) {
-    logger_critical("<renderer:%p> VkPhysicalDevice selection failed", renderer);
+    logger_critical_format("<renderer:%p> VkPhysicalDevice selection failed", (void *)renderer);
 
     renderer_vulkan_surface_destroy(renderer);
     renderer_vulkan_debug_messenger_destroy(renderer);
@@ -72,15 +73,16 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
     return NULL;
   }
 
-  logger_debug("<renderer:%p> <physical_device:%p> VkPhysicalDevice selected", renderer, renderer->physical_device);
-  logger_debug("|- [ %u ] %s", renderer->physical_device_properties.deviceID,
-               renderer->physical_device_properties.deviceName);
-  logger_debug("|- |- [ queues family indices ] <compute:%u> <present:%u> <graphics:%u> <transfer:%u>",
-               renderer->compute_queue_family_index, renderer->present_queue_family_index,
-               renderer->graphics_queue_family_index, renderer->transfer_queue_family_index);
+  logger_debug_format("<renderer:%p> <physical_device:%p> VkPhysicalDevice selected", (void *)renderer,
+                      (void *)renderer->physical_device);
+  logger_debug_format("|- [ %u ] %s", renderer->physical_device_properties.deviceID,
+                      renderer->physical_device_properties.deviceName);
+  logger_debug_format("|- |- [ queues family indices ] <compute:%u> <present:%u> <graphics:%u> <transfer:%u>",
+                      renderer->compute_queue_family_index, renderer->present_queue_family_index,
+                      renderer->graphics_queue_family_index, renderer->transfer_queue_family_index);
 
   if (!renderer_vulkan_device_create(renderer)) {
-    logger_critical("<renderer:%p> VkDevice creation failed", renderer);
+    logger_critical_format("<renderer:%p> VkDevice creation failed", (void *)renderer);
 
     renderer_vulkan_surface_destroy(renderer);
     renderer_vulkan_debug_messenger_destroy(renderer);
@@ -96,37 +98,41 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 
 b8 renderer_destroy(renderer_t *renderer) {
   if (!renderer_vulkan_device_destroy(renderer)) {
-    logger_critical("<renderer:%p> <device:%p> VkDevice destruction failed", renderer, renderer->device);
+    logger_critical_format("<renderer:%p> <device:%p> VkDevice destruction failed", (void *)renderer,
+                           (void *)renderer->device);
 
     return false;
   }
 
-  logger_debug("<renderer:%p> <device:%p> VkDevice destroyed", renderer, renderer->device);
+  logger_debug_format("<renderer:%p> <device:%p> VkDevice destroyed", (void *)renderer, (void *)renderer->device);
 
   if (!renderer_vulkan_surface_destroy(renderer)) {
-    logger_critical("<renderer:%p> <surface:%p> VkSurfaceKHR destruction failed", renderer, renderer->surface);
+    logger_critical_format("<renderer:%p> <surface:%p> VkSurfaceKHR destruction failed", (void *)renderer,
+                           (void *)renderer->surface);
 
     return false;
   }
 
-  logger_debug("<renderer:%p> <surface:%p> VkSurfaceKHR destroyed", renderer, renderer->surface);
+  logger_debug_format("<renderer:%p> <surface:%p> VkSurfaceKHR destroyed", (void *)renderer, (void *)renderer->surface);
 
   if (!renderer_vulkan_debug_messenger_destroy(renderer)) {
-    logger_critical("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT destruction failed", renderer,
-                    renderer->messenger);
+    logger_critical_format("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT destruction failed", (void *)renderer,
+                           (void *)renderer->messenger);
 
     return false;
   }
 
-  logger_debug("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT destroyed", renderer, renderer->messenger);
+  logger_debug_format("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT destroyed", (void *)renderer,
+                      (void *)renderer->messenger);
 
   if (!renderer_vulkan_instance_destroy(renderer)) {
-    logger_critical("<renderer:%p> <instance:%p> VkInstance destruction failed", renderer, renderer->instance);
+    logger_critical_format("<renderer:%p> <instance:%p> VkInstance destruction failed", (void *)renderer,
+                           (void *)renderer->instance);
 
     return false;
   }
 
-  logger_debug("<renderer:%p> <instance:%p> VkInstance destroyed", renderer, renderer->instance);
+  logger_debug_format("<renderer:%p> <instance:%p> VkInstance destroyed", (void *)renderer, (void *)renderer->instance);
 
   platform_memory_deallocate(renderer);
 

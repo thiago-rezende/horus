@@ -29,24 +29,24 @@ b8 renderer_vulkan_instance_create(renderer_t *renderer, application_t *applicat
   array_t *layers = renderer_vulkan_instance_get_required_layers();
   array_t *extensions = renderer_vulkan_instance_get_required_extensions();
 
-  logger_debug("<renderer:%p> <count:%llu> required instance layers", renderer, layers->count);
+  logger_debug_format("<renderer:%p> <count:%llu> required instance layers", (void *)renderer, layers->count);
 
   for (u64 i = 0; i < layers->count; i++) {
     char *name;
 
     array_retrieve(layers, i, (void *)&name);
 
-    logger_debug("|- [ %s ]", name);
+    logger_debug_format("|- [ %s ]", name);
   }
 
-  logger_debug("<renderer:%p> <count:%llu> required instance extensions", renderer, extensions->count);
+  logger_debug_format("<renderer:%p> <count:%llu> required instance extensions", (void *)renderer, extensions->count);
 
   for (u64 i = 0; i < extensions->count; i++) {
     char *name;
 
     array_retrieve(extensions, i, (void *)&name);
 
-    logger_debug("|- [ %s ]", name);
+    logger_debug_format("|- [ %s ]", name);
   }
 
   VkInstanceCreateInfo instance_create_info = (VkInstanceCreateInfo){

@@ -77,7 +77,8 @@ b8 renderer_vulkan_surface_create(renderer_t *renderer, platform_window_t *windo
   };
 
   if (vkCreateXcbSurfaceKHR(renderer->instance, &surface_create_info, NULL, &renderer->surface) != VK_SUCCESS) {
-    logger_critical("<renderer:%p> <instance:%p> surface creation failed", renderer, renderer->instance);
+    logger_critical_format("<renderer:%p> <instance:%p> surface creation failed", (void *)renderer,
+                           (void *)renderer->instance);
 
     return false;
   }

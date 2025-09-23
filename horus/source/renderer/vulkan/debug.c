@@ -8,6 +8,8 @@ VKAPI_ATTR VkBool32 VKAPI_CALL renderer_vulkan_debug_callback(VkDebugUtilsMessag
                                                               VkDebugUtilsMessageTypeFlagsEXT type,
                                                               const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
                                                               void *user_data) {
+  (void)type; /* unused */
+
   renderer_t *renderer = (renderer_t *)user_data;
 
   logger_level_t level = LOGGER_LEVEL_TRACE;
@@ -42,7 +44,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL renderer_vulkan_debug_callback(VkDebugUtilsMessag
     }
   }
 
-  __logger_general(level, "<renderer:%p> %s", renderer, callback_data->pMessage);
+  __logger_general_format(level, "<renderer:%p> %s", (void *)renderer, callback_data->pMessage);
 
   return VK_FALSE;
 }
