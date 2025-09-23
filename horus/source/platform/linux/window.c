@@ -139,7 +139,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   window->has_resized = false;
   window->should_close = false;
 
-  logger_debug_format("<window:%p> <xcb_window:%lu> created", (void *)window, window->context.window);
+  logger_debug_format("<window:%p> <xcb_window:%u> created", (void *)window, window->context.window);
 
   return window;
 }
@@ -147,7 +147,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
 b8 platform_window_destroy(platform_window_t *window) {
   xcb_destroy_window(window->context.connection, window->context.window);
 
-  logger_debug_format("<window:%p> <xcb_window:%lu> destroyed", (void *)window, window->context.window);
+  logger_debug_format("<window:%p> <xcb_window:%u> destroyed", (void *)window, window->context.window);
 
   xcb_disconnect(window->context.connection);
 
