@@ -1,15 +1,25 @@
 /* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/swapchain.h>
 
+/* horus core layer */
+#include <horus/core/numeric.h>
+
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
-b8 renderer_vulkan_swapchain_create(renderer_t *renderer) {
+b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *window) {
   u32 minimum_image_count = renderer->surface_capabilities.minImageCount + 1;
 
   if (renderer->surface_capabilities.maxImageCount > 0 &&
       minimum_image_count > renderer->surface_capabilities.maxImageCount) {
     minimum_image_count = renderer->surface_capabilities.maxImageCount;
+  }
+
+  if (!renderer_vulkan_swapchain_build_extent(renderer, window)) {
+    logger_critical_format("<renderer:%p> <window:%p> swapchain extent creation failed", (void *)renderer,
+                           (void *)window);
+
+    return false;
   }
 
   VkSwapchainCreateInfoKHR swapchain_create_info = (VkSwapchainCreateInfoKHR){
@@ -60,12 +70,35 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer) {
   return true;
 }
 
-b8 renderer_vulkan_swapchain_update(renderer_t *renderer) {
+b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *window) {
   return false;
 }
 
 b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {
   vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+  return true;
+}
+
+b8 renderer_vulkan_swapchain_build_extent(renderer_t *renderer, platform_window_t *window) {
+  if (renderer->surface_capabilities.currentExtent.width != max_u32) {
+    renderer->swapchain_extent = renderer->surface_capabilities.currentExtent;
+
+    return true;
+  }
+
+  platform_window_size_t window_size = platform_window_size(window);
+
+  u32 selected_width = numeric_clamp_u32((u32)window_size.width, renderer->surface_capabilities.minImageExtent.width,
+                                         renderer->surface_capabilities.maxImageExtent.width);
+  u32 selected_height = numeric_clamp_u32((u32)window_size.height, renderer->surface_capabilities.minImageExtent.height,
+                                          renderer->surface_capabilities.maxImageExtent.height);
+  ;
+
+  renderer->swapchain_extent = (VkExtent2D){
+      .width = selected_width,
+      .height = selected_height,
+  };
 
   return true;
 }

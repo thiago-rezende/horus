@@ -42,6 +42,7 @@ struct __renderer {
   VkSwapchainKHR swapchain;
 
   array_t *swapchain_images;
+  VkExtent2D swapchain_extent;
 
   VkDebugUtilsMessengerEXT messenger;
 };

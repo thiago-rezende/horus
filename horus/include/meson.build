@@ -10,6 +10,7 @@ horus_headers = [
   'horus/core/types.h',
   'horus/core/assert.h',
   'horus/core/macros.h',
+  'horus/core/numeric.h',
   'horus/core/strings.h',
 
   # horus containers layer

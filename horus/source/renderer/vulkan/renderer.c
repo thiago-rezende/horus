@@ -96,7 +96,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
 
   logger_debug_format("<renderer:%p> <device:%p> VkDevice created", (void *)renderer, (void *)renderer->device);
 
-  if (!renderer_vulkan_swapchain_create(renderer)) {
+  if (!renderer_vulkan_swapchain_create(renderer, window)) {
     logger_critical_format("<renderer:%p> VkSwapchainKHR creation failed", (void *)renderer);
 
     renderer_vulkan_device_destroy(renderer);

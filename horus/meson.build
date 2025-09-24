@@ -5,6 +5,7 @@ horus_sources = [
 
   # horus core layer
   'source/core/strings.c',
+  'source/core/numeric.c',
 
   # horus containers layer
   'source/containers/array.c',
