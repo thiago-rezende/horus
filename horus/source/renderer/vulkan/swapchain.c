@@ -67,6 +67,17 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   vkGetSwapchainImagesKHR(renderer->device, renderer->swapchain, &swapchain_image_count,
                           renderer->swapchain_images->buffer);
 
+  if (!renderer_vulkan_swapchain_image_views_create(renderer)) {
+    logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image views creation failed", renderer,
+                           renderer->swapchain);
+
+    array_destroy(renderer->swapchain_images);
+
+    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+    return false;
+  }
+
   return true;
 }
 
@@ -75,6 +86,15 @@ b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *win
 }
 
 b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {
+  if (!renderer_vulkan_swapchain_image_views_destroy(renderer)) {
+    logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image views destruction failed", renderer,
+                           renderer->swapchain);
+
+    return false;
+  }
+
+  array_destroy(renderer->swapchain_images);
+
   vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
 
   return true;
@@ -99,6 +119,67 @@ b8 renderer_vulkan_swapchain_build_extent(renderer_t *renderer, platform_window_
       .width = selected_width,
       .height = selected_height,
   };
+
+  return true;
+}
+
+b8 renderer_vulkan_swapchain_image_views_create(renderer_t *renderer) {
+  VkImageViewCreateInfo image_view_create_info = (VkImageViewCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+      .viewType = VK_IMAGE_VIEW_TYPE_2D,
+      .format = renderer->surface_format.format,
+      .components =
+          (VkComponentMapping){
+              .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+              .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+              .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+              .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+          },
+      .subresourceRange =
+          (VkImageSubresourceRange){
+              .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+              .baseMipLevel = 0,
+              .levelCount = 1,
+              .baseArrayLayer = 0,
+              .layerCount = 1,
+          },
+  };
+
+  renderer->swapchain_image_views = array_create(renderer->swapchain_images->count, sizeof(VkImageView));
+
+  for (u64 i = 0; i < renderer->swapchain_images->count; i++) {
+    VkImage image;
+    VkImageView image_view;
+
+    array_retrieve(renderer->swapchain_images, i, (void *)&image);
+
+    image_view_create_info.image = image;
+
+    if (vkCreateImageView(renderer->device, &image_view_create_info, NULL, &image_view) != VK_SUCCESS) {
+      logger_critical_format("<renderer:%p> <swapchain:%p> <image:%p> image views creation failed for swapchain image",
+                             renderer, renderer->swapchain, image);
+
+      renderer_vulkan_swapchain_image_views_destroy(renderer);
+
+      return false;
+    }
+
+    array_insert(renderer->swapchain_image_views, &image_view);
+  }
+
+  return true;
+}
+
+b8 renderer_vulkan_swapchain_image_views_destroy(renderer_t *renderer) {
+  for (u64 i = 0; i < renderer->swapchain_image_views->count; i++) {
+    VkImageView view;
+
+    array_retrieve(renderer->swapchain_image_views, i, (void *)&view);
+
+    vkDestroyImageView(renderer->device, view, NULL);
+  }
+
+  array_destroy(renderer->swapchain_image_views);
 
   return true;
 }

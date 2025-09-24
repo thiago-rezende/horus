@@ -11,3 +11,6 @@ b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *win
 b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer);
 
 b8 renderer_vulkan_swapchain_build_extent(renderer_t *renderer, platform_window_t *window);
+
+b8 renderer_vulkan_swapchain_image_views_create(renderer_t *renderer);
+b8 renderer_vulkan_swapchain_image_views_destroy(renderer_t *renderer);
