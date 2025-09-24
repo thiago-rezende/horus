@@ -10,6 +10,7 @@
 #include <horus/renderer/vulkan/instance.h>
 #include <horus/renderer/vulkan/platform.h>
 #include <horus/renderer/vulkan/renderer.h>
+#include <horus/renderer/vulkan/swapchain.h>
 
 /* horus platform layer */
 #include <horus/platform/memory.h>
@@ -93,10 +94,39 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
     return NULL;
   }
 
+  logger_debug_format("<renderer:%p> <device:%p> VkDevice created", (void *)renderer, (void *)renderer->device);
+
+  if (!renderer_vulkan_swapchain_create(renderer)) {
+    logger_critical_format("<renderer:%p> VkSwapchainKHR creation failed", (void *)renderer);
+
+    renderer_vulkan_device_destroy(renderer);
+    renderer_vulkan_surface_destroy(renderer);
+    renderer_vulkan_debug_messenger_destroy(renderer);
+    renderer_vulkan_instance_destroy(renderer);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
+
+  logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR created", (void *)renderer,
+                      (void *)renderer->swapchain);
+  logger_debug_format("|- [ image count ] %lu", renderer->swapchain_images->count);
+
   return renderer;
 }
 
 b8 renderer_destroy(renderer_t *renderer) {
+  if (!renderer_vulkan_swapchain_destroy(renderer)) {
+    logger_critical_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destruction failed", (void *)renderer,
+                           (void *)renderer->swapchain);
+
+    return false;
+  }
+
+  logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destroyed", (void *)renderer,
+                      (void *)renderer->swapchain);
+
   if (!renderer_vulkan_device_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <device:%p> VkDevice destruction failed", (void *)renderer,
                            (void *)renderer->device);

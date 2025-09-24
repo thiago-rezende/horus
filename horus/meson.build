@@ -31,6 +31,7 @@ horus_sources = [
   'source/renderer/vulkan/loader.c',
   'source/renderer/vulkan/instance.c',
   'source/renderer/vulkan/renderer.c',
+  'source/renderer/vulkan/swapchain.c',
 ]
 
 # horus source files [ linux ]

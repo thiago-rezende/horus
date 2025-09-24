@@ -5,6 +5,9 @@
 /* horus application layer */
 #include <horus/application/application.h>
 
+/* horus containers layer */
+#include <horus/containers/array.h>
+
 /* horus renderer layer */
 #include <horus/renderer/renderer.h>
 
@@ -35,6 +38,10 @@ struct __renderer {
   VkPresentModeKHR surface_present_mode;
   VkSurfaceFormatKHR surface_format;
   VkSurfaceCapabilitiesKHR surface_capabilities;
+
+  VkSwapchainKHR swapchain;
+
+  array_t *swapchain_images;
 
   VkDebugUtilsMessengerEXT messenger;
 };
