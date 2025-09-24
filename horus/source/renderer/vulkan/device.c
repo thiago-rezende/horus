@@ -310,6 +310,9 @@ surface_information_t renderer_vulkan_physical_device_get_surface_information(Vk
   formats->count = format_count;
   present_modes->count = present_mode_count;
 
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &format_count, formats->buffer);
+  vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_mode_count, present_modes->buffer);
+
   /* TODO: rank the available formats in case of desired format is missing */
   array_retrieve(formats, 0, (void *)&format);
 
