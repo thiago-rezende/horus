@@ -41,21 +41,26 @@ horus_headers = [
   'horus/platform/debugger.h',
   'horus/platform/detection.h',
   'horus/platform/entrypoint.h',
+  'horus/platform/filesystem.h',
 
   # horus platform input layer
   'horus/platform/input/mouse.h',
   'horus/platform/input/keyboard.h',
 
   # horus renderer layer
+  'horus/renderer/shader.h',
   'horus/renderer/general.h',
   'horus/renderer/renderer.h',
+  'horus/renderer/pipeline.h',
 
   # horus renderer layer [ vulkan ]
   'horus/renderer/vulkan/debug.h',
   'horus/renderer/vulkan/device.h',
   'horus/renderer/vulkan/loader.h',
+  'horus/renderer/vulkan/shader.h',
   'horus/renderer/vulkan/instance.h',
   'horus/renderer/vulkan/renderer.h',
+  'horus/renderer/vulkan/pipeline.h',
   'horus/renderer/vulkan/platform.h',
   'horus/renderer/vulkan/swapchain.h',
 ]

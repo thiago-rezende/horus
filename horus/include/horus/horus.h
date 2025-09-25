@@ -24,6 +24,7 @@
 #include <horus/platform/window.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
+#include <horus/platform/filesystem.h>
 
 #if !defined(HORUS_ENTRYPOINT_DISABLE)
 #include <horus/platform/entrypoint.h>
@@ -42,4 +43,6 @@
 #include <horus/events/keyboard.h>
 
 /* horus renderer layer */
+#include <horus/renderer/shader.h>
+#include <horus/renderer/pipeline.h>
 #include <horus/renderer/renderer.h>

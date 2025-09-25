@@ -17,6 +17,7 @@
 #include <horus/application/application.h>
 
 /* horus renderer layer */
+#include <horus/renderer/pipeline.h>
 #include <horus/renderer/renderer.h>
 
 extern application_t *application_create(void);
@@ -63,6 +64,17 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
   logger_info_format("<renderer:%p> <implementation:%s> created", (void *)renderer,
                      renderer_implementation_string(renderer));
 
+  const char *module_path = "assets/shaders/build/triangle.spv";
+
+  shader_module_t *module = shader_module_create_from_binary(
+      renderer, SHADER_MODULE_STAGE_VERTEX | SHADER_MODULE_STAGE_FRAGMENT, (char *)module_path);
+
+  logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)module, module_path);
+
+  graphics_pipeline_t *pipeline = graphics_pipeline_create(renderer, module);
+
+  logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)pipeline);
+
   if (application->on_event) {
     if (!platform_window_set_event_callback(window, application->on_event)) {
       logger_error_format("<application:%p> <on_event> failed", (void *)application);
@@ -93,6 +105,14 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
     platform_window_process_events(window);
   }
+
+  shader_module_destroy(module);
+
+  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)module);
+
+  graphics_pipeline_destroy(pipeline);
+
+  logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)pipeline);
 
   renderer_destroy(renderer);
 

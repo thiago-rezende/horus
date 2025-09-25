@@ -381,6 +381,11 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
           },
   };
 
+  VkPhysicalDeviceVulkan11Features device_features_vulkan_11 = {
+      .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
+      .shaderDrawParameters = VK_TRUE,
+  };
+
   VkPhysicalDeviceVulkan13Features device_features_vulkan_13 = {
       .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
       .dynamicRendering = true,
@@ -391,7 +396,8 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
       .extendedDynamicState = true,
   };
 
-  device_features_2.pNext = &device_features_vulkan_13;
+  device_features_2.pNext = &device_features_vulkan_11;
+  device_features_vulkan_11.pNext = &device_features_vulkan_13;
   device_features_vulkan_13.pNext = &device_features_dynamic_state;
 
   VkDeviceCreateInfo device_create_info = (VkDeviceCreateInfo){

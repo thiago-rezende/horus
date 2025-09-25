@@ -1,17 +1,17 @@
 #! /usr/bin/env bash
 
-# ╔═╗╔═╗╔╦╗╦ ╦╔═╗
-# ╚═╗║╣  ║ ║ ║╠═╝
-# ╚═╝╚═╝ ╩ ╚═╝╩
+# ╔═╗╔═╗╔═╗╔═╗╔╦╗╔═╗
+# ╠═╣╚═╗╚═╗║╣  ║ ╚═╗
+# ╩ ╩╚═╝╚═╝╚═╝ ╩ ╚═╝
 #
-# Filename:   setup.sh
+# Filename:   assets.sh
 # GitHub:     https://github.com/thiago-rezende
 # Maintainer: Thiago Rezende <thiago.manoel.rezende@gmail.com>
 
 # script variables
 script_name=`basename "$0"`
 script_version='v1.0.0'
-script_description='general purpose setup script'
+script_description='general purpose asset management script'
 
 # script directories
 script_directory=`dirname "$0"`
@@ -22,6 +22,13 @@ script_verbose_output=${SCRIPT_VERBOSE_OUTPUT:-1}
 
 # positional arguments
 positional_arguments=()
+
+# shaders global variables
+default_vertex_shader_entrypoint='vertex_entrypoint'
+default_fragment_shader_entrypoint='fragment_entrypoint'
+
+default_spir_v_target='spirv'
+default_spir_v_profile='spirv_1_4'
 
 # ansi colors
 declare -r                               \
@@ -52,11 +59,11 @@ script__usage() {
   echo -e "  $ansi_green $script_name $ansi_white utility $ansi_yellow command $ansi_magenta < argument > $ansi_cyan [ options ] $ansi_reset"
   echo -e ""
   echo -e "[$ansi_white_bold utilities $ansi_reset]"
-  echo -e "  $ansi_white help $ansi_reset   - show this '$ansi_white_bold help $ansi_reset' message"
-  echo -e "  $ansi_white hooks $ansi_reset  - execute the '$ansi_white_bold hooks $ansi_reset' utility"
+  echo -e "  $ansi_white help $ansi_reset     - show this '$ansi_white_bold help $ansi_reset' message"
+  echo -e "  $ansi_white shaders $ansi_reset  - execute the '$ansi_white_bold shaders $ansi_reset' utility"
   echo -e ""
-  echo -e "[$ansi_white_bold hooks $ansi_reset]"
-  echo -e "  $ansi_yellow apply $ansi_reset  - apply the available git hooks to the repository"
+  echo -e "[$ansi_white_bold shaders $ansi_reset]"
+  echo -e "  $ansi_yellow spir-v $ansi_magenta < slang > < output > $ansi_reset - compile the given slang to spir-v"
   echo -e ""
   echo -e "[$ansi_white_bold options $ansi_reset]"
   echo -e "   $ansi_cyan --quiet $ansi_reset  - reduce verbosity"
@@ -130,47 +137,48 @@ setup__logging() {
   fi
 }
 
-# hooks handler
-hooks__handler() {
+# shaders handler
+shaders__handler() {
   setup__logging
 
   local command=$1
 
   case $command in
-    apply) hooks__apply "${@:2}";;
+    spir-v) shaders__spir_v "${@:2}";;
     *) if [ -z $command ]; then missing "command" $ansi_yellow; else invalid "command" $command $ansi_yellow; fi;;
   esac
 }
 
-# hooks apply procedure
-hooks__apply() {
-  echo >&3 -e "[$ansi_white hooks $ansi_reset] applying the available '$ansi_blue hooks $ansi_reset'"
+# shaders spir-v procedure
+shaders__spir_v() {
+  local slang=$1;
+  local output=$2;
 
-  echo >&3 -e "|- [$ansi_white mkdir $ansi_reset] creating the '$ansi_blue .git/hooks $ansi_reset' directory"
-
-  mkdir >&${script_logs_directory}/setup__hooks__apply__mkdir.log -p .git/hooks
-
-  if [ $? -ne 0 ]; then
-    failure "hooks" "apply" "${script_logs_directory}/setup__hooks__apply__mkdir.log"
+  if [ -z $slang ]; then
+    missing "slang" $ansi_magenta
   fi
 
-  find "scripts/hooks" -follow -type f -print | while read -r f; do
-    case "$f" in
-      *.sh)
-        if [ -r "$f" ]; then
-          hook="${f##*/}"
+  if [ -z $output ]; then
+    missing "output" $ansi_magenta
+  fi
 
-          output="${hook%.*}"
+  echo >&3 -e "[$ansi_white shaders $ansi_reset] compiling started"
 
-          echo >&3 -e "|- [$ansi_white cp $ansi_reset] copying '$ansi_blue $f $ansi_reset' to '$ansi_blue .git/hooks/$output $ansi_reset'";
+  echo >&3 -e "|- [$ansi_white slangc $ansi_reset] '$ansi_blue $slang $ansi_reset' -> '$ansi_blue $output $ansi_reset'"
 
-          cp "$f" ".git/hooks/$output"
-          chmod 755 ".git/hooks/$output"
-        fi
-      ;;
-      *) echo >&3 -e "|- [$ansi_green_bold skip $ansi_reset] ignoring '$ansi_magenta $f $ansi_reset' since it is not a .sh file";;
-    esac
-  done
+  slangc >&${script_logs_directory}/assets__shaders_spir_v__slangc.log \
+    $slang \
+    -target $default_spir_v_target \
+    -profile $default_spir_v_profile \
+    -emit-spirv-directly \
+    -fvk-use-entrypoint-name \
+    -entry $default_vertex_shader_entrypoint \
+    -entry $default_fragment_shader_entrypoint \
+    -o $output
+
+  if [ $? -ne 0 ]; then
+    failure "shaders" "spir-v" "${script_logs_directory}/assets__shaders_spir_v__slangc.log"
+  fi
 }
 
 # options handler
@@ -195,6 +203,6 @@ setup__verbosity
 # argument handler
 case $1 in
   help) script__usage;;
-  hooks) hooks__handler "${@:2}";;
+  shaders) shaders__handler "${@:2}";;
   *) invalid "utility" ${1:-""} $ansi_white;;
 esac

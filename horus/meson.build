@@ -30,8 +30,10 @@ horus_sources = [
   'source/renderer/vulkan/debug.c',
   'source/renderer/vulkan/device.c',
   'source/renderer/vulkan/loader.c',
+  'source/renderer/vulkan/shader.c',
   'source/renderer/vulkan/instance.c',
   'source/renderer/vulkan/renderer.c',
+  'source/renderer/vulkan/pipeline.c',
   'source/renderer/vulkan/swapchain.c',
 ]
 
@@ -43,6 +45,7 @@ if host_machine.system() == 'linux'
     'source/platform/linux/memory.c',
     'source/platform/linux/window.c',
     'source/platform/linux/console.c',
+    'source/platform/linux/filesystem.c',
 
     # horus input layer [ linux ]
     'source/platform/linux/input/mouse.c',
@@ -61,6 +64,7 @@ if host_machine.system() == 'windows'
     'source/platform/windows/memory.c',
     'source/platform/windows/window.c',
     'source/platform/windows/console.c',
+    'source/platform/windows/filesystem.c',
 
     # horus input layer [ windows ]
     'source/platform/windows/input/mouse.c',
