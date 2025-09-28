@@ -8,7 +8,6 @@
 typedef u8 shader_stage_flags_t;
 
 typedef enum __shader_stage {
-  SHADER_STAGE_NONE = 0,
   SHADER_STAGE_VERTEX = (1 << 0),
   SHADER_STAGE_COMPUTE = (1 << 1),
   SHADER_STAGE_FRAGMENT = (1 << 2),
