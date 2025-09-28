@@ -62,8 +62,8 @@ int main(int argc, char **argv, char **envp) {
 
   const char *module_path = "assets/shaders/build/triangle.spv";
 
-  shader_module_t *module = shader_module_create_from_binary(
-      renderer, SHADER_MODULE_STAGE_VERTEX | SHADER_MODULE_STAGE_FRAGMENT, (char *)module_path);
+  shader_module_t *module =
+      shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT, (char *)module_path);
 
   logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)module, module_path);
 

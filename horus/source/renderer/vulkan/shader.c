@@ -8,7 +8,7 @@
 #include <horus/platform/memory.h>
 #include <horus/platform/filesystem.h>
 
-shader_module_t *shader_module_create(renderer_t *renderer, shader_module_stage_t stages, u8 *code, u64 size) {
+shader_module_t *shader_module_create(renderer_t *renderer, shader_stage_flags_t stages, u8 *code, u64 size) {
   shader_module_t *module = platform_memory_allocate(sizeof(shader_module_t));
 
   *module = (shader_module_t){
@@ -43,7 +43,7 @@ shader_module_t *shader_module_create(renderer_t *renderer, shader_module_stage_
       .module = module->module,
   };
 
-  if (stages & SHADER_MODULE_STAGE_VERTEX) {
+  if (stages & SHADER_STAGE_VERTEX) {
     pipeline_shader_stage_create_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
     pipeline_shader_stage_create_info.pName = RENDERER_DEFAULT_SHADER_MODULE_VERTEX_STAGE_ENTRYPOINT;
 
@@ -51,7 +51,7 @@ shader_module_t *shader_module_create(renderer_t *renderer, shader_module_stage_
     module->has_vertex_stage_create_info = true;
   }
 
-  if (stages & SHADER_MODULE_STAGE_COMPUTE) {
+  if (stages & SHADER_STAGE_COMPUTE) {
     pipeline_shader_stage_create_info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
     pipeline_shader_stage_create_info.pName = RENDERER_DEFAULT_SHADER_MODULE_COMPUTE_STAGE_ENTRYPOINT;
 
@@ -59,7 +59,7 @@ shader_module_t *shader_module_create(renderer_t *renderer, shader_module_stage_
     module->has_compute_stage_create_info = true;
   }
 
-  if (stages & SHADER_MODULE_STAGE_FRAGMENT) {
+  if (stages & SHADER_STAGE_FRAGMENT) {
     pipeline_shader_stage_create_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     pipeline_shader_stage_create_info.pName = RENDERER_DEFAULT_SHADER_MODULE_FRAGMENT_STAGE_ENTRYPOINT;
 
@@ -70,7 +70,7 @@ shader_module_t *shader_module_create(renderer_t *renderer, shader_module_stage_
   return module;
 }
 
-shader_module_t *shader_module_create_from_binary(renderer_t *renderer, shader_module_stage_t stages, char *path) {
+shader_module_t *shader_module_create_from_binary(renderer_t *renderer, shader_stage_flags_t stages, char *path) {
   platform_file_t *binary = platform_file_open(path);
 
   if (binary == NULL) {
