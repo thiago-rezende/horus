@@ -56,5 +56,10 @@ struct __renderer {
   VkCommandBuffer graphics_command_buffer;
   VkCommandBuffer transfer_command_buffer;
 
+  VkFence render_complete_fence;
+
+  VkSemaphore render_complete_semaphore;
+  VkSemaphore present_complete_semaphore;
+
   VkDebugUtilsMessengerEXT messenger;
 };

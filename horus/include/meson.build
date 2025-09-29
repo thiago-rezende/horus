@@ -64,6 +64,7 @@ horus_headers = [
   'horus/renderer/vulkan/pipeline.h',
   'horus/renderer/vulkan/platform.h',
   'horus/renderer/vulkan/swapchain.h',
+  'horus/renderer/vulkan/synchronization.h',
 ]
 
 # horus header files [ linux ]

@@ -12,6 +12,7 @@
 #include <horus/renderer/vulkan/platform.h>
 #include <horus/renderer/vulkan/renderer.h>
 #include <horus/renderer/vulkan/swapchain.h>
+#include <horus/renderer/vulkan/synchronization.h>
 
 /* horus platform layer */
 #include <horus/platform/memory.h>
@@ -133,10 +134,35 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
                       (void *)renderer->compute_command_pool, (void *)renderer->present_command_pool,
                       (void *)renderer->graphics_command_pool, (void *)renderer->transfer_command_pool);
 
+  if (!renderer_vulkan_synchronization_create(renderer)) {
+    logger_critical_format("<renderer:%p> synchronization objects creation failed", (void *)renderer);
+
+    renderer_vulkan_command_pools_destroy(renderer);
+    renderer_vulkan_swapchain_destroy(renderer);
+    renderer_vulkan_device_destroy(renderer);
+    renderer_vulkan_surface_destroy(renderer);
+    renderer_vulkan_debug_messenger_destroy(renderer);
+    renderer_vulkan_instance_destroy(renderer);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
+
+  logger_debug_format("<renderer:%p> synchronization objects created", (void *)renderer);
+
   return renderer;
 }
 
 b8 renderer_destroy(renderer_t *renderer) {
+  if (!renderer_vulkan_synchronization_destroy(renderer)) {
+    logger_critical_format("<renderer:%p> synchronization objects destruction failed", (void *)renderer);
+
+    return false;
+  }
+
+  logger_debug_format("<renderer:%p> synchronization objects destroyed", (void *)renderer);
+
   if (!renderer_vulkan_command_pools_destroy(renderer)) {
     logger_critical_format("<renderer:%p> VkCommandPools destruction failed", (void *)renderer);
 
