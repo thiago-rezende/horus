@@ -183,3 +183,38 @@ b8 renderer_vulkan_swapchain_image_views_destroy(renderer_t *renderer) {
 
   return true;
 }
+
+b8 renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info_t info) {
+  VkImageMemoryBarrier2 barrier = (VkImageMemoryBarrier2){
+      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
+
+      .srcStageMask = info.source_stage_mask,
+      .srcAccessMask = info.source_access_mask,
+      .dstStageMask = info.destination_stage_mask,
+      .dstAccessMask = info.destination_access_mask,
+      .oldLayout = info.old_layout,
+      .newLayout = info.new_layout,
+      .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+      .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+      .image = info.image,
+      .subresourceRange =
+          (VkImageSubresourceRange){
+              .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+              .baseMipLevel = 0,
+              .levelCount = 1,
+              .baseArrayLayer = 0,
+              .layerCount = 1,
+          },
+  };
+
+  VkDependencyInfo dependency_info = (VkDependencyInfo){
+      .sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
+      .dependencyFlags = (VkDependencyFlags)0,
+      .imageMemoryBarrierCount = 1,
+      .pImageMemoryBarriers = &barrier,
+  };
+
+  vkCmdPipelineBarrier2(info.command_buffer, &dependency_info);
+
+  return true;
+}
