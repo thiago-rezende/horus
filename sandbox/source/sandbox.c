@@ -14,11 +14,15 @@ application_t *application_create(void) {
       .patch = 0,
   };
 
-  application->configuration = (configuration_t){.fullscreen = false,
-                                                 .resolution = (resolution_t){
-                                                     .width = 1280,
-                                                     .height = 720,
-                                                 }};
+  application->configuration = (configuration_t){
+      .fullscreen = false,
+      .framerate = 60,
+      .resolution =
+          (resolution_t){
+              .width = 1280,
+              .height = 720,
+          },
+  };
 
   application->on_event = on_event;
   application->on_update = on_update;

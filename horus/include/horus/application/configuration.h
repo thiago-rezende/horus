@@ -11,5 +11,7 @@ typedef struct __resolution {
 typedef struct __configuration {
   b8 fullscreen;
 
+  u16 framerate;
+
   resolution_t resolution;
 } configuration_t;

@@ -197,6 +197,81 @@ b8 renderer_destroy(renderer_t *renderer) {
   return true;
 }
 
+b8 renderer_record_commands(renderer_t *renderer) {
+  VkCommandBufferBeginInfo command_buffer_begin_info = (VkCommandBufferBeginInfo){
+      .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+      .flags = (VkCommandBufferUsageFlags)0,
+      .pInheritanceInfo = VK_NULL_HANDLE,
+  };
+
+  if (vkBeginCommandBuffer(renderer->compute_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> compute command buffer begin failed", renderer,
+                           renderer->compute_command_buffer);
+
+    return false;
+  }
+
+  if (vkBeginCommandBuffer(renderer->present_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> present command buffer begin failed", renderer,
+                           renderer->present_command_buffer);
+
+    return false;
+  }
+
+  if (vkBeginCommandBuffer(renderer->graphics_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> graphics command buffer begin failed", renderer,
+                           renderer->graphics_command_buffer);
+
+    return false;
+  }
+
+  if (vkBeginCommandBuffer(renderer->transfer_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer begin failed", renderer,
+                           renderer->transfer_command_buffer);
+
+    return false;
+  }
+
+  return true;
+}
+
+b8 renderer_submit_commands(renderer_t *renderer) {
+  if (vkEndCommandBuffer(renderer->compute_command_buffer) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> compute command buffer end failed", renderer,
+                           renderer->compute_command_buffer);
+
+    return false;
+  }
+
+  if (vkEndCommandBuffer(renderer->present_command_buffer) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> present command buffer end failed", renderer,
+                           renderer->present_command_buffer);
+
+    return false;
+  }
+
+  if (vkEndCommandBuffer(renderer->graphics_command_buffer) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> graphics command buffer end failed", renderer,
+                           renderer->graphics_command_buffer);
+
+    return false;
+  }
+
+  if (vkEndCommandBuffer(renderer->transfer_command_buffer) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer end failed", renderer,
+                           renderer->transfer_command_buffer);
+
+    return false;
+  }
+
+  renderer_vulkan_command_buffer_reset(renderer->compute_command_buffer);
+  renderer_vulkan_command_buffer_reset(renderer->present_command_buffer);
+  renderer_vulkan_command_buffer_reset(renderer->graphics_command_buffer);
+  renderer_vulkan_command_buffer_reset(renderer->transfer_command_buffer);
+
+  return true;
+}
+
 renderer_implementation_t renderer_implementation(renderer_t *renderer) {
   return renderer->implementation;
 }

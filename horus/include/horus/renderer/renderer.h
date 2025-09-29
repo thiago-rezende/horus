@@ -19,3 +19,6 @@ b8 renderer_destroy(renderer_t *renderer);
 
 renderer_implementation_t renderer_implementation(renderer_t *renderer);
 const char *renderer_implementation_string(renderer_t *renderer);
+
+b8 renderer_record_commands(renderer_t *renderer);
+b8 renderer_submit_commands(renderer_t *renderer);

@@ -86,6 +86,8 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
   f64 previous_absolute_time = platform_absolute_time();
 
   while (!platform_window_should_close(window)) {
+    platform_window_process_events(window);
+
     previous_absolute_time = current_absolute_time;
     current_absolute_time = platform_absolute_time();
 
@@ -97,13 +99,35 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
       }
     }
 
+    if (!renderer_record_commands(renderer)) {
+      logger_critical_format("<renderer:%p> commands recording failed", renderer);
+
+      platform_window_set_should_close(window, true);
+
+      continue;
+    }
+
     if (application->on_render) {
       if (!application->on_render()) {
         logger_error_format("<application:%p> <on_render> failed", (void *)application);
       }
     }
 
-    platform_window_process_events(window);
+    if (!renderer_submit_commands(renderer)) {
+      logger_critical_format("<renderer:%p> commands submission failed", renderer);
+
+      platform_window_set_should_close(window, true);
+
+      continue;
+    }
+
+    f64 target_frame_time = (1.0 / (f64)configuration->framerate);
+    f64 current_elapsed_time = current_absolute_time - platform_absolute_time();
+    f64 remaining_frame_time = target_frame_time - current_elapsed_time;
+
+    if (configuration->framerate && remaining_frame_time > 0) {
+      platform_sleep((u64)(remaining_frame_time * 1000) - 1);
+    }
   }
 
   shader_module_destroy(module);
