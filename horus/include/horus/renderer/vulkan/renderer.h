@@ -46,7 +46,10 @@ struct __renderer {
   array_t *swapchain_images;
   array_t *swapchain_image_views;
 
-  VkCommandPool command_pool;
+  VkCommandPool compute_command_pool;
+  VkCommandPool present_command_pool;
+  VkCommandPool graphics_command_pool;
+  VkCommandPool transfer_command_pool;
 
   VkDebugUtilsMessengerEXT messenger;
 };

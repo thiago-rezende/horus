@@ -114,7 +114,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
                       (void *)renderer->swapchain);
   logger_debug_format("|- [ image count ] %lu", renderer->swapchain_images->count);
 
-  if (!renderer_vulkan_command_pool_create(renderer)) {
+  if (!renderer_vulkan_command_pools_create(renderer)) {
     logger_critical_format("<renderer:%p> VkCommandPool creation failed", (void *)renderer);
 
     renderer_vulkan_swapchain_destroy(renderer);
@@ -128,22 +128,22 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
     return NULL;
   }
 
-  logger_debug_format("<renderer:%p> <command_pool:%p> VkCommandPool created", (void *)renderer,
-                      (void *)renderer->command_pool);
+  logger_debug_format("<renderer:%p> VkCommandPools created", (void *)renderer);
+  logger_debug_format("|- [ pools ] <compute:%p> <present:%p> <graphics:%p> <transfer:%p>",
+                      (void *)renderer->compute_command_pool, (void *)renderer->present_command_pool,
+                      (void *)renderer->graphics_command_pool, (void *)renderer->transfer_command_pool);
 
   return renderer;
 }
 
 b8 renderer_destroy(renderer_t *renderer) {
-  if (!renderer_vulkan_command_pool_destroy(renderer)) {
-    logger_critical_format("<renderer:%p> <command_pool:%p> VkCommandPool destruction failed", (void *)renderer,
-                           (void *)renderer->command_pool);
+  if (!renderer_vulkan_command_pools_destroy(renderer)) {
+    logger_critical_format("<renderer:%p> VkCommandPools destruction failed", (void *)renderer);
 
     return false;
   }
 
-  logger_debug_format("<renderer:%p> <command_pool:%p> VkCommandPool destroyed", (void *)renderer,
-                      (void *)renderer->command_pool);
+  logger_debug_format("<renderer:%p> VkCommandPool destroyed", (void *)renderer);
 
   if (!renderer_vulkan_swapchain_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destruction failed", (void *)renderer,
