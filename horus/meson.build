@@ -31,6 +31,7 @@ horus_sources = [
   'source/renderer/vulkan/device.c',
   'source/renderer/vulkan/loader.c',
   'source/renderer/vulkan/shader.c',
+  'source/renderer/vulkan/command.c',
   'source/renderer/vulkan/instance.c',
   'source/renderer/vulkan/renderer.c',
   'source/renderer/vulkan/pipeline.c',

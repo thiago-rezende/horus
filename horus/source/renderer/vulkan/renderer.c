@@ -7,6 +7,7 @@
 #include <horus/renderer/vulkan/debug.h>
 #include <horus/renderer/vulkan/device.h>
 #include <horus/renderer/vulkan/loader.h>
+#include <horus/renderer/vulkan/command.h>
 #include <horus/renderer/vulkan/instance.h>
 #include <horus/renderer/vulkan/platform.h>
 #include <horus/renderer/vulkan/renderer.h>
@@ -113,10 +114,37 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
                       (void *)renderer->swapchain);
   logger_debug_format("|- [ image count ] %lu", renderer->swapchain_images->count);
 
+  if (!renderer_vulkan_command_pool_create(renderer)) {
+    logger_critical_format("<renderer:%p> VkCommandPool creation failed", (void *)renderer);
+
+    renderer_vulkan_swapchain_destroy(renderer);
+    renderer_vulkan_device_destroy(renderer);
+    renderer_vulkan_surface_destroy(renderer);
+    renderer_vulkan_debug_messenger_destroy(renderer);
+    renderer_vulkan_instance_destroy(renderer);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
+
+  logger_debug_format("<renderer:%p> <command_pool:%p> VkCommandPool created", (void *)renderer,
+                      (void *)renderer->command_pool);
+
   return renderer;
 }
 
 b8 renderer_destroy(renderer_t *renderer) {
+  if (!renderer_vulkan_command_pool_destroy(renderer)) {
+    logger_critical_format("<renderer:%p> <command_pool:%p> VkCommandPool destruction failed", (void *)renderer,
+                           (void *)renderer->command_pool);
+
+    return false;
+  }
+
+  logger_debug_format("<renderer:%p> <command_pool:%p> VkCommandPool destroyed", (void *)renderer,
+                      (void *)renderer->command_pool);
+
   if (!renderer_vulkan_swapchain_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destruction failed", (void *)renderer,
                            (void *)renderer->swapchain);
