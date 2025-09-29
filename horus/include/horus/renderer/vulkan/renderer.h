@@ -51,5 +51,10 @@ struct __renderer {
   VkCommandPool graphics_command_pool;
   VkCommandPool transfer_command_pool;
 
+  VkCommandBuffer compute_command_buffer;
+  VkCommandBuffer present_command_buffer;
+  VkCommandBuffer graphics_command_buffer;
+  VkCommandBuffer transfer_command_buffer;
+
   VkDebugUtilsMessengerEXT messenger;
 };
