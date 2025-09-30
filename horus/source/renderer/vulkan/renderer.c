@@ -424,6 +424,12 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   return true;
 }
 
+b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances) {
+  vkCmdDraw(renderer->graphics_command_buffer, vertices, instances, 0, 0);
+
+  return true;
+}
+
 renderer_implementation_t renderer_implementation(renderer_t *renderer) {
   return renderer->implementation;
 }

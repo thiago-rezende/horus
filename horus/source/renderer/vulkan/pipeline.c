@@ -199,3 +199,9 @@ b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline) {
 
   return true;
 }
+
+b8 graphics_pipeline_bind(graphics_pipeline_t *pipeline, renderer_t *renderer) {
+  vkCmdBindPipeline(renderer->graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
+
+  return true;
+}

@@ -107,6 +107,22 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
       continue;
     }
 
+    if (!graphics_pipeline_bind(pipeline, renderer)) {
+      logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, pipeline);
+
+      platform_window_set_should_close(window, true);
+
+      continue;
+    }
+
+    if (!renderer_draw(renderer, 3, 1)) {
+      logger_critical_format("<renderer:%p> draw command failed", renderer);
+
+      platform_window_set_should_close(window, true);
+
+      continue;
+    }
+
     if (application->on_render) {
       if (!application->on_render()) {
         logger_error_format("<application:%p> <on_render> failed", (void *)application);

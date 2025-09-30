@@ -22,3 +22,5 @@ const char *renderer_implementation_string(renderer_t *renderer);
 
 b8 renderer_record_commands(renderer_t *renderer);
 b8 renderer_submit_commands(renderer_t *renderer);
+
+b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances);

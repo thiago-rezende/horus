@@ -11,3 +11,5 @@ typedef struct __graphics_pipeline graphics_pipeline_t;
 
 graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_module_t *module);
 b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline);
+
+b8 graphics_pipeline_bind(graphics_pipeline_t *pipeline, renderer_t *renderer);
