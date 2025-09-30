@@ -363,6 +363,17 @@ surface_information_t renderer_vulkan_physical_device_get_surface_information(Vk
   };
 }
 
+b8 renderer_vulkan_physical_device_update_surface_information(renderer_t *renderer) {
+  surface_information_t info =
+      renderer_vulkan_physical_device_get_surface_information(renderer->physical_device, renderer->surface);
+
+  renderer->surface_format = info.format;
+  renderer->surface_capabilities = info.capabilities;
+  renderer->surface_present_mode = info.present_mode;
+
+  return true;
+}
+
 b8 renderer_vulkan_device_create(renderer_t *renderer) {
   array_t *queue_create_infos = __build_queue_create_infos(renderer);
 

@@ -1,4 +1,5 @@
 /* horus renderer layer [ vulkan ] */
+#include <horus/renderer/vulkan/device.h>
 #include <horus/renderer/vulkan/swapchain.h>
 
 /* horus core layer */
@@ -82,7 +83,13 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
 }
 
 b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *window) {
-  return false;
+  renderer_vulkan_swapchain_destroy(renderer);
+
+  renderer_vulkan_physical_device_update_surface_information(renderer);
+
+  renderer_vulkan_swapchain_create(renderer, window);
+
+  return true;
 }
 
 b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {

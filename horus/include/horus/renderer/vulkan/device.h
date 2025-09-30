@@ -54,5 +54,7 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 surface_information_t renderer_vulkan_physical_device_get_surface_information(VkPhysicalDevice device,
                                                                               VkSurfaceKHR surface);
 
+b8 renderer_vulkan_physical_device_update_surface_information(renderer_t *renderer);
+
 b8 renderer_vulkan_device_create(renderer_t *renderer);
 b8 renderer_vulkan_device_destroy(renderer_t *renderer);

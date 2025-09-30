@@ -231,7 +231,8 @@ b8 renderer_record_commands(renderer_t *renderer) {
   if (acquire_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
 
-    /* TODO: swapchain recreation */
+    /* TODO: improve window retrieval for multiple windows support */
+    renderer_vulkan_swapchain_update(renderer, platform_window());
 
     return false;
   }
@@ -423,8 +424,6 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   if (vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, renderer->render_complete_fence) != VK_SUCCESS) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
 
-    /* TODO: swapchain recreation */
-
     return false;
   }
 
@@ -449,7 +448,8 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   VkResult queue_present_result = vkQueuePresentKHR(renderer->present_queue, &present_info);
 
   if (queue_present_result == VK_ERROR_OUT_OF_DATE_KHR || queue_present_result == VK_SUBOPTIMAL_KHR) {
-    /* TODO: */
+    /* TODO: improve window retrieval for multiple windows support */
+    renderer_vulkan_swapchain_update(renderer, platform_window());
 
     return false;
   }
