@@ -224,8 +224,24 @@ b8 renderer_destroy(renderer_t *renderer) {
 }
 
 b8 renderer_record_commands(renderer_t *renderer) {
-  vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, renderer->present_complete_semaphore,
-                        VK_NULL_HANDLE, &renderer->current_swapchain_image_index);
+  VkResult acquire_next_image_result =
+      vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, renderer->present_complete_semaphore,
+                            VK_NULL_HANDLE, &renderer->current_swapchain_image_index);
+
+  if (acquire_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
+    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
+
+    /* TODO: swapchain recreation */
+
+    return false;
+  }
+
+  if (acquire_next_image_result != VK_SUCCESS && acquire_next_image_result != VK_SUBOPTIMAL_KHR) {
+    logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image retrieval failed", renderer,
+                           renderer->swapchain);
+
+    return false;
+  }
 
   VkCommandBufferBeginInfo command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -334,7 +350,11 @@ b8 renderer_record_commands(renderer_t *renderer) {
 }
 
 b8 renderer_submit_commands(renderer_t *renderer) {
-  vkResetFences(renderer->device, 1, &renderer->render_complete_fence);
+  if (vkResetFences(renderer->device, 1, &renderer->render_complete_fence) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> fences reset failed", renderer);
+
+    return false;
+  }
 
   vkCmdEndRendering(renderer->graphics_command_buffer);
 
@@ -399,7 +419,14 @@ b8 renderer_submit_commands(renderer_t *renderer) {
       .pSignalSemaphores = &renderer->render_complete_semaphore,
   };
 
-  vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, renderer->render_complete_fence);
+  /* TODO: submit all the command buffers to their queues */
+  if (vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, renderer->render_complete_fence) != VK_SUCCESS) {
+    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
+
+    /* TODO: swapchain recreation */
+
+    return false;
+  }
 
   while (vkWaitForFences(renderer->device, 1, &renderer->render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
     ;
@@ -419,7 +446,13 @@ b8 renderer_submit_commands(renderer_t *renderer) {
       .pResults = NULL,
   };
 
-  vkQueuePresentKHR(renderer->present_queue, &present_info);
+  VkResult queue_present_result = vkQueuePresentKHR(renderer->present_queue, &present_info);
+
+  if (queue_present_result == VK_ERROR_OUT_OF_DATE_KHR || queue_present_result == VK_SUBOPTIMAL_KHR) {
+    /* TODO: */
+
+    return false;
+  }
 
   return true;
 }

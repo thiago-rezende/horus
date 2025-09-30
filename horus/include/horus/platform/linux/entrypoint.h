@@ -95,42 +95,26 @@ int main(int argc, char **argv, char **envp) {
       }
     }
 
-    if (!renderer_record_commands(renderer)) {
-      logger_critical_format("<renderer:%p> commands recording failed", renderer);
+    if (renderer_record_commands(renderer)) {
+      if (!graphics_pipeline_bind(pipeline, renderer)) {
+        logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, pipeline);
 
-      platform_window_set_should_close(window, true);
-
-      continue;
-    }
-
-    if (!graphics_pipeline_bind(pipeline, renderer)) {
-      logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, pipeline);
-
-      platform_window_set_should_close(window, true);
-
-      continue;
-    }
-
-    if (!renderer_draw(renderer, 3, 1)) {
-      logger_critical_format("<renderer:%p> draw command failed", renderer);
-
-      platform_window_set_should_close(window, true);
-
-      continue;
-    }
-
-    if (application->on_render) {
-      if (!application->on_render()) {
-        logger_error_format("<application:%p> <on_render> failed", (void *)application);
+        continue;
       }
-    }
 
-    if (!renderer_submit_commands(renderer)) {
-      logger_critical_format("<renderer:%p> commands submission failed", renderer);
+      if (!renderer_draw(renderer, 3, 1)) {
+        logger_critical_format("<renderer:%p> draw command failed", renderer);
 
-      platform_window_set_should_close(window, true);
+        continue;
+      }
 
-      continue;
+      if (application->on_render) {
+        if (!application->on_render()) {
+          logger_error_format("<application:%p> <on_render> failed", (void *)application);
+        }
+      }
+
+      renderer_submit_commands(renderer);
     }
 
     f64 target_frame_time = (1.0 / (f64)configuration->framerate);
