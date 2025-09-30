@@ -389,6 +389,7 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
   VkPhysicalDeviceVulkan13Features device_features_vulkan_13 = {
       .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
       .dynamicRendering = true,
+      .synchronization2 = true,
   };
 
   VkPhysicalDeviceExtendedDynamicStateFeaturesEXT device_features_dynamic_state = {

@@ -43,6 +43,8 @@ b8 renderer_vulkan_synchronization_create(renderer_t *renderer) {
 }
 
 b8 renderer_vulkan_synchronization_destroy(renderer_t *renderer) {
+  vkDeviceWaitIdle(renderer->device);
+
   vkDestroyFence(renderer->device, renderer->render_complete_fence, NULL);
   vkDestroySemaphore(renderer->device, renderer->render_complete_semaphore, NULL);
   vkDestroySemaphore(renderer->device, renderer->present_complete_semaphore, NULL);

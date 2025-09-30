@@ -61,5 +61,7 @@ struct __renderer {
   VkSemaphore render_complete_semaphore;
   VkSemaphore present_complete_semaphore;
 
+  u32 current_swapchain_image_index;
+
   VkDebugUtilsMessengerEXT messenger;
 };

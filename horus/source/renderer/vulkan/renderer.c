@@ -224,6 +224,9 @@ b8 renderer_destroy(renderer_t *renderer) {
 }
 
 b8 renderer_record_commands(renderer_t *renderer) {
+  vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, renderer->present_complete_semaphore,
+                        VK_NULL_HANDLE, &renderer->current_swapchain_image_index);
+
   VkCommandBufferBeginInfo command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
       .flags = (VkCommandBufferUsageFlags)0,
@@ -258,10 +261,103 @@ b8 renderer_record_commands(renderer_t *renderer) {
     return false;
   }
 
+  swapchain_image_transition_info_t swapchain_image_transition_info = (swapchain_image_transition_info_t){
+      .old_layout = VK_IMAGE_LAYOUT_UNDEFINED,
+      .new_layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
+      .source_access_mask = (VkAccessFlags2)0,
+      .destination_access_mask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
+      .source_stage_mask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT,
+      .destination_stage_mask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
+      .command_buffer = renderer->graphics_command_buffer,
+  };
+
+  array_retrieve(renderer->swapchain_images, renderer->current_swapchain_image_index,
+                 &swapchain_image_transition_info.image);
+
+  if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer begin failed", renderer,
+                           renderer->transfer_command_buffer);
+
+    return false;
+  }
+
+  VkClearColorValue clear_color_value = (VkClearColorValue){
+      .float32[0] = 0.01f,
+      .float32[1] = 0.01f,
+      .float32[2] = 0.01f,
+      .float32[3] = 1.0f,
+  };
+
+  VkRenderingAttachmentInfo rendering_attachment_info = (VkRenderingAttachmentInfo){
+      .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+      .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+      .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+      .clearValue = (VkClearValue)clear_color_value,
+  };
+
+  array_retrieve(renderer->swapchain_image_views, renderer->current_swapchain_image_index,
+                 &rendering_attachment_info.imageView);
+
+  VkRenderingInfo rendering_info = (VkRenderingInfo){
+      .sType = VK_STRUCTURE_TYPE_RENDERING_INFO,
+      .renderArea =
+          (VkRect2D){
+              .offset = (VkOffset2D){.x = 0, .y = 0},
+              .extent = renderer->swapchain_extent,
+          },
+      .layerCount = 1,
+      .colorAttachmentCount = 1,
+      .pColorAttachments = &rendering_attachment_info,
+  };
+
+  vkCmdBeginRendering(renderer->graphics_command_buffer, &rendering_info);
+
+  VkViewport viewport = (VkViewport){
+      .x = 0,
+      .y = 0,
+      .width = renderer->swapchain_extent.width,
+      .height = renderer->swapchain_extent.height,
+      .minDepth = 0.0f,
+      .maxDepth = 1.0f,
+  };
+
+  VkRect2D scissor = (VkRect2D){
+      .offset = (VkOffset2D){.x = 0, .y = 0},
+      .extent = renderer->swapchain_extent,
+  };
+
+  vkCmdSetViewport(renderer->graphics_command_buffer, 0, 1, &viewport);
+  vkCmdSetScissor(renderer->graphics_command_buffer, 0, 1, &scissor);
+
   return true;
 }
 
 b8 renderer_submit_commands(renderer_t *renderer) {
+  vkResetFences(renderer->device, 1, &renderer->render_complete_fence);
+
+  vkCmdEndRendering(renderer->graphics_command_buffer);
+
+  swapchain_image_transition_info_t swapchain_image_transition_info = (swapchain_image_transition_info_t){
+      .old_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      .new_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+      .source_access_mask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
+      .destination_access_mask = (VkAccessFlags2)0,
+      .source_stage_mask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
+      .destination_stage_mask = VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT,
+      .command_buffer = renderer->graphics_command_buffer,
+  };
+
+  array_retrieve(renderer->swapchain_images, renderer->current_swapchain_image_index,
+                 &swapchain_image_transition_info.image);
+
+  if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
+    logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer begin failed", renderer,
+                           renderer->transfer_command_buffer);
+
+    return false;
+  }
+
   if (vkEndCommandBuffer(renderer->compute_command_buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> compute command buffer end failed", renderer,
                            renderer->compute_command_buffer);
@@ -290,10 +386,40 @@ b8 renderer_submit_commands(renderer_t *renderer) {
     return false;
   }
 
+  VkPipelineStageFlags pipeline_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+  VkSubmitInfo submit_info = (VkSubmitInfo){
+      .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+      .waitSemaphoreCount = 1,
+      .pWaitSemaphores = &renderer->present_complete_semaphore,
+      .pWaitDstStageMask = &pipeline_stage_flags,
+      .commandBufferCount = 1,
+      .pCommandBuffers = &renderer->graphics_command_buffer,
+      .signalSemaphoreCount = 1,
+      .pSignalSemaphores = &renderer->render_complete_semaphore,
+  };
+
+  vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, renderer->render_complete_fence);
+
+  while (vkWaitForFences(renderer->device, 1, &renderer->render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
+    ;
+
   renderer_vulkan_command_buffer_reset(renderer->compute_command_buffer);
   renderer_vulkan_command_buffer_reset(renderer->present_command_buffer);
   renderer_vulkan_command_buffer_reset(renderer->graphics_command_buffer);
   renderer_vulkan_command_buffer_reset(renderer->transfer_command_buffer);
+
+  VkPresentInfoKHR present_info = (VkPresentInfoKHR){
+      .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+      .waitSemaphoreCount = 1,
+      .pWaitSemaphores = &renderer->render_complete_semaphore,
+      .swapchainCount = 1,
+      .pSwapchains = &renderer->swapchain,
+      .pImageIndices = &renderer->current_swapchain_image_index,
+      .pResults = NULL,
+  };
+
+  vkQueuePresentKHR(renderer->present_queue, &present_info);
 
   return true;
 }
