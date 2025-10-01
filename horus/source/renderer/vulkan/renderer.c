@@ -223,6 +223,7 @@ b8 renderer_destroy(renderer_t *renderer) {
   return true;
 }
 
+/* TODO: improve for multiple windows support */
 b8 renderer_record_commands(renderer_t *renderer) {
   VkResult acquire_next_image_result =
       vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, renderer->present_complete_semaphore,
@@ -350,6 +351,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
   return true;
 }
 
+/* TODO: improve for multiple windows support */
 b8 renderer_submit_commands(renderer_t *renderer) {
   if (vkResetFences(renderer->device, 1, &renderer->render_complete_fence) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> fences reset failed", renderer);

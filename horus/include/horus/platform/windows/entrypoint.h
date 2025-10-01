@@ -99,6 +99,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
       }
     }
 
+    /* TODO: improve for multiple windows support */
     if (renderer_record_commands(renderer)) {
       if (!graphics_pipeline_bind(pipeline, renderer)) {
         logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, pipeline);
