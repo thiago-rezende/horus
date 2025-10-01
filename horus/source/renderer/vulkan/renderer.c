@@ -225,6 +225,14 @@ b8 renderer_destroy(renderer_t *renderer) {
 
 /* TODO: improve for multiple windows support */
 b8 renderer_record_commands(renderer_t *renderer) {
+  /* TODO: improve window retrieval for multiple windows support */
+  platform_window_t *window = platform_window();
+  platform_window_size_t window_size = platform_window_size(platform_window());
+
+  if (window_size.width == 0 || window_size.height == 0) {
+    return false;
+  }
+
   VkResult acquire_next_image_result =
       vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, renderer->present_complete_semaphore,
                             VK_NULL_HANDLE, &renderer->current_swapchain_image_index);
@@ -232,8 +240,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
   if (acquire_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
 
-    /* TODO: improve window retrieval for multiple windows support */
-    renderer_vulkan_swapchain_update(renderer, platform_window());
+    renderer_vulkan_swapchain_update(renderer, window);
 
     return false;
   }
@@ -353,6 +360,10 @@ b8 renderer_record_commands(renderer_t *renderer) {
 
 /* TODO: improve for multiple windows support */
 b8 renderer_submit_commands(renderer_t *renderer) {
+  /* TODO: improve window retrieval for multiple windows support */
+  platform_window_t *window = platform_window();
+  platform_window_size_t window_size = platform_window_size(platform_window());
+
   if (vkResetFences(renderer->device, 1, &renderer->render_complete_fence) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> fences reset failed", renderer);
 
@@ -450,8 +461,11 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   VkResult queue_present_result = vkQueuePresentKHR(renderer->present_queue, &present_info);
 
   if (queue_present_result == VK_ERROR_OUT_OF_DATE_KHR || queue_present_result == VK_SUBOPTIMAL_KHR) {
-    /* TODO: improve window retrieval for multiple windows support */
-    renderer_vulkan_swapchain_update(renderer, platform_window());
+    if (window_size.width == 0 || window_size.height == 0) {
+      return false;
+    }
+
+    renderer_vulkan_swapchain_update(renderer, window);
 
     return false;
   }

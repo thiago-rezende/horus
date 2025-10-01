@@ -1,6 +1,7 @@
 /* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/device.h>
 #include <horus/renderer/vulkan/swapchain.h>
+#include <horus/renderer/vulkan/synchronization.h>
 
 /* horus core layer */
 #include <horus/core/numeric.h>
@@ -9,6 +10,8 @@
 #include <horus/logger/logger.h>
 
 b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *window) {
+  vkDeviceWaitIdle(renderer->device);
+
   u32 minimum_image_count = renderer->surface_capabilities.minImageCount + 1;
 
   if (renderer->surface_capabilities.maxImageCount > 0 &&
@@ -83,6 +86,12 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
 }
 
 b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *window) {
+  platform_window_size_t window_size = platform_window_size(window);
+
+  if (window_size.width == 0 || window_size.height == 0) {
+    return false;
+  }
+
   renderer_vulkan_swapchain_destroy(renderer);
 
   renderer_vulkan_physical_device_update_surface_information(renderer);
@@ -93,6 +102,8 @@ b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *win
 }
 
 b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {
+  vkDeviceWaitIdle(renderer->device);
+
   if (!renderer_vulkan_swapchain_image_views_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image views destruction failed", renderer,
                            renderer->swapchain);
@@ -108,12 +119,6 @@ b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {
 }
 
 b8 renderer_vulkan_swapchain_build_extent(renderer_t *renderer, platform_window_t *window) {
-  if (renderer->surface_capabilities.currentExtent.width != max_u32) {
-    renderer->swapchain_extent = renderer->surface_capabilities.currentExtent;
-
-    return true;
-  }
-
   platform_window_size_t window_size = platform_window_size(window);
 
   u32 selected_width = numeric_clamp_u32((u32)window_size.width, renderer->surface_capabilities.minImageExtent.width,

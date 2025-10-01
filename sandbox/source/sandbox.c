@@ -117,6 +117,10 @@ b8 on_update(f64 timestep) {
     platform_window_set_should_close(window, true);
   }
 
+  if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_ENTER)) {
+    platform_window_set_fullscreen(window, !platform_window_is_fullscreen(window));
+  }
+
   if (input_keyboard_keycode_is_held(KEYBOARD_KEYCODE_ESCAPE)) {
     logger_debug_format("<on_update> <timestep:%f> <keycode:%s> is held", timestep,
                         input_keyboard_keycode_string(KEYBOARD_KEYCODE_ESCAPE));

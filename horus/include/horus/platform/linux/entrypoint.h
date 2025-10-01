@@ -84,6 +84,11 @@ int main(int argc, char **argv, char **envp) {
   while (!platform_window_should_close(window)) {
     platform_window_process_events(window);
 
+    /* check window state before proceeding to prevent problems renderer problems */
+    if (platform_window_should_close(window)) {
+      break;
+    }
+
     previous_absolute_time = current_absolute_time;
     current_absolute_time = platform_absolute_time();
 
