@@ -300,8 +300,8 @@ b8 renderer_record_commands(renderer_t *renderer) {
                  &swapchain_image_transition_info.image);
 
   if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
-    logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer begin failed", renderer,
-                           renderer->transfer_command_buffer);
+    logger_critical_format("<renderer:%p> <command_buffer:%p> swapchain image transition failed", renderer,
+                           renderer->graphics_command_buffer);
 
     return false;
   }
@@ -386,8 +386,8 @@ b8 renderer_submit_commands(renderer_t *renderer) {
                  &swapchain_image_transition_info.image);
 
   if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
-    logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer begin failed", renderer,
-                           renderer->transfer_command_buffer);
+    logger_critical_format("<renderer:%p> <command_buffer:%p> swapchain image transition failed", renderer,
+                           renderer->graphics_command_buffer);
 
     return false;
   }
