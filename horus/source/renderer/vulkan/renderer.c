@@ -26,6 +26,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
   *renderer = (renderer_t){
       .implementation = RENDERER_IMPLEMENTATION_VULKAN,
       .implementation_string = __renderer_implementation_string(RENDERER_IMPLEMENTATION_VULKAN),
+      .current_frame_in_flight_index = 0,
   };
 
   if (!renderer_vulkan_instance_create(renderer, application)) {
@@ -233,9 +234,29 @@ b8 renderer_record_commands(renderer_t *renderer) {
     return false;
   }
 
+  VkFence render_complete_fence;
+  VkSemaphore present_complete_semaphore;
+
+  VkCommandBuffer compute_command_buffer;
+  VkCommandBuffer present_command_buffer;
+  VkCommandBuffer graphics_command_buffer;
+  VkCommandBuffer transfer_command_buffer;
+
+  array_retrieve(renderer->render_complete_fences, renderer->current_frame_in_flight_index, &render_complete_fence);
+  array_retrieve(renderer->present_complete_semaphores, renderer->current_frame_in_flight_index,
+                 &present_complete_semaphore);
+
+  array_retrieve(renderer->compute_command_buffers, renderer->current_frame_in_flight_index, &compute_command_buffer);
+  array_retrieve(renderer->present_command_buffers, renderer->current_frame_in_flight_index, &present_command_buffer);
+  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(renderer->transfer_command_buffers, renderer->current_frame_in_flight_index, &transfer_command_buffer);
+
+  while (vkWaitForFences(renderer->device, 1, &render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
+    ;
+
   VkResult acquire_next_image_result =
-      vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, renderer->present_complete_semaphore,
-                            VK_NULL_HANDLE, &renderer->current_swapchain_image_index);
+      vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, present_complete_semaphore, VK_NULL_HANDLE,
+                            &renderer->current_swapchain_image_index);
 
   if (acquire_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
@@ -252,36 +273,42 @@ b8 renderer_record_commands(renderer_t *renderer) {
     return false;
   }
 
+  if (vkResetFences(renderer->device, 1, &render_complete_fence) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> fences reset failed", renderer);
+
+    return false;
+  }
+
   VkCommandBufferBeginInfo command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
       .flags = (VkCommandBufferUsageFlags)0,
       .pInheritanceInfo = VK_NULL_HANDLE,
   };
 
-  if (vkBeginCommandBuffer(renderer->compute_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+  if (vkBeginCommandBuffer(compute_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> compute command buffer begin failed", renderer,
-                           renderer->compute_command_buffer);
+                           compute_command_buffer);
 
     return false;
   }
 
-  if (vkBeginCommandBuffer(renderer->present_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+  if (vkBeginCommandBuffer(present_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> present command buffer begin failed", renderer,
-                           renderer->present_command_buffer);
+                           present_command_buffer);
 
     return false;
   }
 
-  if (vkBeginCommandBuffer(renderer->graphics_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+  if (vkBeginCommandBuffer(graphics_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> graphics command buffer begin failed", renderer,
-                           renderer->graphics_command_buffer);
+                           graphics_command_buffer);
 
     return false;
   }
 
-  if (vkBeginCommandBuffer(renderer->transfer_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
+  if (vkBeginCommandBuffer(transfer_command_buffer, &command_buffer_begin_info) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer begin failed", renderer,
-                           renderer->transfer_command_buffer);
+                           transfer_command_buffer);
 
     return false;
   }
@@ -293,7 +320,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .destination_access_mask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
       .source_stage_mask = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT,
       .destination_stage_mask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
-      .command_buffer = renderer->graphics_command_buffer,
+      .command_buffer = graphics_command_buffer,
   };
 
   array_retrieve(renderer->swapchain_images, renderer->current_swapchain_image_index,
@@ -301,7 +328,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
 
   if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> swapchain image transition failed", renderer,
-                           renderer->graphics_command_buffer);
+                           graphics_command_buffer);
 
     return false;
   }
@@ -336,7 +363,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .pColorAttachments = &rendering_attachment_info,
   };
 
-  vkCmdBeginRendering(renderer->graphics_command_buffer, &rendering_info);
+  vkCmdBeginRendering(graphics_command_buffer, &rendering_info);
 
   VkViewport viewport = (VkViewport){
       .x = 0,
@@ -352,25 +379,35 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .extent = renderer->swapchain_extent,
   };
 
-  vkCmdSetViewport(renderer->graphics_command_buffer, 0, 1, &viewport);
-  vkCmdSetScissor(renderer->graphics_command_buffer, 0, 1, &scissor);
+  vkCmdSetViewport(graphics_command_buffer, 0, 1, &viewport);
+  vkCmdSetScissor(graphics_command_buffer, 0, 1, &scissor);
 
   return true;
 }
 
 /* TODO: improve for multiple windows support */
 b8 renderer_submit_commands(renderer_t *renderer) {
-  /* TODO: improve window retrieval for multiple windows support */
-  platform_window_t *window = platform_window();
-  platform_window_size_t window_size = platform_window_size(platform_window());
+  VkFence render_complete_fence;
+  VkSemaphore render_complete_semaphore;
+  VkSemaphore present_complete_semaphore;
 
-  if (vkResetFences(renderer->device, 1, &renderer->render_complete_fence) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> fences reset failed", renderer);
+  VkCommandBuffer compute_command_buffer;
+  VkCommandBuffer present_command_buffer;
+  VkCommandBuffer graphics_command_buffer;
+  VkCommandBuffer transfer_command_buffer;
 
-    return false;
-  }
+  array_retrieve(renderer->render_complete_fences, renderer->current_frame_in_flight_index, &render_complete_fence);
+  array_retrieve(renderer->render_complete_semaphores, renderer->current_frame_in_flight_index,
+                 &render_complete_semaphore);
+  array_retrieve(renderer->present_complete_semaphores, renderer->current_frame_in_flight_index,
+                 &present_complete_semaphore);
 
-  vkCmdEndRendering(renderer->graphics_command_buffer);
+  array_retrieve(renderer->compute_command_buffers, renderer->current_frame_in_flight_index, &compute_command_buffer);
+  array_retrieve(renderer->present_command_buffers, renderer->current_frame_in_flight_index, &present_command_buffer);
+  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(renderer->transfer_command_buffers, renderer->current_frame_in_flight_index, &transfer_command_buffer);
+
+  vkCmdEndRendering(graphics_command_buffer);
 
   swapchain_image_transition_info_t swapchain_image_transition_info = (swapchain_image_transition_info_t){
       .old_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -379,7 +416,7 @@ b8 renderer_submit_commands(renderer_t *renderer) {
       .destination_access_mask = (VkAccessFlags2)0,
       .source_stage_mask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
       .destination_stage_mask = VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT,
-      .command_buffer = renderer->graphics_command_buffer,
+      .command_buffer = graphics_command_buffer,
   };
 
   array_retrieve(renderer->swapchain_images, renderer->current_swapchain_image_index,
@@ -387,35 +424,35 @@ b8 renderer_submit_commands(renderer_t *renderer) {
 
   if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> swapchain image transition failed", renderer,
-                           renderer->graphics_command_buffer);
+                           graphics_command_buffer);
 
     return false;
   }
 
-  if (vkEndCommandBuffer(renderer->compute_command_buffer) != VK_SUCCESS) {
+  if (vkEndCommandBuffer(compute_command_buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> compute command buffer end failed", renderer,
-                           renderer->compute_command_buffer);
+                           compute_command_buffer);
 
     return false;
   }
 
-  if (vkEndCommandBuffer(renderer->present_command_buffer) != VK_SUCCESS) {
+  if (vkEndCommandBuffer(present_command_buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> present command buffer end failed", renderer,
-                           renderer->present_command_buffer);
+                           present_command_buffer);
 
     return false;
   }
 
-  if (vkEndCommandBuffer(renderer->graphics_command_buffer) != VK_SUCCESS) {
+  if (vkEndCommandBuffer(graphics_command_buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> graphics command buffer end failed", renderer,
-                           renderer->graphics_command_buffer);
+                           graphics_command_buffer);
 
     return false;
   }
 
-  if (vkEndCommandBuffer(renderer->transfer_command_buffer) != VK_SUCCESS) {
+  if (vkEndCommandBuffer(transfer_command_buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <command_buffer:%p> transfer command buffer end failed", renderer,
-                           renderer->transfer_command_buffer);
+                           transfer_command_buffer);
 
     return false;
   }
@@ -425,33 +462,34 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   VkSubmitInfo submit_info = (VkSubmitInfo){
       .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
       .waitSemaphoreCount = 1,
-      .pWaitSemaphores = &renderer->present_complete_semaphore,
+      .pWaitSemaphores = &present_complete_semaphore,
       .pWaitDstStageMask = &pipeline_stage_flags,
       .commandBufferCount = 1,
-      .pCommandBuffers = &renderer->graphics_command_buffer,
+      .pCommandBuffers = &graphics_command_buffer,
       .signalSemaphoreCount = 1,
-      .pSignalSemaphores = &renderer->render_complete_semaphore,
+      .pSignalSemaphores = &render_complete_semaphore,
   };
 
   /* TODO: submit all the command buffers to their queues */
-  if (vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, renderer->render_complete_fence) != VK_SUCCESS) {
+  /* TODO: use VK_KHR_swapchain_maintenance1 to signal a fence to prevent race condition on extremely high framerates */
+  if (vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, render_complete_fence) != VK_SUCCESS) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
 
     return false;
   }
 
-  while (vkWaitForFences(renderer->device, 1, &renderer->render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
+  while (vkWaitForFences(renderer->device, 1, &render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
     ;
 
-  renderer_vulkan_command_buffer_reset(renderer->compute_command_buffer);
-  renderer_vulkan_command_buffer_reset(renderer->present_command_buffer);
-  renderer_vulkan_command_buffer_reset(renderer->graphics_command_buffer);
-  renderer_vulkan_command_buffer_reset(renderer->transfer_command_buffer);
+  renderer_vulkan_command_buffer_reset(compute_command_buffer);
+  renderer_vulkan_command_buffer_reset(present_command_buffer);
+  renderer_vulkan_command_buffer_reset(graphics_command_buffer);
+  renderer_vulkan_command_buffer_reset(transfer_command_buffer);
 
   VkPresentInfoKHR present_info = (VkPresentInfoKHR){
       .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
       .waitSemaphoreCount = 1,
-      .pWaitSemaphores = &renderer->render_complete_semaphore,
+      .pWaitSemaphores = &render_complete_semaphore,
       .swapchainCount = 1,
       .pSwapchains = &renderer->swapchain,
       .pImageIndices = &renderer->current_swapchain_image_index,
@@ -459,6 +497,10 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   };
 
   VkResult queue_present_result = vkQueuePresentKHR(renderer->present_queue, &present_info);
+
+  /* TODO: improve window retrieval for multiple windows support */
+  platform_window_t *window = platform_window();
+  platform_window_size_t window_size = platform_window_size(platform_window());
 
   if (queue_present_result == VK_ERROR_OUT_OF_DATE_KHR || queue_present_result == VK_SUBOPTIMAL_KHR) {
     if (window_size.width == 0 || window_size.height == 0) {
@@ -470,11 +512,18 @@ b8 renderer_submit_commands(renderer_t *renderer) {
     return false;
   }
 
+  renderer->current_frame_in_flight_index =
+      (renderer->current_frame_in_flight_index + 1) % RENDERER_VULKAN_FRAMES_IN_FLIGHT;
+
   return true;
 }
 
 b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances) {
-  vkCmdDraw(renderer->graphics_command_buffer, vertices, instances, 0, 0);
+  VkCommandBuffer graphics_command_buffer;
+
+  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+
+  vkCmdDraw(graphics_command_buffer, vertices, instances, 0, 0);
 
   return true;
 }

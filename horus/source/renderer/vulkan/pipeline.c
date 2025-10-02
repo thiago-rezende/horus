@@ -201,7 +201,11 @@ b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline) {
 }
 
 b8 graphics_pipeline_bind(graphics_pipeline_t *pipeline, renderer_t *renderer) {
-  vkCmdBindPipeline(renderer->graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
+  VkCommandBuffer graphics_command_buffer;
+
+  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+
+  vkCmdBindPipeline(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
 
   return true;
 }

@@ -11,6 +11,8 @@
 /* horus renderer layer */
 #include <horus/renderer/renderer.h>
 
+#define RENDERER_VULKAN_FRAMES_IN_FLIGHT 2
+
 struct __renderer {
   renderer_implementation_t implementation;
   const char *implementation_string;
@@ -51,17 +53,18 @@ struct __renderer {
   VkCommandPool graphics_command_pool;
   VkCommandPool transfer_command_pool;
 
-  VkCommandBuffer compute_command_buffer;
-  VkCommandBuffer present_command_buffer;
-  VkCommandBuffer graphics_command_buffer;
-  VkCommandBuffer transfer_command_buffer;
+  array_t *compute_command_buffers;
+  array_t *present_command_buffers;
+  array_t *graphics_command_buffers;
+  array_t *transfer_command_buffers;
 
-  VkFence render_complete_fence;
+  array_t *render_complete_fences;
 
-  VkSemaphore render_complete_semaphore;
-  VkSemaphore present_complete_semaphore;
+  array_t *render_complete_semaphores;
+  array_t *present_complete_semaphores;
 
   u32 current_swapchain_image_index;
+  u8 current_frame_in_flight_index;
 
   VkDebugUtilsMessengerEXT messenger;
 };

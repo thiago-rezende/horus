@@ -55,33 +55,33 @@ b8 renderer_vulkan_command_pools_create(renderer_t *renderer) {
     return false;
   }
 
-  renderer->compute_command_buffer =
-      renderer_vulkan_command_buffer_create(renderer->compute_command_pool, renderer->device);
+  renderer->compute_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->device, renderer->compute_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->present_command_buffer =
-      renderer_vulkan_command_buffer_create(renderer->present_command_pool, renderer->device);
+  renderer->present_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->device, renderer->present_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->graphics_command_buffer =
-      renderer_vulkan_command_buffer_create(renderer->graphics_command_pool, renderer->device);
+  renderer->graphics_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->device, renderer->graphics_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->transfer_command_buffer =
-      renderer_vulkan_command_buffer_create(renderer->transfer_command_pool, renderer->device);
+  renderer->transfer_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->device, renderer->transfer_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
   return true;
 }
 
 b8 renderer_vulkan_command_pools_destroy(renderer_t *renderer) {
-  renderer_vulkan_command_buffer_destroy(renderer->compute_command_buffer, renderer->compute_command_pool,
-                                         renderer->device);
+  renderer_vulkan_command_buffers_destroy(renderer->compute_command_buffers, renderer->device,
+                                          renderer->compute_command_pool);
 
-  renderer_vulkan_command_buffer_destroy(renderer->present_command_buffer, renderer->present_command_pool,
-                                         renderer->device);
+  renderer_vulkan_command_buffers_destroy(renderer->present_command_buffers, renderer->device,
+                                          renderer->present_command_pool);
 
-  renderer_vulkan_command_buffer_destroy(renderer->graphics_command_buffer, renderer->graphics_command_pool,
-                                         renderer->device);
+  renderer_vulkan_command_buffers_destroy(renderer->graphics_command_buffers, renderer->device,
+                                          renderer->graphics_command_pool);
 
-  renderer_vulkan_command_buffer_destroy(renderer->transfer_command_buffer, renderer->transfer_command_pool,
-                                         renderer->device);
+  renderer_vulkan_command_buffers_destroy(renderer->transfer_command_buffers, renderer->device,
+                                          renderer->transfer_command_pool);
 
   vkDestroyCommandPool(renderer->device, renderer->compute_command_pool, NULL);
   vkDestroyCommandPool(renderer->device, renderer->present_command_pool, NULL);
@@ -97,7 +97,7 @@ b8 renderer_vulkan_command_buffer_reset(VkCommandBuffer buffer) {
   return true;
 }
 
-VkCommandBuffer renderer_vulkan_command_buffer_create(VkCommandPool pool, VkDevice device) {
+VkCommandBuffer renderer_vulkan_command_buffer_create(VkDevice device, VkCommandPool pool) {
   VkCommandBuffer buffer = VK_NULL_HANDLE;
 
   VkCommandBufferAllocateInfo command_buffer_allocate_info = (VkCommandBufferAllocateInfo){
@@ -116,8 +116,44 @@ VkCommandBuffer renderer_vulkan_command_buffer_create(VkCommandPool pool, VkDevi
   return buffer;
 }
 
-b8 renderer_vulkan_command_buffer_destroy(VkCommandBuffer buffer, VkCommandPool pool, VkDevice device) {
+b8 renderer_vulkan_command_buffer_destroy(VkDevice device, VkCommandBuffer buffer, VkCommandPool pool) {
   vkFreeCommandBuffers(device, pool, 1, &buffer);
+
+  return true;
+}
+
+array_t *renderer_vulkan_command_buffers_create(VkDevice device, VkCommandPool pool, u8 count) {
+  array_t *buffers = array_create(count, sizeof(VkCommandBuffer));
+
+  for (u8 i = 0; i < count; i++) {
+    VkCommandBuffer buffer = renderer_vulkan_command_buffer_create(device, pool);
+
+    if (buffer == VK_NULL_HANDLE) {
+      renderer_vulkan_command_buffers_destroy(buffers, device, pool);
+
+      return NULL;
+    }
+
+    array_insert(buffers, &buffer);
+  }
+
+  return buffers;
+}
+
+b8 renderer_vulkan_command_buffers_destroy(array_t *buffers, VkDevice device, VkCommandPool pool) {
+  for (u8 i = 0; i < buffers->count; i++) {
+    VkCommandBuffer buffer;
+
+    array_retrieve(buffers, i, &buffer);
+
+    if (!renderer_vulkan_command_buffer_destroy(device, buffer, pool)) {
+      array_destroy(buffers);
+
+      return false;
+    }
+  }
+
+  array_destroy(buffers);
 
   return true;
 }
