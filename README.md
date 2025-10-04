@@ -17,6 +17,9 @@
 
 This project is being developed to be the simplest and yet complete cross-platform application development framework using the [C][c-url] programming language, [Vulkan][vulkan-url] graphics API and [Meson][meson-url] bulid system.
 
+<!-- Screenshot -->
+![Sandbox Application](.github/sandbox.png)
+
 <!-- Links -->
 
 [ci-url-linux]: https://github.com/thiago-rezende/horus/actions/workflows/linux.yml
