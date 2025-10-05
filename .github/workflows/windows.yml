@@ -34,12 +34,10 @@ jobs:
           update: false
           install: >-
             clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-loader
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
@@ -82,12 +80,10 @@ jobs:
           update: false
           install: >-
             clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-loader
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
@@ -130,12 +126,10 @@ jobs:
           update: false
           install: >-
             clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-loader
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
@@ -178,12 +172,10 @@ jobs:
           update: false
           install: >-
             clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-loader
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
