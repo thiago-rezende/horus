@@ -36,10 +36,14 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-ca-certificates
             clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Update CA Certificates
+        run: update-ca-trust
 
       - name: Setup Project
         run: meson setup build
@@ -80,10 +84,14 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-ca-certificates
             clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Update CA Certificates
+        run: update-ca-trust
 
       - name: Setup Project
         run: meson setup build
@@ -124,10 +132,14 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-ca-certificates
             clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Update CA Certificates
+        run: update-ca-trust
 
       - name: Setup Project
         run: meson setup build
@@ -168,10 +180,14 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-cmocka
             clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-headers
+            clang64/mingw-w64-clang-x86_64-ca-certificates
             clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
+
+      - name: Update CA Certificates
+        run: update-ca-trust
 
       - name: Setup Project
         run: meson setup build
