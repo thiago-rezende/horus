@@ -471,7 +471,7 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   };
 
   /* TODO: submit all the command buffers to their queues */
-  /* TODO: use VK_KHR_swapchain_maintenance1 to signal a fence to prevent race condition on extremely high framerates */
+  /* FIXME: find a way to prevent race condition on extremely high framerates */
   if (vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, render_complete_fence) != VK_SUCCESS) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
 
