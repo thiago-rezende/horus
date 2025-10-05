@@ -95,6 +95,10 @@ if host_machine.system() == 'linux'
 
   # horus renderer dependencies [ linux ]
   vulkan_dep = dependency('vulkan')
+  vulkan_memory_allocator_dep = dependency(
+    'vulkan-memory-allocator',
+    fallback: ['vulkan-memory-allocator', 'vma_allocator_dep'],
+  )
 
   horus_dependencies += [
     # horus window dependencies [ linux ]
@@ -103,6 +107,7 @@ if host_machine.system() == 'linux'
 
     # horus renderer dependencies [ linux ]
     vulkan_dep,
+    vulkan_memory_allocator_dep,
   ]
 endif
 
@@ -110,10 +115,15 @@ endif
 if host_machine.system() == 'windows'
   # horus renderer dependencies [ windows ]
   vulkan_dep = dependency('vulkan')
+  vulkan_memory_allocator_dep = dependency(
+    'vulkan-memory-allocator',
+    fallback: ['vulkan-memory-allocator', 'vma_allocator_dep'],
+  )
 
   horus_dependencies += [
     # horus renderer dependencies [ windows ]
     vulkan_dep,
+    vulkan_memory_allocator_dep,
   ]
 endif
 
