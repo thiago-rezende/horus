@@ -26,6 +26,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
   *renderer = (renderer_t){
       .implementation = RENDERER_IMPLEMENTATION_VULKAN,
       .implementation_string = __renderer_implementation_string(RENDERER_IMPLEMENTATION_VULKAN),
+      .current_semaphore_index = 0,
       .current_frame_in_flight_index = 0,
   };
 
@@ -243,8 +244,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
   VkCommandBuffer transfer_command_buffer;
 
   array_retrieve(renderer->render_complete_fences, renderer->current_frame_in_flight_index, &render_complete_fence);
-  array_retrieve(renderer->present_complete_semaphores, renderer->current_frame_in_flight_index,
-                 &present_complete_semaphore);
+  array_retrieve(renderer->present_complete_semaphores, renderer->current_semaphore_index, &present_complete_semaphore);
 
   array_retrieve(renderer->compute_command_buffers, renderer->current_frame_in_flight_index, &compute_command_buffer);
   array_retrieve(renderer->present_command_buffers, renderer->current_frame_in_flight_index, &present_command_buffer);
@@ -278,6 +278,11 @@ b8 renderer_record_commands(renderer_t *renderer) {
 
     return false;
   }
+
+  renderer_vulkan_command_buffer_reset(compute_command_buffer);
+  renderer_vulkan_command_buffer_reset(present_command_buffer);
+  renderer_vulkan_command_buffer_reset(graphics_command_buffer);
+  renderer_vulkan_command_buffer_reset(transfer_command_buffer);
 
   VkCommandBufferBeginInfo command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -397,10 +402,9 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   VkCommandBuffer transfer_command_buffer;
 
   array_retrieve(renderer->render_complete_fences, renderer->current_frame_in_flight_index, &render_complete_fence);
-  array_retrieve(renderer->render_complete_semaphores, renderer->current_frame_in_flight_index,
+  array_retrieve(renderer->present_complete_semaphores, renderer->current_semaphore_index, &present_complete_semaphore);
+  array_retrieve(renderer->render_complete_semaphores, renderer->current_swapchain_image_index,
                  &render_complete_semaphore);
-  array_retrieve(renderer->present_complete_semaphores, renderer->current_frame_in_flight_index,
-                 &present_complete_semaphore);
 
   array_retrieve(renderer->compute_command_buffers, renderer->current_frame_in_flight_index, &compute_command_buffer);
   array_retrieve(renderer->present_command_buffers, renderer->current_frame_in_flight_index, &present_command_buffer);
@@ -471,20 +475,11 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   };
 
   /* TODO: submit all the command buffers to their queues */
-  /* FIXME: find a way to prevent race condition on extremely high framerates */
   if (vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, render_complete_fence) != VK_SUCCESS) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
 
     return false;
   }
-
-  while (vkWaitForFences(renderer->device, 1, &render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
-    ;
-
-  renderer_vulkan_command_buffer_reset(compute_command_buffer);
-  renderer_vulkan_command_buffer_reset(present_command_buffer);
-  renderer_vulkan_command_buffer_reset(graphics_command_buffer);
-  renderer_vulkan_command_buffer_reset(transfer_command_buffer);
 
   VkPresentInfoKHR present_info = (VkPresentInfoKHR){
       .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
@@ -511,6 +506,9 @@ b8 renderer_submit_commands(renderer_t *renderer) {
 
     return false;
   }
+
+  renderer->current_semaphore_index =
+      (renderer->current_semaphore_index + 1) % renderer->present_complete_semaphores->count;
 
   renderer->current_frame_in_flight_index =
       (renderer->current_frame_in_flight_index + 1) % RENDERER_VULKAN_FRAMES_IN_FLIGHT;

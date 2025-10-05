@@ -63,8 +63,9 @@ struct __renderer {
   array_t *render_complete_semaphores;
   array_t *present_complete_semaphores;
 
-  u32 current_swapchain_image_index;
+  u8 current_semaphore_index;
   u8 current_frame_in_flight_index;
+  u32 current_swapchain_image_index;
 
   VkDebugUtilsMessengerEXT messenger;
 };

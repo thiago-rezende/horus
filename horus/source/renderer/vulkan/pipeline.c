@@ -189,6 +189,8 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 }
 
 b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline) {
+  vkDeviceWaitIdle(pipeline->device);
+
   vkDestroyPipeline(pipeline->device, pipeline->pipeline, NULL);
 
   vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);

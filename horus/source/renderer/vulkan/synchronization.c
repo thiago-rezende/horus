@@ -18,10 +18,11 @@ b8 renderer_vulkan_synchronization_create(renderer_t *renderer) {
       renderer_vulkan_fences_create(renderer->device, &fence_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
   renderer->render_complete_semaphores =
-      renderer_vulkan_semaphores_create(renderer->device, &semaphore_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+      renderer_vulkan_semaphores_create(renderer->device, &semaphore_create_info, renderer->swapchain_images->count);
 
   renderer->present_complete_semaphores =
-      renderer_vulkan_semaphores_create(renderer->device, &semaphore_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+      renderer_vulkan_semaphores_create(renderer->device, &semaphore_create_info, renderer->swapchain_images->count);
+
   return true;
 }
 
