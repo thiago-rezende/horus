@@ -38,6 +38,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
@@ -81,6 +82,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
@@ -124,6 +126,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
@@ -167,6 +170,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-vulkan-loader
+            clang64/mingw-w64-clang-x86_64-vulkan-memory-allocator
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
