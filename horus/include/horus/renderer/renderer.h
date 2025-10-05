@@ -6,15 +6,20 @@
 /* horus core layer */
 #include <horus/core/types.h>
 
-/* horus application layer */
-#include <horus/application/application.h>
-
 /* horus platform layer */
 #include <horus/platform/window.h>
 
+/* horus application layer */
+#include <horus/application/version.h>
+
 typedef struct __renderer renderer_t;
 
-renderer_t *renderer_create(application_t *application, platform_window_t *window);
+typedef struct __renderer_create_info {
+  char *name;
+  version_t version;
+} renderer_create_info_t;
+
+renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *window);
 b8 renderer_destroy(renderer_t *renderer);
 
 renderer_implementation_t renderer_implementation(renderer_t *renderer);

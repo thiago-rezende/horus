@@ -20,7 +20,7 @@
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
-renderer_t *renderer_create(application_t *application, platform_window_t *window) {
+renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *window) {
   renderer_t *renderer = platform_memory_allocate(sizeof(renderer_t));
 
   *renderer = (renderer_t){
@@ -30,7 +30,7 @@ renderer_t *renderer_create(application_t *application, platform_window_t *windo
       .current_frame_in_flight_index = 0,
   };
 
-  if (!renderer_vulkan_instance_create(renderer, application)) {
+  if (!renderer_vulkan_instance_create(renderer, info)) {
     logger_critical_format("<renderer:%p> VkInstance creation failed", (void *)renderer);
 
     platform_memory_deallocate(renderer);
@@ -516,6 +516,7 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   return true;
 }
 
+/* TODO: improve for multiple window support */
 b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances) {
   VkCommandBuffer graphics_command_buffer;
 

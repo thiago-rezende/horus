@@ -2,9 +2,6 @@
 
 #include <vulkan/vulkan.h>
 
-/* horus application layer */
-#include <horus/application/application.h>
-
 /* horus containers layer */
 #include <horus/containers/array.h>
 

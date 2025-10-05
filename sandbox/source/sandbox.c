@@ -2,6 +2,12 @@
 
 #include <sandbox/sandbox.h>
 
+const char *triangle_shader_module_path = "assets/shaders/build/triangle.spv";
+
+shader_module_t *triangle_shader_module = NULL;
+
+graphics_pipeline_t *triangle_graphics_pipeline = NULL;
+
 application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
   platform_memory_clear(application, sizeof(application_t));
@@ -24,6 +30,9 @@ application_t *application_create(void) {
           },
   };
 
+  application->on_create = on_create;
+  application->on_destroy = on_destroy;
+
   application->on_event = on_event;
   application->on_update = on_update;
   application->on_render = on_render;
@@ -33,6 +42,32 @@ application_t *application_create(void) {
 
 b8 application_destroy(application_t *application) {
   platform_memory_deallocate(application);
+
+  return true;
+}
+
+b8 on_create(application_t *application, renderer_t *renderer) {
+  triangle_shader_module = shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT,
+                                                            (char *)triangle_shader_module_path);
+
+  logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)triangle_shader_module,
+                     triangle_shader_module_path);
+
+  triangle_graphics_pipeline = graphics_pipeline_create(renderer, triangle_shader_module);
+
+  logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)triangle_graphics_pipeline);
+
+  return true;
+}
+
+b8 on_destroy(application_t *application, renderer_t *renderer) {
+  shader_module_destroy(triangle_shader_module);
+
+  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)triangle_shader_module);
+
+  graphics_pipeline_destroy(triangle_graphics_pipeline);
+
+  logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)triangle_graphics_pipeline);
 
   return true;
 }
@@ -169,6 +204,18 @@ b8 on_update(f64 timestep) {
   return true;
 }
 
-b8 on_render(void) {
+b8 on_render(renderer_t *renderer) {
+  if (!graphics_pipeline_bind(triangle_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, triangle_graphics_pipeline);
+
+    return false;
+  }
+
+  if (!renderer_draw(renderer, 3, 1)) {
+    logger_error_format("<renderer:%p> draw command failed", renderer);
+
+    return false;
+  }
+
   return true;
 }

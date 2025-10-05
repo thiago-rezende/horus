@@ -11,16 +11,15 @@
 /* horus containers layer */
 #include <horus/containers/array.h>
 
-b8 renderer_vulkan_instance_create(renderer_t *renderer, application_t *application) {
+b8 renderer_vulkan_instance_create(renderer_t *renderer, renderer_create_info_t info) {
   unsigned int engine_version_major = horus_project_version_major();
   unsigned int engine_version_minor = horus_project_version_minor();
   unsigned int engine_version_patch = horus_project_version_patch();
 
   VkApplicationInfo application_info = (VkApplicationInfo){
       .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-      .pApplicationName = application->name,
-      .applicationVersion =
-          VK_MAKE_VERSION(application->version.major, application->version.minor, application->version.patch),
+      .pApplicationName = info.name,
+      .applicationVersion = VK_MAKE_VERSION(info.version.major, info.version.minor, info.version.patch),
       .pEngineName = horus_project_name(),
       .engineVersion = VK_MAKE_VERSION(engine_version_major, engine_version_minor, engine_version_patch),
       .apiVersion = VK_API_VERSION_1_3,

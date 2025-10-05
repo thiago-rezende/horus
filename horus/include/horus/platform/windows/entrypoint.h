@@ -59,25 +59,25 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
   logger_info_format("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", (void *)window,
                      application->name, resolution->width, resolution->height, configuration->fullscreen);
 
-  renderer_t *renderer = renderer_create(application, window);
+  renderer_create_info_t renderer_create_info = (renderer_create_info_t){
+      .name = application->name,
+      .version = application->version,
+  };
+
+  renderer_t *renderer = renderer_create(renderer_create_info, window);
 
   logger_info_format("<renderer:%p> <implementation:%s> created", (void *)renderer,
                      renderer_implementation_string(renderer));
 
-  const char *module_path = "assets/shaders/build/triangle.spv";
-
-  shader_module_t *module =
-      shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT, (char *)module_path);
-
-  logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)module, module_path);
-
-  graphics_pipeline_t *pipeline = graphics_pipeline_create(renderer, module);
-
-  logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)pipeline);
-
   if (application->on_event) {
     if (!platform_window_set_event_callback(window, application->on_event)) {
       logger_error_format("<application:%p> <on_event> failed", (void *)application);
+    }
+  }
+
+  if (application->on_create) {
+    if (!application->on_create(application, renderer)) {
+      logger_error_format("<application:%p> <on_create> failed", (void *)application);
     }
   }
 
@@ -106,20 +106,8 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
     /* TODO: improve for multiple windows support */
     if (renderer_record_commands(renderer)) {
-      if (!graphics_pipeline_bind(pipeline, renderer)) {
-        logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, pipeline);
-
-        continue;
-      }
-
-      if (!renderer_draw(renderer, 3, 1)) {
-        logger_critical_format("<renderer:%p> draw command failed", renderer);
-
-        continue;
-      }
-
       if (application->on_render) {
-        if (!application->on_render()) {
+        if (!application->on_render(renderer)) {
           logger_error_format("<application:%p> <on_render> failed", (void *)application);
         }
       }
@@ -136,13 +124,11 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
     }
   }
 
-  shader_module_destroy(module);
-
-  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)module);
-
-  graphics_pipeline_destroy(pipeline);
-
-  logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)pipeline);
+  if (application->on_destroy) {
+    if (!application->on_destroy(application, renderer)) {
+      logger_error_format("<application:%p> <on_destroy> failed", (void *)application);
+    }
+  }
 
   renderer_destroy(renderer);
 

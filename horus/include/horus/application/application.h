@@ -6,21 +6,29 @@
 /* horus events layer */
 #include <horus/events/base.h>
 
+/* horus renderer layer */
+#include <horus/renderer/renderer.h>
+
 /* horus application layer */
 #include <horus/application/version.h>
 #include <horus/application/configuration.h>
 
-typedef struct __application {
+typedef struct __application application_t;
+
+struct __application {
   char *name;
 
   version_t version;
 
   configuration_t configuration;
 
+  b8 (*on_create)(application_t *application, renderer_t *renderer);
+  b8 (*on_destroy)(application_t *application, renderer_t *renderer);
+
   b8 (*on_event)(event_t *event);
-  b8 (*on_render)(void);
+  b8 (*on_render)(renderer_t *renderer);
   b8 (*on_update)(f64 timestep);
-} application_t;
+};
 
 application_t *application(void);
 
