@@ -42,8 +42,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
-        # ignoring ssl verification for wrap dependencies downloads
-        run: meson setup build -Dssl_verify=false
+        run: meson setup build
         env:
           CC: clang
 
@@ -87,8 +86,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
-        # ignoring ssl verification for wrap dependencies downloads
-        run: meson setup build -Dssl_verify=false
+        run: meson setup build
         env:
           CC: clang
 
@@ -132,8 +130,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
-        # ignoring ssl verification for wrap dependencies downloads
-        run: meson setup build -Dssl_verify=false
+        run: meson setup build
         env:
           CC: clang
 
@@ -177,8 +174,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Setup Project
-        # ignoring ssl verification for wrap dependencies downloads
-        run: meson setup build -Dssl_verify=false
+        run: meson setup build
         env:
           CC: clang
 
