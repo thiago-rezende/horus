@@ -211,7 +211,7 @@ b8 on_render(renderer_t *renderer) {
     return false;
   }
 
-  if (!renderer_draw(renderer, 3, 1)) {
+  if (!renderer_draw(renderer, 3, 3)) {
     logger_error_format("<renderer:%p> draw command failed", renderer);
 
     return false;
