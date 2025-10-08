@@ -97,6 +97,13 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
                                           window                             /* lpParam */
   );
 
+  BOOL use_immersive_dark_mode = TRUE;
+
+  DwmSetWindowAttribute(window->context.window, DWMWA_USE_IMMERSIVE_DARK_MODE, &use_immersive_dark_mode,
+                        sizeof(use_immersive_dark_mode));
+
+  SetWindowTheme(window->context.window, L"DarkMode", NULL);
+
   ShowWindow(window->context.window, SW_SHOWDEFAULT);
 
   window->size = size;

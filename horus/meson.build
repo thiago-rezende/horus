@@ -113,6 +113,12 @@ endif
 
 # horus dependencies [ windows ]
 if host_machine.system() == 'windows'
+  cc = meson.get_compiler('c')
+
+  # horus window dependencies [ windows ]
+  dwmapi_dep = cc.find_library('dwmapi', required: true)
+  uxtheme_dep = cc.find_library('uxtheme', required: true)
+
   # horus renderer dependencies [ windows ]
   vulkan_dep = dependency('vulkan')
   vulkan_memory_allocator_dep = dependency(
@@ -121,6 +127,10 @@ if host_machine.system() == 'windows'
   )
 
   horus_dependencies += [
+    # horus window dependencies [ windows ]
+    dwmapi_dep,
+    uxtheme_dep,
+
     # horus renderer dependencies [ windows ]
     vulkan_dep,
     vulkan_memory_allocator_dep,

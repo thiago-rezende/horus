@@ -30,7 +30,7 @@
 #define NOATOM
 #define NOCLIPBOARD
 #define NOCOLOR
-#define NOCTLMGR
+/* #define NOCTLMGR */
 #define NODRAWTEXT
 #define NOKERNEL
 #define NONLS
@@ -40,7 +40,7 @@
 #define NOSCROLL
 #define NOSERVICE
 #define NOSOUND
-#define NOTEXTMETRIC
+/* #define NOTEXTMETRIC */
 #define NOWH
 #define NOCOMM
 #define NOKANJI
@@ -86,3 +86,7 @@
 /* Windows header file */
 #include <windows.h>
 #include <windowsx.h>
+
+/* Window manager headers */
+#include <dwmapi.h>
+#include <uxtheme.h>
