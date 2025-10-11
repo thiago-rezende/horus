@@ -14,7 +14,10 @@ b8 renderer_vulkan_synchronization_create(renderer_t *renderer) {
       .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
   };
 
-  renderer->render_complete_fences = renderer->render_complete_fences =
+  renderer->render_complete_fences =
+      renderer_vulkan_fences_create(renderer->device, &fence_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+
+  renderer->transfer_complete_fences =
       renderer_vulkan_fences_create(renderer->device, &fence_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
   renderer->render_complete_semaphores =
@@ -30,6 +33,8 @@ b8 renderer_vulkan_synchronization_destroy(renderer_t *renderer) {
   vkDeviceWaitIdle(renderer->device);
 
   renderer_vulkan_fences_destroy(renderer->device, renderer->render_complete_fences);
+  renderer_vulkan_fences_destroy(renderer->device, renderer->transfer_complete_fences);
+
   renderer_vulkan_semaphores_destroy(renderer->device, renderer->render_complete_semaphores);
   renderer_vulkan_semaphores_destroy(renderer->device, renderer->present_complete_semaphores);
 

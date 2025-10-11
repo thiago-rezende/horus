@@ -38,6 +38,10 @@ vertex_buffer_t *vertex_buffer_create(renderer_t *renderer, vertex_t *vertices, 
       .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
   };
 
+  if (renderer->graphics_queue_family_index != renderer->transfer_queue_family_index) {
+    buffer_create_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
+  }
+
   if (vkCreateBuffer(renderer->device, &buffer_create_info, NULL, &buffer->buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> buffer creation failed", renderer);
 

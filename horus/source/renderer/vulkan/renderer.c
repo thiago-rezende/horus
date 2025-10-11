@@ -393,6 +393,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
 /* TODO: improve for multiple windows support */
 b8 renderer_submit_commands(renderer_t *renderer) {
   VkFence render_complete_fence;
+  VkFence transfer_complete_fence;
   VkSemaphore render_complete_semaphore;
   VkSemaphore present_complete_semaphore;
 
@@ -402,6 +403,7 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   VkCommandBuffer transfer_command_buffer;
 
   array_retrieve(renderer->render_complete_fences, renderer->current_frame_in_flight_index, &render_complete_fence);
+  array_retrieve(renderer->transfer_complete_fences, renderer->current_frame_in_flight_index, &transfer_complete_fence);
   array_retrieve(renderer->present_complete_semaphores, renderer->current_semaphore_index, &present_complete_semaphore);
   array_retrieve(renderer->render_complete_semaphores, renderer->current_swapchain_image_index,
                  &render_complete_semaphore);
@@ -461,21 +463,43 @@ b8 renderer_submit_commands(renderer_t *renderer) {
     return false;
   }
 
-  VkPipelineStageFlags pipeline_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+  /* TODO: submit all the command buffers to their queues */
 
-  VkSubmitInfo submit_info = (VkSubmitInfo){
+  VkSubmitInfo transfer_queue_submit_info = (VkSubmitInfo){
+      .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+      .commandBufferCount = 1,
+      .pCommandBuffers = &transfer_command_buffer,
+  };
+
+  if (vkResetFences(renderer->device, 1, &transfer_complete_fence) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> fences reset failed", renderer);
+
+    return false;
+  }
+
+  if (vkQueueSubmit(renderer->transfer_queue, 1, &transfer_queue_submit_info, transfer_complete_fence) != VK_SUCCESS) {
+    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
+
+    return false;
+  }
+
+  while (vkWaitForFences(renderer->device, 1, &transfer_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
+    ;
+
+  VkPipelineStageFlags graphics_pipeline_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+  VkSubmitInfo graphics_queue_submit_info = (VkSubmitInfo){
       .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
       .waitSemaphoreCount = 1,
       .pWaitSemaphores = &present_complete_semaphore,
-      .pWaitDstStageMask = &pipeline_stage_flags,
+      .pWaitDstStageMask = &graphics_pipeline_stage_flags,
       .commandBufferCount = 1,
       .pCommandBuffers = &graphics_command_buffer,
       .signalSemaphoreCount = 1,
       .pSignalSemaphores = &render_complete_semaphore,
   };
 
-  /* TODO: submit all the command buffers to their queues */
-  if (vkQueueSubmit(renderer->graphics_queue, 1, &submit_info, render_complete_fence) != VK_SUCCESS) {
+  if (vkQueueSubmit(renderer->graphics_queue, 1, &graphics_queue_submit_info, render_complete_fence) != VK_SUCCESS) {
     logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
 
     return false;

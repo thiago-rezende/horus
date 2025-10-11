@@ -56,6 +56,7 @@ struct __renderer {
   array_t *transfer_command_buffers;
 
   array_t *render_complete_fences;
+  array_t *transfer_complete_fences;
 
   array_t *render_complete_semaphores;
   array_t *present_complete_semaphores;
