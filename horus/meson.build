@@ -87,10 +87,10 @@ endif
 horus_includes = include_directories('include')
 
 # horus dependencies
-cglm_dep = dependency('cglm', fallback: ['cglm', 'cglm_dep'])
+threads_dep = dependency('threads')
 
 horus_dependencies = [
-  cglm_dep,
+  threads_dep,
 ]
 
 # horus dependencies [ linux ]
@@ -109,9 +109,6 @@ if host_machine.system() == 'linux'
 
     # horus renderer dependencies [ linux ]
     vulkan_dep,
-
-    # horus maths dependencies [ linux ]
-    cglm_dep,
   ]
 endif
 
@@ -133,9 +130,6 @@ if host_machine.system() == 'windows'
 
     # horus renderer dependencies [ windows ]
     vulkan_dep,
-
-    # horus maths dependencies [ linux ]
-    cglm_dep,
   ]
 endif
 
