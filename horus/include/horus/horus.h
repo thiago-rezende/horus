@@ -46,3 +46,6 @@
 #include <horus/renderer/shader.h>
 #include <horus/renderer/pipeline.h>
 #include <horus/renderer/renderer.h>
+
+/* horus renderer buffers layer */
+#include <horus/renderer/buffers/vertex.h>

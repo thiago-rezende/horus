@@ -8,6 +8,9 @@
 /* horus platform layer */
 #include <horus/platform/memory.h>
 
+/* horus types layer */
+#include <horus/types/vertex.h>
+
 #define RENDERER_PIPELINE_DYNAMIC_STATES_COUNT 2
 
 static const VkDynamicState renderer_pipeline_dynamic_state_scissor = VK_DYNAMIC_STATE_SCISSOR;
@@ -30,8 +33,39 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       .pDynamicStates = pipeline->dynamic_states->buffer,
   };
 
+  VkVertexInputBindingDescription vertex_input_binding_description = (VkVertexInputBindingDescription){
+      .binding = 0,
+      .stride = sizeof(vertex_t),
+      .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+  };
+
+  VkVertexInputAttributeDescription vertex_input_attribute_description_position = (VkVertexInputAttributeDescription){
+      .binding = 0,
+      .location = 0,
+      .format = VK_FORMAT_R32G32B32_SFLOAT,
+      .offset = offsetof(vertex_t, position),
+  };
+
+  VkVertexInputAttributeDescription vertex_input_attribute_description_color = (VkVertexInputAttributeDescription){
+      .binding = 0,
+      .location = 1,
+      .format = VK_FORMAT_R8G8B8A8_UINT,
+      .offset = offsetof(vertex_t, color),
+  };
+
+  const u32 vertex_input_attribute_description_count = 2;
+
+  VkVertexInputAttributeDescription vertex_input_attribute_descriptions[] = {
+      vertex_input_attribute_description_position,
+      vertex_input_attribute_description_color,
+  };
+
   VkPipelineVertexInputStateCreateInfo pipeline_vertex_input_state_create_info = (VkPipelineVertexInputStateCreateInfo){
       .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+      .vertexBindingDescriptionCount = 1,
+      .pVertexBindingDescriptions = &vertex_input_binding_description,
+      .vertexAttributeDescriptionCount = vertex_input_attribute_description_count,
+      .pVertexAttributeDescriptions = vertex_input_attribute_descriptions,
   };
 
   VkPipelineInputAssemblyStateCreateInfo pipeline_input_assembly_state_create_info =

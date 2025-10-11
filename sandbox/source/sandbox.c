@@ -2,11 +2,21 @@
 
 #include <sandbox/sandbox.h>
 
-const char *triangle_shader_module_path = "assets/shaders/build/triangle.spv";
+const char *default_shader_module_path = "assets/shaders/build/default.spv";
 
-shader_module_t *triangle_shader_module = NULL;
+shader_module_t *default_shader_module = NULL;
 
-graphics_pipeline_t *triangle_graphics_pipeline = NULL;
+graphics_pipeline_t *default_graphics_pipeline = NULL;
+
+vertex_buffer_t *triangle_vertex_buffer = NULL;
+
+#define TRIANGLE_VERTICES_COUNT 3
+
+vertex_t triangle_vertices[TRIANGLE_VERTICES_COUNT] = {
+    (vertex_t){.position = {0.0f, -0.5f, 0.0f}, .color = {1.0f, 0.0f, 0.0f, 1.0f}},
+    (vertex_t){.position = {0.5f, 0.5f, 0.0f}, .color = {0.0f, 1.0f, 0.0f, 1.0f}},
+    (vertex_t){.position = {-0.5f, 0.5f, 0.0f}, .color = {0.0f, 0.0f, 1.0f, 1.0f}},
+};
 
 application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
@@ -47,27 +57,35 @@ b8 application_destroy(application_t *application) {
 }
 
 b8 on_create(application_t *application, renderer_t *renderer) {
-  triangle_shader_module = shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT,
-                                                            (char *)triangle_shader_module_path);
+  default_shader_module = shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT,
+                                                           (char *)default_shader_module_path);
 
-  logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)triangle_shader_module,
-                     triangle_shader_module_path);
+  logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)default_shader_module,
+                     default_shader_module_path);
 
-  triangle_graphics_pipeline = graphics_pipeline_create(renderer, triangle_shader_module);
+  default_graphics_pipeline = graphics_pipeline_create(renderer, default_shader_module);
 
-  logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)triangle_graphics_pipeline);
+  logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)default_graphics_pipeline);
+
+  triangle_vertex_buffer = vertex_buffer_create(renderer, triangle_vertices, TRIANGLE_VERTICES_COUNT);
+
+  logger_info_format("<renderer:%p> <vertex_buffer:%p> created", (void *)renderer, (void *)triangle_vertex_buffer);
 
   return true;
 }
 
 b8 on_destroy(application_t *application, renderer_t *renderer) {
-  shader_module_destroy(triangle_shader_module);
+  vertex_buffer_destroy(triangle_vertex_buffer);
 
-  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)triangle_shader_module);
+  logger_info_format("<renderer:%p> <vertex_buffer:%p> destroyed", (void *)renderer, (void *)triangle_vertex_buffer);
 
-  graphics_pipeline_destroy(triangle_graphics_pipeline);
+  shader_module_destroy(default_shader_module);
 
-  logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)triangle_graphics_pipeline);
+  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)default_shader_module);
+
+  graphics_pipeline_destroy(default_graphics_pipeline);
+
+  logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)default_graphics_pipeline);
 
   return true;
 }
@@ -205,8 +223,15 @@ b8 on_update(f64 timestep) {
 }
 
 b8 on_render(renderer_t *renderer) {
-  if (!graphics_pipeline_bind(triangle_graphics_pipeline, renderer)) {
-    logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, triangle_graphics_pipeline);
+  if (!graphics_pipeline_bind(default_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, default_graphics_pipeline);
+
+    return false;
+  }
+
+  if (!vertex_buffer_bind(triangle_vertex_buffer, default_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> <vertex_buffer:%p> vertex buffer binding failed", renderer,
+                           default_graphics_pipeline, triangle_vertex_buffer);
 
     return false;
   }
