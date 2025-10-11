@@ -87,10 +87,10 @@ endif
 horus_includes = include_directories('include')
 
 # horus dependencies
-threads_dep = dependency('threads')
+cglm_dep = dependency('cglm', fallback: ['cglm', 'cglm_dep'])
 
 horus_dependencies = [
-  threads_dep,
+  cglm_dep,
 ]
 
 # horus dependencies [ linux ]
@@ -104,12 +104,6 @@ if host_machine.system() == 'linux'
   vulkan_memory_allocator_dep = dependency(
     'vulkan-memory-allocator',
     fallback: ['vulkan-memory-allocator', 'vma_allocator_dep'],
-  )
-
-  # horus maths dependencies [ linux ]
-  cglm_dep = dependency(
-    'cglm',
-    fallback: ['cglm', 'cglm_dep'],
   )
 
   horus_dependencies += [
@@ -139,12 +133,6 @@ if host_machine.system() == 'windows'
   vulkan_memory_allocator_dep = dependency(
     'vulkan-memory-allocator',
     fallback: ['vulkan-memory-allocator', 'vma_allocator_dep'],
-  )
-
-  # horus maths dependencies [ linux ]
-  cglm_dep = dependency(
-    'cglm',
-    fallback: ['cglm', 'cglm_dep'],
   )
 
   horus_dependencies += [
