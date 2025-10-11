@@ -106,6 +106,12 @@ if host_machine.system() == 'linux'
     fallback: ['vulkan-memory-allocator', 'vma_allocator_dep'],
   )
 
+  # horus maths dependencies [ linux ]
+  cglm_dep = dependency(
+    'cglm',
+    fallback: ['cglm', 'cglm_dep'],
+  )
+
   horus_dependencies += [
     # horus window dependencies [ linux ]
     xcb_dep,
@@ -114,6 +120,9 @@ if host_machine.system() == 'linux'
     # horus renderer dependencies [ linux ]
     vulkan_dep,
     vulkan_memory_allocator_dep,
+
+    # horus maths dependencies [ linux ]
+    cglm_dep,
   ]
 endif
 
@@ -132,6 +141,12 @@ if host_machine.system() == 'windows'
     fallback: ['vulkan-memory-allocator', 'vma_allocator_dep'],
   )
 
+  # horus maths dependencies [ linux ]
+  cglm_dep = dependency(
+    'cglm',
+    fallback: ['cglm', 'cglm_dep'],
+  )
+
   horus_dependencies += [
     # horus window dependencies [ windows ]
     dwmapi_dep,
@@ -140,6 +155,9 @@ if host_machine.system() == 'windows'
     # horus renderer dependencies [ windows ]
     vulkan_dep,
     vulkan_memory_allocator_dep,
+
+    # horus maths dependencies [ linux ]
+    cglm_dep,
   ]
 endif
 
