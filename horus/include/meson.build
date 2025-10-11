@@ -52,7 +52,9 @@ horus_headers = [
   'horus/renderer/general.h',
   'horus/renderer/renderer.h',
   'horus/renderer/pipeline.h',
+]
 
+horus_renderer_vulkan_headers = [
   # horus renderer layer [ vulkan ]
   'horus/renderer/vulkan/debug.h',
   'horus/renderer/vulkan/device.h',
@@ -78,6 +80,8 @@ if host_machine.system() == 'linux'
     'horus/platform/linux/input/mouse.h',
     'horus/platform/linux/input/keyboard.h',
   ]
+
+  horus_headers += horus_renderer_vulkan_headers
 endif
 
 # horus header files [ windows ]
@@ -92,6 +96,8 @@ if host_machine.system() == 'windows'
     'horus/platform/windows/input/mouse.h',
     'horus/platform/windows/input/keyboard.h',
   ]
+
+  horus_headers += horus_renderer_vulkan_headers
 endif
 
 # horus headers installation

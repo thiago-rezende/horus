@@ -25,7 +25,9 @@ horus_sources = [
 
   # horus renderer layer
   'source/renderer/general.c',
+]
 
+horus_renderer_vulkan_sources = [
   # horus renderer layer [ vulkan ]
   'source/renderer/vulkan/debug.c',
   'source/renderer/vulkan/device.c',
@@ -56,6 +58,8 @@ if host_machine.system() == 'linux'
     # horus renderer layer [ vulkan ]
     'source/renderer/vulkan/linux/platform.c',
   ]
+
+  horus_sources += horus_renderer_vulkan_sources
 endif
 
 # horus source files [ windows ]
@@ -75,6 +79,8 @@ if host_machine.system() == 'windows'
     # horus renderer layer [ vulkan ]
     'source/renderer/vulkan/windows/platform.c',
   ]
+
+  horus_sources += horus_renderer_vulkan_sources
 endif
 
 # horus include directories
