@@ -25,6 +25,7 @@ struct __index_buffer {
   VkDeviceMemory staging_memory;
 };
 
+/* TODO: refactor into multipe functions for usage within other types of buffer */
 index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 count) {
   index_buffer_t *buffer = platform_memory_allocate(sizeof(index_buffer_t));
 

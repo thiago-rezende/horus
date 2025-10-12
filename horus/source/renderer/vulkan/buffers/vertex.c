@@ -25,6 +25,7 @@ struct __vertex_buffer {
   VkDeviceMemory staging_memory;
 };
 
+/* TODO: refactor into multipe functions for usage within other types of buffer */
 vertex_buffer_t *vertex_buffer_create(renderer_t *renderer, vertex_t *vertices, u64 count) {
   vertex_buffer_t *buffer = platform_memory_allocate(sizeof(vertex_buffer_t));
 
