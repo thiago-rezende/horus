@@ -29,3 +29,4 @@ b8 renderer_record_commands(renderer_t *renderer);
 b8 renderer_submit_commands(renderer_t *renderer);
 
 b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances);
+b8 renderer_draw_indexed(renderer_t *renderer, u32 indices, u32 instances);

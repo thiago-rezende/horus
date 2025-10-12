@@ -8,14 +8,19 @@ shader_module_t *default_shader_module = NULL;
 
 graphics_pipeline_t *default_graphics_pipeline = NULL;
 
-vertex_buffer_t *triangle_vertex_buffer = NULL;
+index_buffer_t *quad_index_buffer = NULL;
+vertex_buffer_t *quad_vertex_buffer = NULL;
 
-#define TRIANGLE_VERTICES_COUNT 3
+#define QUAD_INDICES_COUNT 6
+#define QUAD_VERTICES_COUNT 4
 
-vertex_t triangle_vertices[TRIANGLE_VERTICES_COUNT] = {
-    (vertex_t){.position = {0.0f, -0.5f, 0.0f}, .color = {1.0f, 0.0f, 0.0f, 1.0f}},
-    (vertex_t){.position = {0.5f, 0.5f, 0.0f}, .color = {0.0f, 1.0f, 0.0f, 1.0f}},
-    (vertex_t){.position = {-0.5f, 0.5f, 0.0f}, .color = {0.0f, 0.0f, 1.0f, 1.0f}},
+u32 quad_indices[QUAD_INDICES_COUNT] = {0, 1, 2, 2, 3, 0};
+
+vertex_t quad_vertices[QUAD_VERTICES_COUNT] = {
+    (vertex_t){.position = {-0.5f, -0.5f, 0.0f}, .color = {1.0f, 0.0f, 0.0f, 1.0f}},
+    (vertex_t){.position = {0.5f, -0.5f, 0.0f}, .color = {0.0f, 1.0f, 0.0f, 1.0f}},
+    (vertex_t){.position = {0.5f, 0.5f, 0.0f}, .color = {0.0f, 0.0f, 1.0f, 1.0f}},
+    (vertex_t){.position = {-0.5f, 0.5f, 0.0f}, .color = {1.0f, 1.0f, 1.0f, 1.0f}},
 };
 
 application_t *application_create(void) {
@@ -67,17 +72,25 @@ b8 on_create(application_t *application, renderer_t *renderer) {
 
   logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)default_graphics_pipeline);
 
-  triangle_vertex_buffer = vertex_buffer_create(renderer, triangle_vertices, TRIANGLE_VERTICES_COUNT);
+  quad_index_buffer = index_buffer_create(renderer, quad_indices, QUAD_INDICES_COUNT);
 
-  logger_info_format("<renderer:%p> <vertex_buffer:%p> created", (void *)renderer, (void *)triangle_vertex_buffer);
+  logger_info_format("<renderer:%p> <index_buffer:%p> created", (void *)renderer, (void *)quad_index_buffer);
+
+  quad_vertex_buffer = vertex_buffer_create(renderer, quad_vertices, QUAD_VERTICES_COUNT);
+
+  logger_info_format("<renderer:%p> <vertex_buffer:%p> created", (void *)renderer, (void *)quad_vertex_buffer);
 
   return true;
 }
 
 b8 on_destroy(application_t *application, renderer_t *renderer) {
-  vertex_buffer_destroy(triangle_vertex_buffer);
+  vertex_buffer_destroy(quad_vertex_buffer);
 
-  logger_info_format("<renderer:%p> <vertex_buffer:%p> destroyed", (void *)renderer, (void *)triangle_vertex_buffer);
+  logger_info_format("<renderer:%p> <vertex_buffer:%p> destroyed", (void *)renderer, (void *)quad_vertex_buffer);
+
+  index_buffer_destroy(quad_index_buffer);
+
+  logger_info_format("<renderer:%p> <index_buffer:%p> destroyed", (void *)renderer, (void *)quad_index_buffer);
 
   shader_module_destroy(default_shader_module);
 
@@ -229,15 +242,22 @@ b8 on_render(renderer_t *renderer) {
     return false;
   }
 
-  if (!vertex_buffer_bind(triangle_vertex_buffer, default_graphics_pipeline, renderer)) {
-    logger_critical_format("<renderer:%p> <pipeline:%p> <vertex_buffer:%p> vertex buffer binding failed", renderer,
-                           default_graphics_pipeline, triangle_vertex_buffer);
+  if (!index_buffer_bind(quad_index_buffer, default_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> <index_buffer:%p> index buffer binding failed", renderer,
+                           default_graphics_pipeline, quad_index_buffer);
 
     return false;
   }
 
-  if (!renderer_draw(renderer, 3, 3)) {
-    logger_error_format("<renderer:%p> draw command failed", renderer);
+  if (!vertex_buffer_bind(quad_vertex_buffer, default_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> <vertex_buffer:%p> vertex buffer binding failed", renderer,
+                           default_graphics_pipeline, quad_vertex_buffer);
+
+    return false;
+  }
+
+  if (!renderer_draw_indexed(renderer, QUAD_INDICES_COUNT, 1)) {
+    logger_error_format("<renderer:%p> draw indexed command failed", renderer);
 
     return false;
   }

@@ -55,6 +55,10 @@ horus_headers = [
   'horus/renderer/general.h',
   'horus/renderer/renderer.h',
   'horus/renderer/pipeline.h',
+
+  # horus renderer buffers layer
+  'horus/renderer/buffers/index.h',
+  'horus/renderer/buffers/vertex.h',
 ]
 
 horus_renderer_vulkan_headers = [

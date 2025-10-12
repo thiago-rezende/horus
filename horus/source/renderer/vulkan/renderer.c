@@ -551,6 +551,17 @@ b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances) {
   return true;
 }
 
+/* TODO: improve for multiple window support */
+b8 renderer_draw_indexed(renderer_t *renderer, u32 indices, u32 instances) {
+  VkCommandBuffer graphics_command_buffer;
+
+  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+
+  vkCmdDrawIndexed(graphics_command_buffer, indices, instances, 0, 0, 0);
+
+  return true;
+}
+
 renderer_implementation_t renderer_implementation(renderer_t *renderer) {
   return renderer->implementation;
 }

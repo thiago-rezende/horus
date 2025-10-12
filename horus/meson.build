@@ -41,6 +41,7 @@ horus_renderer_vulkan_sources = [
   'source/renderer/vulkan/synchronization.c',
 
   # horus renderer buffers layer [ vulkan ]
+  'source/renderer/vulkan/buffers/index.c',
   'source/renderer/vulkan/buffers/vertex.c',
 ]
 

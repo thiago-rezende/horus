@@ -48,4 +48,5 @@
 #include <horus/renderer/renderer.h>
 
 /* horus renderer buffers layer */
+#include <horus/renderer/buffers/index.h>
 #include <horus/renderer/buffers/vertex.h>
