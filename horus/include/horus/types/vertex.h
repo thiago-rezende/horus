@@ -6,5 +6,5 @@
 typedef struct __vertex {
   f32 position[3];
 
-  i8 color[4];
+  f32 color[4];
 } vertex_t;

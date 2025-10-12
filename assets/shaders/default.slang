@@ -2,7 +2,7 @@
 struct vertex_input_t {
   float3 position; /* vertex position */
 
-  uint4 color; /* vertex color */
+  float4 color; /* vertex color */
 };
 
 /* vertex shader output structure */
