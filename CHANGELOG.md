@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+ - [efec9fa] chore(renderer|vulkan): add TODO for future refactor of buffer creation functions (Thiago Rezende)
+ - [5f88c03] docs: update the sandbox screenshot to show the new quad vertex colors (Thiago Rezende)
+ - [599a47d] chore(sandbox): update quad vertex colors for visualization purposes (Thiago Rezende)
+ - [9b90c8c] feat(renderer): update vertex color type to f32 and update its vulkan implementation (Thiago Rezende)
+ - [fad3d1a] docs: update the sandbox screenshot to show the index buffer support (Thiago Rezende)
+ - [0dd5811] feat(renderer): add initial index buffer API and its vulkan implementation (Thiago Rezende)
+ - [cbe2217] feat(renderer|vulkan): add staging buffer usage at vertex buffer creation to use high speed memory from the GPU (Thiago Rezende)
+ - [3243956] feat(renderer|vulkan): add transfer queue submission per frame before graphics submission (Thiago Rezende)
+ - [7fb57c2] docs: update the sandbox screenshot to show the vertex buffer support (Thiago Rezende)
+ - [9c4e134] feat(renderer): add vertex initial buffer and its vulkan implementation (Thiago Rezende)
+ - [57cf7ab] build: remove cglm library in order to implement a new math library (Thiago Rezende)
+ - [1be5de3] build: remove vulkan-memory-allocator dependency since it requires a C++ compiler (Thiago Rezende)
+ - [11bfc2b] build: move cglm library to default dependencies list (Thiago Rezende)
+ - [d830fd0] build: add cglm library as dependency for windows and linux platforms (Thiago Rezende)
+ - [6869152] build(renderer): separate the vulkan renderer implementation files from the default files in build scripts (Thiago Rezende)
+ - [5c35508] docs(changelog): update CHANGELOG.md file (Thiago Rezende)
  - [863881a] feat(window|windows): update default window theme to dark variant (Thiago Rezende)
  - [4be23f8] chore: update sandbox screenshot to show instancing support (Thiago Rezende)
  - [9fdc919] feat(assets): add COLOR0 attribute semantic to vertex output on triangle shader and add instancing support (Thiago Rezende)
