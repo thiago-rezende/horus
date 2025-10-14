@@ -9,7 +9,7 @@
 #include <horus/renderer/renderer.h>
 
 /* TODO: improve the buffering control and allow the application to choose */
-#define RENDERER_VULKAN_FRAMES_IN_FLIGHT 2
+#define RENDERER_VULKAN_FRAMES_IN_FLIGHT 1
 
 struct __renderer {
   renderer_implementation_t implementation;
@@ -65,6 +65,8 @@ struct __renderer {
   u8 current_semaphore_index;
   u8 current_frame_in_flight_index;
   u32 current_swapchain_image_index;
+
+  VkDescriptorPool descriptor_pool;
 
   VkDebugUtilsMessengerEXT messenger;
 };

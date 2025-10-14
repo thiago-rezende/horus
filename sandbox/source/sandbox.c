@@ -8,6 +8,10 @@ shader_module_t *default_shader_module = NULL;
 
 graphics_pipeline_t *default_graphics_pipeline = NULL;
 
+f32 start_absolute_time = 0.0f;
+uniform_buffer_t *uniform_buffer = NULL;
+uniform_buffer_object_t uniform_buffer_object = {0};
+
 index_buffer_t *quad_index_buffer = NULL;
 vertex_buffer_t *quad_vertex_buffer = NULL;
 
@@ -52,6 +56,8 @@ application_t *application_create(void) {
   application->on_update = on_update;
   application->on_render = on_render;
 
+  start_absolute_time = (f32)platform_absolute_time();
+
   return application;
 }
 
@@ -71,6 +77,10 @@ b8 on_create(application_t *application, renderer_t *renderer) {
   default_graphics_pipeline = graphics_pipeline_create(renderer, default_shader_module);
 
   logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)default_graphics_pipeline);
+
+  uniform_buffer = uniform_buffer_create(renderer, &uniform_buffer_object);
+
+  logger_info_format("<renderer:%p> <uniform_buffer:%p> created", (void *)renderer, (void *)uniform_buffer);
 
   quad_index_buffer = index_buffer_create(renderer, quad_indices, QUAD_INDICES_COUNT);
 
@@ -92,13 +102,17 @@ b8 on_destroy(application_t *application, renderer_t *renderer) {
 
   logger_info_format("<renderer:%p> <index_buffer:%p> destroyed", (void *)renderer, (void *)quad_index_buffer);
 
-  shader_module_destroy(default_shader_module);
+  uniform_buffer_destroy(uniform_buffer);
 
-  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)default_shader_module);
+  logger_info_format("<renderer:%p> <uniform_buffer:%p> destroyed", (void *)renderer, (void *)uniform_buffer);
 
   graphics_pipeline_destroy(default_graphics_pipeline);
 
   logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)default_graphics_pipeline);
+
+  shader_module_destroy(default_shader_module);
+
+  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)default_shader_module);
 
   return true;
 }
@@ -236,12 +250,32 @@ b8 on_update(f64 timestep) {
 }
 
 b8 on_render(renderer_t *renderer) {
+  /* uniform buffer object update */
+  f32 current_absolute_time = platform_absolute_time();
+  f32 elapsed_time = start_absolute_time - current_absolute_time;
+
+  uniform_buffer_object = (uniform_buffer_object_t){
+      .time = elapsed_time,
+  };
+
+  uniform_buffer_update(uniform_buffer, &uniform_buffer_object);
+
+  /* graphics pipeline setup */
   if (!graphics_pipeline_bind(default_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, default_graphics_pipeline);
 
     return false;
   }
 
+  /* uniform buffer object setup */
+  if (!uniform_buffer_bind(uniform_buffer, default_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> <uniform_buffer:%p> index buffer binding failed", renderer,
+                           default_graphics_pipeline, uniform_buffer);
+
+    return false;
+  }
+
+  /* geometry indices setup */
   if (!index_buffer_bind(quad_index_buffer, default_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <index_buffer:%p> index buffer binding failed", renderer,
                            default_graphics_pipeline, quad_index_buffer);
@@ -249,6 +283,7 @@ b8 on_render(renderer_t *renderer) {
     return false;
   }
 
+  /* geometry vertices setup */
   if (!vertex_buffer_bind(quad_vertex_buffer, default_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <vertex_buffer:%p> vertex buffer binding failed", renderer,
                            default_graphics_pipeline, quad_vertex_buffer);
@@ -256,6 +291,7 @@ b8 on_render(renderer_t *renderer) {
     return false;
   }
 
+  /* geometry draw call */
   if (!renderer_draw_indexed(renderer, QUAD_INDICES_COUNT, 1)) {
     logger_error_format("<renderer:%p> draw indexed command failed", renderer);
 

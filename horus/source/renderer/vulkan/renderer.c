@@ -12,6 +12,7 @@
 #include <horus/renderer/vulkan/platform.h>
 #include <horus/renderer/vulkan/renderer.h>
 #include <horus/renderer/vulkan/swapchain.h>
+#include <horus/renderer/vulkan/descriptors.h>
 #include <horus/renderer/vulkan/synchronization.h>
 
 /* horus platform layer */
@@ -153,10 +154,36 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
 
   logger_debug_format("<renderer:%p> synchronization objects created", (void *)renderer);
 
+  if (!renderer_vulkan_descriptor_pool_create(renderer)) {
+    renderer_vulkan_synchronization_destroy(renderer);
+    renderer_vulkan_command_pools_destroy(renderer);
+    renderer_vulkan_swapchain_destroy(renderer);
+    renderer_vulkan_device_destroy(renderer);
+    renderer_vulkan_surface_destroy(renderer);
+    renderer_vulkan_debug_messenger_destroy(renderer);
+    renderer_vulkan_instance_destroy(renderer);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
+
+  logger_debug_format("<renderer:%p> <descriptor_pool:%p> VkDescriptorPool created", (void *)renderer,
+                      (void *)renderer->descriptor_pool);
+
   return renderer;
 }
 
 b8 renderer_destroy(renderer_t *renderer) {
+  if (!renderer_vulkan_descriptor_pool_destroy(renderer)) {
+    logger_critical_format("<renderer:%p> VkDescriptorPool destruction failed", (void *)renderer);
+
+    return false;
+  }
+
+  logger_debug_format("<renderer:%p> <descriptor_pool:%p> VkDescriptorPool destroyed", (void *)renderer,
+                      (void *)renderer->descriptor_pool);
+
   if (!renderer_vulkan_synchronization_destroy(renderer)) {
     logger_critical_format("<renderer:%p> synchronization objects destruction failed", (void *)renderer);
 
@@ -171,7 +198,10 @@ b8 renderer_destroy(renderer_t *renderer) {
     return false;
   }
 
-  logger_debug_format("<renderer:%p> VkCommandPool destroyed", (void *)renderer);
+  logger_debug_format("<renderer:%p> VkCommandPools destroyed", (void *)renderer);
+  logger_debug_format("|- [ pools ] <compute:%p> <present:%p> <graphics:%p> <transfer:%p>",
+                      (void *)renderer->compute_command_pool, (void *)renderer->present_command_pool,
+                      (void *)renderer->graphics_command_pool, (void *)renderer->transfer_command_pool);
 
   if (!renderer_vulkan_swapchain_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destruction failed", (void *)renderer,

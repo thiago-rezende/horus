@@ -50,3 +50,4 @@
 /* horus renderer buffers layer */
 #include <horus/renderer/buffers/index.h>
 #include <horus/renderer/buffers/vertex.h>
+#include <horus/renderer/buffers/uniform.h>

@@ -38,11 +38,13 @@ horus_renderer_vulkan_sources = [
   'source/renderer/vulkan/renderer.c',
   'source/renderer/vulkan/pipeline.c',
   'source/renderer/vulkan/swapchain.c',
+  'source/renderer/vulkan/descriptors.c',
   'source/renderer/vulkan/synchronization.c',
 
   # horus renderer buffers layer [ vulkan ]
   'source/renderer/vulkan/buffers/index.c',
   'source/renderer/vulkan/buffers/vertex.c',
+  'source/renderer/vulkan/buffers/uniform.c',
 ]
 
 # horus source files [ linux ]

@@ -1,6 +1,7 @@
 /* horus renderer layer [ vulkan ] */
 #include <horus/renderer/vulkan/shader.h>
 #include <horus/renderer/vulkan/pipeline.h>
+#include <horus/renderer/vulkan/descriptors.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
@@ -19,8 +20,11 @@ static const VkDynamicState renderer_pipeline_dynamic_state_viewport = VK_DYNAMI
 graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_module_t *module) {
   graphics_pipeline_t *pipeline = platform_memory_allocate(sizeof(graphics_pipeline_t));
 
-  pipeline->device = renderer->device;
-  pipeline->module = module;
+  *pipeline = (graphics_pipeline_t){
+      .device = renderer->device,
+      .module = module,
+      .descriptor_pool = renderer->descriptor_pool,
+  };
 
   pipeline->dynamic_states = array_create(RENDERER_PIPELINE_DYNAMIC_STATES_COUNT, sizeof(VkDynamicState));
 
@@ -120,14 +124,63 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       .pAttachments = &pipeline_color_blend_attachment_state,
   };
 
+  VkDescriptorSetLayoutBinding descriptor_set_layout_binding = (VkDescriptorSetLayoutBinding){
+      .binding = 0,
+      .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+      .descriptorCount = 1,
+      .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+      .pImmutableSamplers = NULL,
+  };
+
+  VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info = (VkDescriptorSetLayoutCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+      .flags = (VkDescriptorSetLayoutCreateFlags)0,
+      .bindingCount = 1,
+      .pBindings = &descriptor_set_layout_binding,
+      .pNext = NULL,
+  };
+
+  if (vkCreateDescriptorSetLayout(pipeline->device, &descriptor_set_layout_create_info, NULL,
+                                  &pipeline->descriptor_set_layout) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <device:%p> pipeline descriptor set layout creation failed", renderer,
+                           pipeline->device);
+
+    array_destroy(pipeline->dynamic_states);
+
+    platform_memory_deallocate(pipeline);
+
+    return NULL;
+  }
+
+  /* TODO: improve to support the frames in flight */
+  pipeline->descriptor_set = renderer_vulkan_descriptor_set_create(pipeline->device, pipeline->descriptor_pool,
+                                                                   pipeline->descriptor_set_layout);
+
+  if (pipeline->descriptor_set == VK_NULL_HANDLE) {
+    logger_critical_format("<renderer:%p> <device:%p> pipeline layout creation failed", renderer, pipeline->device);
+
+    vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
+
+    array_destroy(pipeline->dynamic_states);
+
+    platform_memory_deallocate(pipeline);
+
+    return NULL;
+  }
+
   VkPipelineLayoutCreateInfo pipeline_layout_create_info = (VkPipelineLayoutCreateInfo){
       .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-      .setLayoutCount = 0,
+      .setLayoutCount = 1,
+      .pSetLayouts = &pipeline->descriptor_set_layout,
       .pushConstantRangeCount = 0,
   };
 
   if (vkCreatePipelineLayout(pipeline->device, &pipeline_layout_create_info, NULL, &pipeline->layout) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <device:%p> pipeline layout creation failed", renderer, pipeline->device);
+
+    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+
+    vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
     array_destroy(pipeline->dynamic_states);
 
@@ -148,6 +201,10 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
+    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+
+    vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
+
     array_destroy(pipeline->dynamic_states);
 
     platform_memory_deallocate(pipeline);
@@ -161,6 +218,10 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
+    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+
+    vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
+
     array_destroy(pipeline->dynamic_states);
 
     platform_memory_deallocate(pipeline);
@@ -173,6 +234,10 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
                            pipeline->module);
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
+
+    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+
+    vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
     array_destroy(pipeline->dynamic_states);
 
@@ -208,6 +273,10 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
+    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+
+    vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
+
     array_destroy(shader_stage_create_infos);
 
     array_destroy(pipeline->dynamic_states);
@@ -228,6 +297,10 @@ b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline) {
   vkDestroyPipeline(pipeline->device, pipeline->pipeline, NULL);
 
   vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
+
+  renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+
+  vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
   array_destroy(pipeline->dynamic_states);
 

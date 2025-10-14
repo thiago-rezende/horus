@@ -20,6 +20,11 @@ struct __graphics_pipeline {
 
   shader_module_t *module;
 
+  /* TODO: improve to support the frames in flight */
+  VkDescriptorSet descriptor_set;
+  VkDescriptorPool descriptor_pool;
+  VkDescriptorSetLayout descriptor_set_layout;
+
   VkPipelineLayout layout;
 
   VkPipeline pipeline;
