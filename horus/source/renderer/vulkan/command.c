@@ -122,6 +122,7 @@ b8 renderer_vulkan_command_buffer_destroy(VkDevice device, VkCommandBuffer buffe
   return true;
 }
 
+/* TODO: call vkAllocateCommandBuffers directly since it can handle multiple buffers creation */
 array_t *renderer_vulkan_command_buffers_create(VkDevice device, VkCommandPool pool, u8 count) {
   array_t *buffers = array_create(count, sizeof(VkCommandBuffer));
 
@@ -140,6 +141,7 @@ array_t *renderer_vulkan_command_buffers_create(VkDevice device, VkCommandPool p
   return buffers;
 }
 
+/* TODO: call vkFreeCommandBuffers directly since it can handle multiple buffers creation */
 b8 renderer_vulkan_command_buffers_destroy(array_t *buffers, VkDevice device, VkCommandPool pool) {
   for (u8 i = 0; i < buffers->count; i++) {
     VkCommandBuffer buffer;
