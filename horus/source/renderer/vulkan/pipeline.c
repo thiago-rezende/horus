@@ -152,12 +152,11 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
     return NULL;
   }
 
-  /* TODO: improve to support the frames in flight */
-  pipeline->descriptor_set = renderer_vulkan_descriptor_set_create(pipeline->device, pipeline->descriptor_pool,
-                                                                   pipeline->descriptor_set_layout);
+  pipeline->descriptor_sets = renderer_vulkan_descriptor_sets_create(
+      pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set_layout, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  if (pipeline->descriptor_set == VK_NULL_HANDLE) {
-    logger_critical_format("<renderer:%p> <device:%p> pipeline layout creation failed", renderer, pipeline->device);
+  if (pipeline->descriptor_sets == NULL) {
+    logger_critical_format("<renderer:%p> <device:%p> descriptor sets creation failed", renderer, pipeline->device);
 
     vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
@@ -178,7 +177,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
   if (vkCreatePipelineLayout(pipeline->device, &pipeline_layout_create_info, NULL, &pipeline->layout) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <device:%p> pipeline layout creation failed", renderer, pipeline->device);
 
-    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+    renderer_vulkan_descriptor_sets_destroy(pipeline->descriptor_sets, pipeline->device, pipeline->descriptor_pool);
 
     vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
@@ -201,7 +200,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
-    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+    renderer_vulkan_descriptor_sets_destroy(pipeline->descriptor_sets, pipeline->device, pipeline->descriptor_pool);
 
     vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
@@ -218,7 +217,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
-    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+    renderer_vulkan_descriptor_sets_destroy(pipeline->descriptor_sets, pipeline->device, pipeline->descriptor_pool);
 
     vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
@@ -235,7 +234,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
-    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+    renderer_vulkan_descriptor_sets_destroy(pipeline->descriptor_sets, pipeline->device, pipeline->descriptor_pool);
 
     vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
@@ -273,7 +272,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
 
     vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
-    renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+    renderer_vulkan_descriptor_sets_destroy(pipeline->descriptor_sets, pipeline->device, pipeline->descriptor_pool);
 
     vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 
@@ -298,7 +297,7 @@ b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline) {
 
   vkDestroyPipelineLayout(pipeline->device, pipeline->layout, NULL);
 
-  renderer_vulkan_descriptor_set_destroy(pipeline->device, pipeline->descriptor_pool, pipeline->descriptor_set);
+  renderer_vulkan_descriptor_sets_destroy(pipeline->descriptor_sets, pipeline->device, pipeline->descriptor_pool);
 
   vkDestroyDescriptorSetLayout(pipeline->device, pipeline->descriptor_set_layout, NULL);
 

@@ -9,7 +9,7 @@
 #include <horus/renderer/renderer.h>
 
 /* TODO: improve the buffering control and allow the application to choose */
-#define RENDERER_VULKAN_FRAMES_IN_FLIGHT 1
+#define RENDERER_VULKAN_FRAMES_IN_FLIGHT 3
 
 struct __renderer {
   renderer_implementation_t implementation;

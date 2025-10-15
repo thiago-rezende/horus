@@ -57,6 +57,40 @@ VkDescriptorSet renderer_vulkan_descriptor_set_create(VkDevice device,
   return descriptor_set;
 }
 
+array_t *renderer_vulkan_descriptor_sets_create(VkDevice device,
+                                                VkDescriptorPool descriptor_pool,
+                                                VkDescriptorSetLayout layout,
+                                                u8 count) {
+  array_t *descriptor_sets = array_create(count, sizeof(VkDescriptorSet));
+  descriptor_sets->count = count;
+
+  array_t *descriptor_sets_layouts = array_create(count, sizeof(VkDescriptorSetLayout));
+
+  for (u8 i = 0; i < count; i++) {
+    array_insert(descriptor_sets_layouts, (void *)&layout);
+  }
+
+  VkDescriptorSetAllocateInfo descriptor_set_allocate_info = (VkDescriptorSetAllocateInfo){
+      .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+      .descriptorPool = descriptor_pool,
+      .descriptorSetCount = count,
+      .pSetLayouts = descriptor_sets_layouts->buffer,
+  };
+
+  if (vkAllocateDescriptorSets(device, &descriptor_set_allocate_info, descriptor_sets->buffer) != VK_SUCCESS) {
+    logger_critical_format("<device:%p> <descriptor_pool:%p> descriptor sets creation failed", device, descriptor_pool);
+
+    array_destroy(descriptor_sets_layouts);
+    array_destroy(descriptor_sets);
+
+    return NULL;
+  }
+
+  array_destroy(descriptor_sets_layouts);
+
+  return descriptor_sets;
+}
+
 b8 renderer_vulkan_descriptor_set_update(VkDevice device, VkDescriptorSet descriptor_set, VkBuffer buffer, u64 size) {
   VkDescriptorBufferInfo descriptor_buffer_info = (VkDescriptorBufferInfo){
       .buffer = buffer,
@@ -83,6 +117,16 @@ b8 renderer_vulkan_descriptor_set_destroy(VkDevice device,
                                           VkDescriptorPool descriptor_pool,
                                           VkDescriptorSet descriptor_set) {
   vkFreeDescriptorSets(device, descriptor_pool, 1, &descriptor_set);
+
+  return true;
+}
+
+b8 renderer_vulkan_descriptor_sets_destroy(array_t *descriptor_sets,
+                                           VkDevice device,
+                                           VkDescriptorPool descriptor_pool) {
+  vkFreeDescriptorSets(device, descriptor_pool, descriptor_sets->count, descriptor_sets->buffer);
+
+  array_destroy(descriptor_sets);
 
   return true;
 }

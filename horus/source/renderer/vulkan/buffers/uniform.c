@@ -140,14 +140,16 @@ uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_obj
 
 b8 uniform_buffer_bind(uniform_buffer_t *buffer, graphics_pipeline_t *pipeline, renderer_t *renderer) {
   VkCommandBuffer graphics_command_buffer;
+  VkDescriptorSet descriptor_set;
 
   array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(pipeline->descriptor_sets, renderer->current_frame_in_flight_index, &descriptor_set);
 
-  renderer_vulkan_descriptor_set_update(renderer->device, pipeline->descriptor_set, buffer->buffer,
+  renderer_vulkan_descriptor_set_update(renderer->device, descriptor_set, buffer->buffer,
                                         sizeof(uniform_buffer_object_t));
 
   vkCmdBindDescriptorSets(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->layout, 0, 1,
-                          &pipeline->descriptor_set, 0, NULL);
+                          &descriptor_set, 0, NULL);
 
   return true;
 }
