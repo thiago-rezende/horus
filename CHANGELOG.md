@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+ - [8a8e30d] chore(renderer|vulkan): add TODO for future refactoring of command buffers allocation (Thiago Rezende)
+ - [44a7ff7] feat(renderer|vulkan): update uniform buffer to support multiple frames in flight (Thiago Rezende)
+ - [0735b57] feat(renderer|vulkan): update pipeline descriptor sets to support multiple frames in flight (Thiago Rezende)
+ - [bb232e2] feat(renderer): add global uniform buffer support and its vulkan implementation (Thiago Rezende)
+ - [76972ff] chore(renderer|vulkan): add TODO for future refactor and improvement of the buffering control (Thiago Rezende)
+ - [c5d7235] docs(changelog): update CHANGELOG.md file (Thiago Rezende)
  - [efec9fa] chore(renderer|vulkan): add TODO for future refactor of buffer creation functions (Thiago Rezende)
  - [5f88c03] docs: update the sandbox screenshot to show the new quad vertex colors (Thiago Rezende)
  - [599a47d] chore(sandbox): update quad vertex colors for visualization purposes (Thiago Rezende)
