@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 
+ - [9630acd] docs(changelog): update CHANGELOG.md file (Thiago Rezende)
  - [8a8e30d] chore(renderer|vulkan): add TODO for future refactoring of command buffers allocation (Thiago Rezende)
  - [44a7ff7] feat(renderer|vulkan): update uniform buffer to support multiple frames in flight (Thiago Rezende)
  - [0735b57] feat(renderer|vulkan): update pipeline descriptor sets to support multiple frames in flight (Thiago Rezende)
