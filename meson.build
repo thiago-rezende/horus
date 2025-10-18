@@ -38,8 +38,6 @@ default_c_args = [
   '-freciprocal-math',
   # loop optimizations
   '-funroll-loops',
-  # link time optimizations
-  '-flto',
 ]
 
 default_override_options = [

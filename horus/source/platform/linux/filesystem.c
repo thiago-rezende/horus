@@ -54,7 +54,7 @@ u64 platform_file_size(platform_file_t *file) {
 }
 
 u64 platform_file_read(platform_file_t *file, u8 *buffer, u64 size) {
-  u64 bytes_read = read(file->descriptor, buffer, size);
+  ssize_t bytes_read = read(file->descriptor, buffer, size);
 
   if (bytes_read == -1) {
     logger_critical_format("<file:%p> <descriptor:%d> <code:%lu> file reading failed", file, file->descriptor, errno);
@@ -63,5 +63,5 @@ u64 platform_file_read(platform_file_t *file, u8 *buffer, u64 size) {
     return 0;
   }
 
-  return bytes_read;
+  return (u64)bytes_read;
 }
