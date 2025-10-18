@@ -1,10 +1,10 @@
 # containers layer test sources
-core_sources = [
+containers_sources = [
   'array.c',
 ]
 
 # containers layer tests executables
-foreach source : core_sources
+foreach source : containers_sources
   name = source.replace('.c', '')
 
   exe = executable(
