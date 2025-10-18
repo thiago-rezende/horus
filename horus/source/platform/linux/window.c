@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xkb.h>
 #include <xcb/xcb_keysyms.h>
 
 /* horus base layer */
@@ -29,6 +30,8 @@
 /* horus input layer [ linux ] */
 #include <horus/platform/linux/input/mouse.h>
 #include <horus/platform/linux/input/keyboard.h>
+
+#include <horus/platform/debugger.h>
 
 #define XCB_ATOM_MAX_LENGTH 255
 
@@ -69,6 +72,7 @@ b8 __window_resized_state = false;
 
 b8 __platform_window_fetch_atoms(xcb_connection_t *connection);
 
+b8 __platform_window_setup_extensions(xcb_connection_t *connection);
 b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection);
 
 b8 __platform_window_is_mouse_button_scroll(xcb_button_t button);
@@ -81,6 +85,8 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   window->context.connection = xcb_connect(NULL, NULL);
 
   logger_debug_format("<window:%p> <xcb_connection:%p> connected", (void *)window, (void *)window->context.connection);
+
+  __platform_window_setup_extensions(window->context.connection);
 
   const xcb_setup_t *screen_setup = xcb_get_setup(window->context.connection);
   xcb_screen_iterator_t screen_iterator = xcb_setup_roots_iterator(screen_setup);
@@ -597,6 +603,81 @@ b8 __platform_window_fetch_atoms(xcb_connection_t *connection) {
   free(wm_delete_window_cookie_reply);
   free(net_wm_state_cookie_reply);
   free(net_wm_state_fullscreen_cookie_reply);
+
+  return true;
+}
+
+b8 __platform_window_setup_extensions(xcb_connection_t *connection) {
+  u8 setup_xkb_extension_result = __platform_window_setup_xkb_extension(connection);
+
+  assert_message_format(setup_xkb_extension_result == true,
+                        "<xcb_connection:%p> <setup_xkb_extension_result:%u> xcb_xkb_use_extension failed", connection,
+                        setup_xkb_extension_result);
+
+  return true;
+}
+
+b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
+  xcb_xkb_use_extension_cookie_t xkb_use_extension_cookie =
+      xcb_xkb_use_extension(connection, XCB_XKB_MAJOR_VERSION, XCB_XKB_MINOR_VERSION);
+
+  xcb_generic_error_t *xkb_use_extension_reply_error = NULL;
+
+  xcb_xkb_use_extension_reply_t *xkb_use_extension_reply =
+      xcb_xkb_use_extension_reply(connection, xkb_use_extension_cookie, &xkb_use_extension_reply_error);
+
+  if (xkb_use_extension_reply == NULL || xkb_use_extension_reply_error != NULL) {
+    logger_critical(
+        "<xcb_connection:%p> <xkb_use_extension_reply:%p> <error:%p> <code:%u> xcb_xkb_use_extension failed",
+        connection, xkb_use_extension_reply, xkb_use_extension_reply_error,
+        xkb_use_extension_reply_error ? xkb_use_extension_reply_error->error_code : 0);
+
+    free(xkb_use_extension_reply);
+    free(xkb_use_extension_reply_error);
+
+    return false;
+  }
+
+  free(xkb_use_extension_reply);
+  free(xkb_use_extension_reply_error);
+
+  xcb_xkb_per_client_flags_cookie_t xcb_xkb_per_client_flags_cookie = xcb_xkb_per_client_flags(
+      connection, XCB_XKB_ID_USE_CORE_KBD, XCB_XKB_PER_CLIENT_FLAG_DETECTABLE_AUTO_REPEAT, 1, 0, 0, 0);
+
+  xcb_generic_error_t *xkb_per_client_flags_reply_error = NULL;
+
+  xcb_xkb_per_client_flags_reply_t *xkb_per_client_flags_reply =
+      xcb_xkb_per_client_flags_reply(connection, xcb_xkb_per_client_flags_cookie, &xkb_per_client_flags_reply_error);
+
+  if (xkb_per_client_flags_reply == NULL || xkb_per_client_flags_reply_error != NULL) {
+    logger_critical(
+        "<xcb_connection:%p> <xcb_xkb_per_client_flags_reply:%p> <error:%p> <code:%u> xcb_xkb_per_client_flags failed",
+        connection, xkb_per_client_flags_reply, xkb_per_client_flags_reply_error,
+        xkb_per_client_flags_reply_error ? xkb_per_client_flags_reply_error->error_code : 0);
+
+    free(xkb_per_client_flags_reply);
+    free(xkb_per_client_flags_reply_error);
+
+    return false;
+  }
+
+  free(xkb_per_client_flags_reply);
+  free(xkb_per_client_flags_reply_error);
+
+  xcb_void_cookie_t xcb_xkb_select_events_cookie = xcb_xkb_select_events(
+      connection, XCB_XKB_ID_USE_CORE_KBD, XCB_XKB_EVENT_TYPE_MAP_NOTIFY | XCB_XKB_EVENT_TYPE_STATE_NOTIFY, 0,
+      XCB_XKB_EVENT_TYPE_MAP_NOTIFY | XCB_XKB_EVENT_TYPE_STATE_NOTIFY, 0, 0, NULL);
+
+  xcb_generic_error_t *xcb_xkb_select_events_error = xcb_request_check(connection, xcb_xkb_select_events_cookie);
+
+  if (xcb_xkb_select_events_error != NULL) {
+    logger_critical("<xcb_connection:%p> <error:%p> <code:%u> xcb_xkb_select_events failed", connection,
+                    xcb_xkb_select_events_error, xcb_xkb_select_events_error->error_code);
+
+    free(xcb_xkb_select_events_error);
+
+    return false;
+  }
 
   return true;
 }
