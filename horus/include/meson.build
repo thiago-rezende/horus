@@ -47,6 +47,9 @@ horus_headers = [
   'horus/platform/input/mouse.h',
   'horus/platform/input/keyboard.h',
 
+  # horus math layer
+  'horus/math/vector.h',
+
   # horus types layer
   'horus/types/vertex.h',
 

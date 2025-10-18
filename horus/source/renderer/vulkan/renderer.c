@@ -380,7 +380,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
       .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
       .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-      .clearValue = (VkClearValue)clear_color_value,
+      .clearValue = (VkClearValue){clear_color_value},
   };
 
   array_retrieve(renderer->swapchain_image_views, renderer->current_swapchain_image_index,

@@ -68,6 +68,8 @@ b8 application_destroy(application_t *application) {
 }
 
 b8 on_create(application_t *application, renderer_t *renderer) {
+  (void)application; /* unused */
+
   default_shader_module = shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT,
                                                            (char *)default_shader_module_path);
 
@@ -94,6 +96,8 @@ b8 on_create(application_t *application, renderer_t *renderer) {
 }
 
 b8 on_destroy(application_t *application, renderer_t *renderer) {
+  (void)application; /* unused */
+
   vertex_buffer_destroy(quad_vertex_buffer);
 
   logger_info_format("<renderer:%p> <vertex_buffer:%p> destroyed", (void *)renderer, (void *)quad_vertex_buffer);
@@ -276,7 +280,7 @@ b8 on_render(renderer_t *renderer) {
   }
 
   /* geometry indices setup */
-  if (!index_buffer_bind(quad_index_buffer, default_graphics_pipeline, renderer)) {
+  if (!index_buffer_bind(quad_index_buffer, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <index_buffer:%p> index buffer binding failed", renderer,
                            default_graphics_pipeline, quad_index_buffer);
 
@@ -284,7 +288,7 @@ b8 on_render(renderer_t *renderer) {
   }
 
   /* geometry vertices setup */
-  if (!vertex_buffer_bind(quad_vertex_buffer, default_graphics_pipeline, renderer)) {
+  if (!vertex_buffer_bind(quad_vertex_buffer, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <vertex_buffer:%p> vertex buffer binding failed", renderer,
                            default_graphics_pipeline, quad_vertex_buffer);
 

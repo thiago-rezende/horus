@@ -6,7 +6,7 @@ project(
   license: 'BSD-3-Clause',
   meson_version: '>=1.0.0',
   default_options: [
-    'c_std=c99',
+    'c_std=c11',
     'buildtype=debug',
   ],
 )
@@ -17,6 +17,36 @@ project_version_minor = project_version_parts[1].to_int()
 project_version_patch = project_version_parts[2].to_int()
 
 project_description = 'A simple closs-platform application development framework'
+
+# global defaults
+default_c_args = [
+  # language standard
+  '-std=c11',
+  # optimizations
+  '-O3',
+  # warnings
+  '-Wall',
+  '-Wextra',
+  '-pedantic',
+  # math optimizations
+  '-ffast-math',
+  '-fvectorize',
+  '-march=native',
+  '-mtune=native',
+  '-fno-math-errno',
+  '-ftree-vectorize',
+  '-freciprocal-math',
+  # loop optimizations
+  '-funroll-loops',
+  # link time optimizations
+  '-flto',
+]
+
+default_override_options = [
+  'c_std=c11',
+  'werror=true',
+  'warning_level=3',
+]
 
 # horus target
 subdir('horus')

@@ -1,10 +1,10 @@
-# containers layer test sources
-containers_sources = [
-  'array.c',
+# math layer test sources
+math_sources = [
+  'vector.c',
 ]
 
-# containers layer tests executables
-foreach source : containers_sources
+# math layer tests executables
+foreach source : math_sources
   name = source.replace('.c', '')
 
   exe = executable(

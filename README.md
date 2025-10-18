@@ -34,6 +34,6 @@ This project is being developed to be the simplest and yet complete cross-platfo
 [ci-badge-linux]: https://img.shields.io/github/actions/workflow/status/thiago-rezende/horus/linux.yml?branch=main&style=flat-square&label=linux
 [ci-badge-windows]: https://img.shields.io/github/actions/workflow/status/thiago-rezende/horus/windows.yml?branch=main&style=flat-square&label=windows
 [license-badge]: https://img.shields.io/badge/license-BSD_3_Clause-yellowgreen.svg?style=flat-square
-[c-badge]: https://img.shields.io/badge/C-99-blue.svg?style=flat-square
+[c-badge]: https://img.shields.io/badge/C-11-blue.svg?style=flat-square
 [vulkan-badge]: https://img.shields.io/badge/vulkan-1.3-AC162C.svg?style=flat-square
 [meson-badge]: https://img.shields.io/badge/meson-1.0-39207c.svg?style=flat-square

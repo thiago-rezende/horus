@@ -20,6 +20,9 @@ horus_sources = [
   # horus events layer
   'source/events/base.c',
 
+  # horus math layer
+  'source/math/vector.c',
+
   # horus application layer
   'source/application/application.c',
 
@@ -172,8 +175,10 @@ configure_file(
 # horus library
 horus_lib = static_library(
   'horus',
+  c_args: default_c_args,
   sources: horus_sources,
   dependencies: horus_dependencies,
+  override_options: default_override_options,
   include_directories: horus_includes,
   install: true,
 )

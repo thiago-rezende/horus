@@ -288,7 +288,7 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
   return buffer;
 }
 
-b8 index_buffer_bind(index_buffer_t *buffer, graphics_pipeline_t *pipeline, renderer_t *renderer) {
+b8 index_buffer_bind(index_buffer_t *buffer, renderer_t *renderer) {
   VkCommandBuffer graphics_command_buffer;
 
   array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);

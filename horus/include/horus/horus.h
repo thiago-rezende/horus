@@ -42,6 +42,9 @@
 #include <horus/events/mouse.h>
 #include <horus/events/keyboard.h>
 
+/* horus math layer */
+#include "horus/math/vector.h"
+
 /* horus types layer */
 #include "horus/types/vertex.h"
 

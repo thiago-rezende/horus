@@ -14,6 +14,6 @@ typedef struct __index_buffer index_buffer_t;
 
 index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 count);
 
-b8 index_buffer_bind(index_buffer_t *buffer, graphics_pipeline_t *pipeline, renderer_t *renderer);
+b8 index_buffer_bind(index_buffer_t *buffer, renderer_t *renderer);
 
 b8 index_buffer_destroy(index_buffer_t *buffer);
