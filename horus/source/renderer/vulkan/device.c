@@ -498,8 +498,8 @@ b8 __physical_device_has_required_extensions(VkPhysicalDevice device, array_t *e
 }
 
 array_t *__build_queue_create_infos(renderer_t *renderer) {
-  const static u64 queue_count = 4;
-  const static float queue_priority = 1.0f;
+  static const u64 queue_count = 4;
+  static const float queue_priority = 1.0f;
 
   VkDeviceQueueCreateInfo compute_queue_create_info = (VkDeviceQueueCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,

@@ -30,7 +30,6 @@ default_c_args = [
   '-pedantic',
   # math optimizations
   '-ffast-math',
-  '-fvectorize',
   '-march=native',
   '-mtune=native',
   '-fno-math-errno',
@@ -42,7 +41,6 @@ default_c_args = [
 
 default_override_options = [
   'c_std=c11',
-  'werror=true',
   'warning_level=3',
 ]
 

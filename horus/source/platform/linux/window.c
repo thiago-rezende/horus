@@ -214,8 +214,8 @@ b8 platform_window_process_events(platform_window_t *window) {
 
           if (window->on_event) {
             if (!window->on_event((event_t *)&mouse_scroll_event)) {
-              logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window,
-                                  (void *)window->on_event, events_type_string(mouse_scroll_event.base.type));
+              logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, window->on_event,
+                                  events_type_string(mouse_scroll_event.base.type));
             }
           }
 
@@ -240,7 +240,7 @@ b8 platform_window_process_events(platform_window_t *window) {
 
         if (window->on_event) {
           if (!window->on_event((event_t *)&mouse_button_press_event)) {
-            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, (void *)window->on_event,
+            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, window->on_event,
                                 events_type_string(mouse_button_press_event.base.type));
           }
         }
@@ -279,7 +279,7 @@ b8 platform_window_process_events(platform_window_t *window) {
 
         if (window->on_event) {
           if (!window->on_event((event_t *)&mouse_button_release_event)) {
-            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, (void *)window->on_event,
+            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, window->on_event,
                                 events_type_string(mouse_button_release_event.base.type));
           }
         }
@@ -325,7 +325,7 @@ b8 platform_window_process_events(platform_window_t *window) {
                                                                                  : (event_t *)&keyboard_press_event;
 
           if (!window->on_event(event)) {
-            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, (void *)window->on_event,
+            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, window->on_event,
                                 events_type_string(event->type));
           }
         }
@@ -359,7 +359,7 @@ b8 platform_window_process_events(platform_window_t *window) {
 
         if (window->on_event) {
           if (!window->on_event((event_t *)&keyboard_release_event)) {
-            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, (void *)window->on_event,
+            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, window->on_event,
                                 events_type_string(keyboard_release_event.base.type));
           }
         }
@@ -408,7 +408,7 @@ b8 platform_window_process_events(platform_window_t *window) {
 
         if (window->on_event) {
           if (!window->on_event((event_t *)&mouse_move_event)) {
-            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, (void *)window->on_event,
+            logger_error_format("<window:%p> <on_event:%p> <type:%s> failed", (void *)window, window->on_event,
                                 events_type_string(mouse_move_event.base.type));
           }
         }

@@ -4,7 +4,7 @@
 #include <horus/platform/console.h>
 
 b8 platform_console_write(char *message) {
-  u32 written = fprintf(stdout, "%s", message);
+  int written = fprintf(stdout, "%s", message);
 
   fflush(stdout);
 
@@ -12,7 +12,7 @@ b8 platform_console_write(char *message) {
 }
 
 b8 platform_console_write_error(char *message) {
-  u32 written = fprintf(stderr, "%s", message);
+  int written = fprintf(stderr, "%s", message);
 
   fflush(stderr);
 
