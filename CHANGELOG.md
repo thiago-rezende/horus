@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+ - [710f129] fix(input|linux): bring back xcb-xkb library to properly handle key repeats for managing key held state (Thiago Rezende)
+ - [148180b] fix: solved some analysis errors (Thiago Rezende)
+ - [8e93853] fix(filesystem|linux): update read function return value type to a signed type (Thiago Rezende)
+ - [423032d] feat(math): add simd capable f32 vectors with addition function and update c standard to C11 (Thiago Rezende)
+ - [219ccaf] chore(tests): update containers layer test sources variable naming to 'containers_sources' (Thiago Rezende)
+ - [e01caec] chore: add types layer include in the global header file 'horus.h' (Thiago Rezende)
+ - [5a57aab] docs(changelog): update CHANGELOG.md file (Thiago Rezende)
  - [9630acd] docs(changelog): update CHANGELOG.md file (Thiago Rezende)
  - [8a8e30d] chore(renderer|vulkan): add TODO for future refactoring of command buffers allocation (Thiago Rezende)
  - [44a7ff7] feat(renderer|vulkan): update uniform buffer to support multiple frames in flight (Thiago Rezende)
