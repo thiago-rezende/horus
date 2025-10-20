@@ -11,11 +11,11 @@
 
 <!-- Short Description -->
 
-> A simple closs-platform application development framework.
+> A simple cross-platform application development framework.
 
 <!-- Description -->
 
-This project is being developed to be the simplest and yet complete cross-platform application development framework using the [C][c-url] programming language, [Vulkan][vulkan-url] graphics API and [Meson][meson-url] bulid system.
+This project is being developed to be the simplest and yet complete cross-platform application development framework using the [C][c-url] programming language, [Vulkan][vulkan-url] graphics API and [Meson][meson-url] build system.
 
 <!-- Screenshot -->
 ![Sandbox Application](.github/sandbox.png)
