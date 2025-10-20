@@ -1,5 +1,6 @@
 # math layer test sources
 math_sources = [
+  'matrix.c',
   'vector.c',
 ]
 
