@@ -159,11 +159,11 @@ physical_device_score_t renderer_vulkan_physical_device_get_score(VkPhysicalDevi
     }
   }
 
-  if (!features.wideLines) {
-    score = 0;
+  if (features.depthBounds) {
+    score += 10;
   }
 
-  if (!features.depthBounds) {
+  if (!features.wideLines) {
     score = 0;
   }
 
