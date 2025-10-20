@@ -383,12 +383,12 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
       .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
       .features =
           (VkPhysicalDeviceFeatures){
-              .wideLines = VK_TRUE,
+              .wideLines = renderer->physical_device_features.wideLines,
               .depthBounds = renderer->physical_device_features.depthBounds,
-              .multiViewport = VK_TRUE,
-              .fillModeNonSolid = VK_TRUE,
-              .samplerAnisotropy = VK_TRUE,
-              .tessellationShader = VK_TRUE,
+              .multiViewport = renderer->physical_device_features.multiViewport,
+              .fillModeNonSolid = renderer->physical_device_features.fillModeNonSolid,
+              .samplerAnisotropy = renderer->physical_device_features.samplerAnisotropy,
+              .tessellationShader = renderer->physical_device_features.tessellationShader,
           },
   };
 
