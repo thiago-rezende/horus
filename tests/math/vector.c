@@ -11,11 +11,11 @@ static void test_vector3f32_add(void **state) {
   (void)state; /* unused */
 
   /* default attrubutes */
-  vector3f32_t a = {.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
-  vector3f32_t b = {.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
+  vector3f32_t a = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
+  vector3f32_t b = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
 
   /* expected result */
-  vector3f32_t expected = {.x = 2.0f, .y = 2.0f, .z = 2.0f, .__padding = 0};
+  vector3f32_t expected = (vector3f32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .__padding = 0};
 
   /* function call */
   vector3f32_t result = vector3f32_add(a, b);
@@ -33,11 +33,11 @@ static void test_vector4f32_add(void **state) {
   (void)state; /* unused */
 
   /* default attrubutes */
-  vector4f32_t a = {.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
-  vector4f32_t b = {.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
+  vector4f32_t a = (vector4f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
+  vector4f32_t b = (vector4f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
 
   /* expected result */
-  vector4f32_t expected = {.x = 2.0f, .y = 2.0f, .z = 2.0f, .w = 0};
+  vector4f32_t expected = (vector4f32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .w = 0};
 
   /* function call */
   vector4f32_t result = vector4f32_add(a, b);

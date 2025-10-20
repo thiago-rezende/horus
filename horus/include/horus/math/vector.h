@@ -12,21 +12,17 @@ typedef union __vector3f32 {
 
   __v3f32 vector;
 
+  /* clang-format off */
   struct {
-    union {
-      f32 x, r, u;
-    };
+    union { f32 x, r, u; };
 
-    union {
-      f32 y, g, v;
-    };
+    union { f32 y, g, v; };
 
-    union {
-      f32 z, b, w;
-    };
+    union { f32 z, b, w; };
 
     f32 __padding;
   };
+  /* clang-format on */
 } vector3f32_t;
 
 typedef union __vector4f32 {
@@ -34,23 +30,14 @@ typedef union __vector4f32 {
 
   __v4f32 vector;
 
+  /* clang-format off */
   struct {
-    union {
-      f32 x, r;
-    };
-
-    union {
-      f32 y, g;
-    };
-
-    union {
-      f32 z, b;
-    };
-
-    union {
-      f32 w, a;
-    };
+    union { f32 x, r; };
+    union { f32 y, g; };
+    union { f32 z, b; };
+    union { f32 w, a; };
   };
+  /* clang-format on */
 } vector4f32_t;
 
 /* TODO: inline all possible vector functions */
