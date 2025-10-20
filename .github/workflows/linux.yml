@@ -37,7 +37,7 @@ jobs:
         run: pip install meson ninja
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 
@@ -76,7 +76,7 @@ jobs:
         run: pip install meson ninja
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 
@@ -115,7 +115,7 @@ jobs:
         run: pip install meson ninja
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 
@@ -154,7 +154,7 @@ jobs:
         run: pip install meson ninja
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 

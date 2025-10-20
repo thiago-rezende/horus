@@ -44,7 +44,7 @@ jobs:
         run: update-ca-trust
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 
@@ -90,7 +90,7 @@ jobs:
         run: update-ca-trust
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 
@@ -136,7 +136,7 @@ jobs:
         run: update-ca-trust
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 
@@ -182,7 +182,7 @@ jobs:
         run: update-ca-trust
 
       - name: Setup Project
-        run: meson setup build
+        run: meson setup build --reconfigure
         env:
           CC: clang
 
