@@ -31,26 +31,14 @@ vertex_output_t vertex_entrypoint(vertex_input_t input) {
   vertex_output_t output;
 
   /* vertex position */
-  output.position = float4(input.position, 1.0);
-
-  /* rotated vertex position */
-  /*
-  float angle = uniform_buffer_object.time * 1.0;
-
-  float c = cos(angle);
-  float s = sin(angle);
-
-  output.position.x = input.position.x * c - input.position.y * s;
-  output.position.y = input.position.x * s + input.position.y * c;
-  */
-
-  /* matrices multiplication */
   float4 vertex_position = float4(input.position, 1.0);
 
+  /* matrices multiplication */
   float4 world_position = mul(uniform_buffer_object.model, vertex_position);
-  float4 view_position = mul(uniform_buffer_object.view, world_position);
 
-  output.position = mul(uniform_buffer_object.projection, view_position);
+  float4 camera_position = mul(uniform_buffer_object.view, world_position);
+
+  output.position = mul(uniform_buffer_object.projection, camera_position);
 
   /* vertex color */
   output.color = input.color;
