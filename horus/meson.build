@@ -21,6 +21,7 @@ horus_sources = [
   'source/events/base.c',
 
   # horus math layer
+  'source/math/matrix.c',
   'source/math/vector.c',
 
   # horus application layer

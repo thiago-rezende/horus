@@ -48,6 +48,7 @@ horus_headers = [
   'horus/platform/input/keyboard.h',
 
   # horus math layer
+  'horus/math/matrix.h',
   'horus/math/vector.h',
 
   # horus types layer

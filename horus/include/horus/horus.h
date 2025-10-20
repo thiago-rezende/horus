@@ -43,6 +43,7 @@
 #include <horus/events/keyboard.h>
 
 /* horus math layer */
+#include "horus/math/matrix.h"
 #include "horus/math/vector.h"
 
 /* horus types layer */
