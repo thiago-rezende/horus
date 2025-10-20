@@ -3,6 +3,9 @@
 /* horus core layer */
 #include <horus/core/types.h>
 
+/* horus math layer */
+#include <horus/math/matrix.h>
+
 /* horus renderer layer */
 #include <horus/renderer/renderer.h>
 #include <horus/renderer/pipeline.h>
@@ -11,6 +14,10 @@ typedef struct __uniform_buffer uniform_buffer_t;
 
 typedef struct __uniform_buffer_object {
   f32 time;
+
+  matrix4f32_t view;
+  matrix4f32_t model;
+  matrix4f32_t projection;
 } uniform_buffer_object_t;
 
 uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_object_t *object);

@@ -21,10 +21,10 @@ vertex_buffer_t *quad_vertex_buffer = NULL;
 u32 quad_indices[QUAD_INDICES_COUNT] = {0, 1, 2, 2, 3, 0};
 
 vertex_t quad_vertices[QUAD_VERTICES_COUNT] = {
-    (vertex_t){.position = {-0.5f, -0.5f, 0.0f}, .color = {1.0f, 1.0f, 0.0f, 1.0f}},
-    (vertex_t){.position = {0.5f, -0.5f, 0.0f}, .color = {1.0f, 1.0f, 0.0f, 1.0f}},
-    (vertex_t){.position = {0.5f, 0.5f, 0.0f}, .color = {0.0f, 1.0f, 1.0f, 1.0f}},
-    (vertex_t){.position = {-0.5f, 0.5f, 0.0f}, .color = {0.0f, 1.0f, 1.0f, 1.0f}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.0f}}, .color = {{1.0f, 1.0f, 0.0f, 1.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, 0.0f}}, .color = {{1.0f, 1.0f, 0.0f, 1.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.0f}}, .color = {{0.0f, 1.0f, 1.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.0f}}, .color = {{0.0f, 1.0f, 1.0f, 1.0f}}},
 };
 
 application_t *application_create(void) {
@@ -260,6 +260,9 @@ b8 on_render(renderer_t *renderer) {
 
   uniform_buffer_object = (uniform_buffer_object_t){
       .time = elapsed_time,
+      .view = matrix4f32_identity(),
+      .model = matrix4f32_identity(),
+      .projection = matrix4f32_identity(),
   };
 
   uniform_buffer_update(uniform_buffer, &uniform_buffer_object);
