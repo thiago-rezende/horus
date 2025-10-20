@@ -384,7 +384,7 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
       .features =
           (VkPhysicalDeviceFeatures){
               .wideLines = VK_TRUE,
-              .depthBounds = VK_TRUE,
+              .depthBounds = renderer->physical_device_features.depthBounds,
               .multiViewport = VK_TRUE,
               .fillModeNonSolid = VK_TRUE,
               .samplerAnisotropy = VK_TRUE,
