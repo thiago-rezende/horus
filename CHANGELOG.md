@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+ - [afc747b] docs: update the sandbox screenshot to show the instance buffer support (Thiago Rezende)
+ - [c9ad31e] feat(renderer): add instance buffer support and its vulkan implementation (Thiago Rezende)
+ - [1d65893] chore(assets): remove unused shader code from default.slang (Thiago Rezende)
+ - [c334aa6] feat(types): update vertex_t to use vector variants and uniform buffer with placeholder model view and projection matrices (Thiago Rezende)
+ - [37a57aa] ci: update meson setup steps to force reconfiguration to prevent a GitHub Action problem (Thiago Rezende)
+ - [6808341] docs(readme): fix some types in the README.md file (Thiago Rezende)
+ - [d46a634] refactor(renderer|vulkan): update device creation to look for physical device features presence (Thiago Rezende)
+ - [64e7aca] refactor(renderer|vulkan): update device creation to look for desired features presence (Thiago Rezende)
+ - [ed2373c] refactor(renderer|vulkan): update physical device selection to make depth bounds checking desired but not required (Thiago Rezende)
+ - [964611f] test(math): add f32 matrix unit tests (Thiago Rezende)
+ - [45476d9] feat(math): add simd capable f32 matrix with identity and multiply functions (Thiago Rezende)
+ - [5e343c2] style(math): update vector3f32 and vector4f32 unions fields styling (Thiago Rezende)
+ - [7814ade] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [710f129] fix(input|linux): bring back xcb-xkb library to properly handle key repeats for managing key held state (Thiago Rezende)
  - [148180b] fix: solved some analysis errors (Thiago Rezende)
  - [8e93853] fix(filesystem|linux): update read function return value type to a signed type (Thiago Rezende)
