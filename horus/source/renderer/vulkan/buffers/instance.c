@@ -14,11 +14,11 @@
 #include <horus/renderer/vulkan/descriptors.h>
 
 /* horus renderer buffers layer [ vulkan ] */
-#include <horus/renderer/buffers/uniform.h>
+#include <horus/renderer/buffers/instance.h>
 
-#define DEFAULT_UNIFORM_BUFFER_BINDING 0
+#define DEFAULT_INSTANCE_BUFFER_BINDING 1
 
-struct __uniform_buffer {
+struct __instance_buffer {
   VkDevice device;
 
   VkDeviceSize size;
@@ -31,11 +31,11 @@ struct __uniform_buffer {
 };
 
 /* TODO: refactor into multipe functions for usage within other types of buffer */
-uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_object_t *object) {
-  uniform_buffer_t *buffer = platform_memory_allocate(sizeof(uniform_buffer_t));
+instance_buffer_t *instance_buffer_create(renderer_t *renderer, instance_buffer_object_t *objects, u32 count) {
+  instance_buffer_t *buffer = platform_memory_allocate(sizeof(instance_buffer_t));
 
-  *buffer = (uniform_buffer_t){
-      .size = sizeof(uniform_buffer_object_t),
+  *buffer = (instance_buffer_t){
+      .size = sizeof(instance_buffer_object_t) * count,
       .device = renderer->device,
       .current_frame_in_flight_index = &renderer->current_frame_in_flight_index,
   };
@@ -53,7 +53,7 @@ uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_obj
         .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .flags = (VkBufferCreateFlags)0,
         .size = buffer->size,
-        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
     };
 
@@ -97,7 +97,7 @@ uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_obj
       logger_critical_format("<renderer:%p> <buffer:%p> desired memory type for buffers creation not found", renderer,
                              buffer);
 
-      uniform_buffer_destroy(buffer);
+      instance_buffer_destroy(buffer);
 
       return NULL;
     }
@@ -112,7 +112,7 @@ uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_obj
     if (vkAllocateMemory(buffer->device, &buffer_memory_allocate_info, NULL, &current_memory) != VK_SUCCESS) {
       logger_critical_format("<renderer:%p> <buffer:%p> buffer memory allocation failed", renderer, buffer);
 
-      uniform_buffer_destroy(buffer);
+      instance_buffer_destroy(buffer);
 
       return NULL;
     }
@@ -122,7 +122,7 @@ uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_obj
     if (vkBindBufferMemory(buffer->device, current_buffer, current_memory, 0) != VK_SUCCESS) {
       logger_critical_format("<renderer:%p> <buffer:%p> staging buffer memory binding failed", renderer, buffer);
 
-      uniform_buffer_destroy(buffer);
+      instance_buffer_destroy(buffer);
 
       return NULL;
     }
@@ -130,20 +130,20 @@ uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_obj
     if (vkMapMemory(buffer->device, current_memory, 0, buffer_create_info.size, 0, &current_mapped) != VK_SUCCESS) {
       logger_critical_format("<renderer:%p> <buffer:%p> buffer memory mapping failed", renderer, buffer);
 
-      uniform_buffer_destroy(buffer);
+      instance_buffer_destroy(buffer);
 
       return NULL;
     }
 
     array_insert(buffer->mappings, (void *)&current_mapped);
 
-    platform_memory_copy(current_mapped, object, sizeof(uniform_buffer_object_t));
+    platform_memory_copy(current_mapped, objects, sizeof(instance_buffer_object_t) * count);
   }
 
   return buffer;
 }
 
-b8 uniform_buffer_bind(uniform_buffer_t *buffer, graphics_pipeline_t *pipeline, renderer_t *renderer) {
+b8 instance_buffer_bind(instance_buffer_t *buffer, graphics_pipeline_t *pipeline, renderer_t *renderer) {
   VkBuffer current_buffer;
   VkDescriptorSet descriptor_set;
   VkCommandBuffer graphics_command_buffer;
@@ -152,8 +152,8 @@ b8 uniform_buffer_bind(uniform_buffer_t *buffer, graphics_pipeline_t *pipeline, 
   array_retrieve(pipeline->descriptor_sets, renderer->current_frame_in_flight_index, &descriptor_set);
   array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
 
-  renderer_vulkan_descriptor_set_update(renderer->device, descriptor_set, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                        DEFAULT_UNIFORM_BUFFER_BINDING, current_buffer, buffer->size);
+  renderer_vulkan_descriptor_set_update(renderer->device, descriptor_set, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                                        DEFAULT_INSTANCE_BUFFER_BINDING, current_buffer, buffer->size);
 
   vkCmdBindDescriptorSets(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->layout, 0, 1,
                           &descriptor_set, 0, NULL);
@@ -161,17 +161,17 @@ b8 uniform_buffer_bind(uniform_buffer_t *buffer, graphics_pipeline_t *pipeline, 
   return true;
 }
 
-b8 uniform_buffer_update(uniform_buffer_t *buffer, uniform_buffer_object_t *object) {
+b8 instance_buffer_update(instance_buffer_t *buffer, instance_buffer_object_t *objects, u32 count) {
   void *mapped = NULL;
 
   array_retrieve(buffer->mappings, *buffer->current_frame_in_flight_index, &mapped);
 
-  platform_memory_copy(mapped, object, sizeof(uniform_buffer_object_t));
+  platform_memory_copy(mapped, objects, sizeof(instance_buffer_object_t) * count);
 
   return true;
 }
 
-b8 uniform_buffer_destroy(uniform_buffer_t *buffer) {
+b8 instance_buffer_destroy(instance_buffer_t *buffer) {
   vkDeviceWaitIdle(buffer->device);
 
   array_destroy(buffer->mappings);

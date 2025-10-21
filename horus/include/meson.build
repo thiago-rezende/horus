@@ -64,6 +64,7 @@ horus_headers = [
   'horus/renderer/buffers/index.h',
   'horus/renderer/buffers/vertex.h',
   'horus/renderer/buffers/uniform.h',
+  'horus/renderer/buffers/instance.h',
 ]
 
 horus_renderer_vulkan_headers = [

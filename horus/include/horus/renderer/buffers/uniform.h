@@ -16,7 +16,6 @@ typedef struct __uniform_buffer_object {
   f32 time;
 
   matrix4f32_t view;
-  matrix4f32_t model;
   matrix4f32_t projection;
 } uniform_buffer_object_t;
 

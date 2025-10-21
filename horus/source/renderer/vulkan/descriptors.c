@@ -5,17 +5,23 @@
 #include <horus/logger/logger.h>
 
 b8 renderer_vulkan_descriptor_pool_create(renderer_t *renderer) {
-  VkDescriptorPoolSize descriptor_pool_size = (VkDescriptorPoolSize){
-      .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-      .descriptorCount = RENDERER_VULKAN_FRAMES_IN_FLIGHT,
+  VkDescriptorPoolSize descriptor_pool_sizes[2] = {
+      (VkDescriptorPoolSize){
+          .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+          .descriptorCount = RENDERER_VULKAN_FRAMES_IN_FLIGHT * 2,
+      },
+      (VkDescriptorPoolSize){
+          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+          .descriptorCount = RENDERER_VULKAN_FRAMES_IN_FLIGHT * 2,
+      },
   };
 
   VkDescriptorPoolCreateInfo descriptor_pool_create_info = (VkDescriptorPoolCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
       .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
       .maxSets = RENDERER_VULKAN_FRAMES_IN_FLIGHT,
-      .poolSizeCount = 1,
-      .pPoolSizes = &descriptor_pool_size,
+      .poolSizeCount = 2,
+      .pPoolSizes = descriptor_pool_sizes,
   };
 
   if (vkCreateDescriptorPool(renderer->device, &descriptor_pool_create_info, NULL, &renderer->descriptor_pool) !=
@@ -91,7 +97,12 @@ array_t *renderer_vulkan_descriptor_sets_create(VkDevice device,
   return descriptor_sets;
 }
 
-b8 renderer_vulkan_descriptor_set_update(VkDevice device, VkDescriptorSet descriptor_set, VkBuffer buffer, u64 size) {
+b8 renderer_vulkan_descriptor_set_update(VkDevice device,
+                                         VkDescriptorSet descriptor_set,
+                                         VkDescriptorType descriptor_type,
+                                         u32 binding,
+                                         VkBuffer buffer,
+                                         u64 size) {
   VkDescriptorBufferInfo descriptor_buffer_info = (VkDescriptorBufferInfo){
       .buffer = buffer,
       .offset = 0,
@@ -101,10 +112,10 @@ b8 renderer_vulkan_descriptor_set_update(VkDevice device, VkDescriptorSet descri
   VkWriteDescriptorSet write_descriptor_set = (VkWriteDescriptorSet){
       .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
       .dstSet = descriptor_set,
-      .dstBinding = 0,
+      .dstBinding = binding,
       .dstArrayElement = 0,
       .descriptorCount = 1,
-      .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+      .descriptorType = descriptor_type,
       .pBufferInfo = &descriptor_buffer_info,
   };
 

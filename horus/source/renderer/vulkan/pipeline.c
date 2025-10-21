@@ -14,6 +14,9 @@
 
 #define RENDERER_PIPELINE_DYNAMIC_STATES_COUNT 2
 
+#define DEFAULT_UNIFORM_BUFFER_BINDING 0
+#define DEFAULT_INSTANCE_BUFFER_BINDING 1
+
 static const VkDynamicState renderer_pipeline_dynamic_state_scissor = VK_DYNAMIC_STATE_SCISSOR;
 static const VkDynamicState renderer_pipeline_dynamic_state_viewport = VK_DYNAMIC_STATE_VIEWPORT;
 
@@ -124,19 +127,28 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       .pAttachments = &pipeline_color_blend_attachment_state,
   };
 
-  VkDescriptorSetLayoutBinding descriptor_set_layout_binding = (VkDescriptorSetLayoutBinding){
-      .binding = 0,
-      .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-      .descriptorCount = 1,
-      .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-      .pImmutableSamplers = NULL,
+  VkDescriptorSetLayoutBinding descriptor_set_layout_bindings[2] = {
+      (VkDescriptorSetLayoutBinding){
+          .binding = DEFAULT_UNIFORM_BUFFER_BINDING,
+          .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+          .descriptorCount = 1,
+          .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+          .pImmutableSamplers = NULL,
+      },
+      (VkDescriptorSetLayoutBinding){
+          .binding = DEFAULT_INSTANCE_BUFFER_BINDING,
+          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+          .descriptorCount = 1,
+          .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+          .pImmutableSamplers = NULL,
+      },
   };
 
   VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info = (VkDescriptorSetLayoutCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
       .flags = (VkDescriptorSetLayoutCreateFlags)0,
-      .bindingCount = 1,
-      .pBindings = &descriptor_set_layout_binding,
+      .bindingCount = 2,
+      .pBindings = descriptor_set_layout_bindings,
       .pNext = NULL,
   };
 

@@ -2,6 +2,10 @@
 
 #include <sandbox/sandbox.h>
 
+#define QUAD_INDICES_COUNT 6
+#define QUAD_VERTICES_COUNT 4
+#define QUAD_INSTANCES_COUNT 2
+
 const char *default_shader_module_path = "assets/shaders/build/default.spv";
 
 shader_module_t *default_shader_module = NULL;
@@ -15,8 +19,8 @@ uniform_buffer_object_t uniform_buffer_object = {0};
 index_buffer_t *quad_index_buffer = NULL;
 vertex_buffer_t *quad_vertex_buffer = NULL;
 
-#define QUAD_INDICES_COUNT 6
-#define QUAD_VERTICES_COUNT 4
+instance_buffer_t *quad_instance_buffer = NULL;
+instance_buffer_object_t quad_instance_buffer_objects[QUAD_INSTANCES_COUNT] = {0};
 
 u32 quad_indices[QUAD_INDICES_COUNT] = {0, 1, 2, 2, 3, 0};
 
@@ -92,11 +96,19 @@ b8 on_create(application_t *application, renderer_t *renderer) {
 
   logger_info_format("<renderer:%p> <vertex_buffer:%p> created", (void *)renderer, (void *)quad_vertex_buffer);
 
+  quad_instance_buffer = instance_buffer_create(renderer, quad_instance_buffer_objects, QUAD_INSTANCES_COUNT);
+
+  logger_info_format("<renderer:%p> <instance_buffer:%p> created", (void *)renderer, (void *)quad_instance_buffer);
+
   return true;
 }
 
 b8 on_destroy(application_t *application, renderer_t *renderer) {
   (void)application; /* unused */
+
+  instance_buffer_destroy(quad_instance_buffer);
+
+  logger_info_format("<renderer:%p> <instance_buffer:%p> destroyed", (void *)renderer, (void *)quad_instance_buffer);
 
   vertex_buffer_destroy(quad_vertex_buffer);
 
@@ -261,11 +273,21 @@ b8 on_render(renderer_t *renderer) {
   uniform_buffer_object = (uniform_buffer_object_t){
       .time = elapsed_time,
       .view = matrix4f32_identity(),
-      .model = matrix4f32_identity(),
       .projection = matrix4f32_identity(),
   };
 
   uniform_buffer_update(uniform_buffer, &uniform_buffer_object);
+
+  /* instance buffer object update */
+  quad_instance_buffer_objects[0] = (instance_buffer_object_t){
+      .model = matrix4f32_translate(matrix4f32_identity(), (vector3f32_t){{-0.4f, -0.3f, 0}}),
+  };
+
+  quad_instance_buffer_objects[1] = (instance_buffer_object_t){
+      .model = matrix4f32_translate(matrix4f32_identity(), (vector3f32_t){{0.4f, 0.3f, 0}}),
+  };
+
+  instance_buffer_update(quad_instance_buffer, quad_instance_buffer_objects, QUAD_INSTANCES_COUNT);
 
   /* graphics pipeline setup */
   if (!graphics_pipeline_bind(default_graphics_pipeline, renderer)) {
@@ -298,8 +320,16 @@ b8 on_render(renderer_t *renderer) {
     return false;
   }
 
+  /* geometry instances setup */
+  if (!instance_buffer_bind(quad_instance_buffer, default_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> <instance_buffer:%p> instance buffer binding failed", renderer,
+                           default_graphics_pipeline, quad_instance_buffer);
+
+    return false;
+  }
+
   /* geometry draw call */
-  if (!renderer_draw_indexed(renderer, QUAD_INDICES_COUNT, 1)) {
+  if (!renderer_draw_indexed(renderer, QUAD_INDICES_COUNT, QUAD_INSTANCES_COUNT)) {
     logger_error_format("<renderer:%p> draw indexed command failed", renderer);
 
     return false;

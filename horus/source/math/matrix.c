@@ -1,7 +1,8 @@
 /* horus math layer */
 #include <horus/math/matrix.h>
 
-#include <horus/logger/logger.h>
+/* horus platform layer */
+#include <horus/platform/memory.h>
 
 matrix4f32_t matrix4f32_identity(void) {
   matrix4f32_t matrix = (matrix4f32_t){0};
@@ -27,4 +28,14 @@ matrix4f32_t matrix4f32_multiply(matrix4f32_t a, matrix4f32_t b) {
   }
 
   return matrix;
+}
+
+matrix4f32_t matrix4f32_translate(matrix4f32_t matrix, vector3f32_t vector) {
+  matrix4f32_t result = {0};
+
+  platform_memory_copy(&result, &matrix, sizeof(matrix4f32_t));
+
+  result.column3 += (__v4f32){vector.x, vector.y, vector.z, 0.0f};
+
+  return result;
 }
