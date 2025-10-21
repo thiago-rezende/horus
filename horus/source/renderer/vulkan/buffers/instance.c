@@ -18,6 +18,7 @@
 
 #define DEFAULT_INSTANCE_BUFFER_BINDING 1
 
+/* TODO: update to use staging buffers enabling high speed memory */
 struct __instance_buffer {
   VkDevice device;
 
