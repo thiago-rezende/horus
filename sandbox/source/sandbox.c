@@ -31,6 +31,14 @@ vertex_t quad_vertices[QUAD_VERTICES_COUNT] = {
     (vertex_t){.position = {{-0.5f, 0.5f, 0.0f}}, .color = {{0.0f, 1.0f, 1.0f, 1.0f}}},
 };
 
+f32 quad_scale_speed = 2.0f;
+f32 quad_position_speed = 1.0f;
+f32 quad_rotation_angle = 1.0f;
+
+vector3f32_t quad_scale = {{1.0f, 1.0f, 1.0f}};
+vector3f32_t quad_position = {{-0.4f, -0.3f, 0}};
+vector3f32_t quad_rotation = {{0.0f, 0.0f, 0.0f}};
+
 application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
   platform_memory_clear(application, sizeof(application_t));
@@ -225,6 +233,8 @@ b8 on_update(f64 timestep) {
   if (input_mouse_button_is_pressed(MOUSE_BUTTON_LEFT)) {
     logger_debug_format("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
                         input_mouse_button_string(MOUSE_BUTTON_LEFT));
+
+    quad_rotation.z += quad_rotation_angle;
   }
 
   if (input_mouse_button_is_released(MOUSE_BUTTON_LEFT)) {
@@ -245,6 +255,8 @@ b8 on_update(f64 timestep) {
   if (input_mouse_button_is_pressed(MOUSE_BUTTON_RIGHT)) {
     logger_debug_format("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
                         input_mouse_button_string(MOUSE_BUTTON_RIGHT));
+
+    quad_rotation.z -= quad_rotation_angle;
   }
 
   if (input_mouse_button_is_released(MOUSE_BUTTON_RIGHT)) {
@@ -255,11 +267,33 @@ b8 on_update(f64 timestep) {
   if (input_mouse_scroll_is_up()) {
     logger_debug_format("<on_update> <timestep:%f> <scroll:%s> is up", timestep,
                         input_mouse_scroll_direction_string(MOUSE_SCROLL_DIRECTION_UP));
+
+    quad_scale.x += quad_scale_speed * timestep;
+    quad_scale.y += quad_scale_speed * timestep;
   }
 
   if (input_mouse_scroll_is_down()) {
     logger_debug_format("<on_update> <timestep:%f> <scroll:%s> is down", timestep,
                         input_mouse_scroll_direction_string(MOUSE_SCROLL_DIRECTION_DOWN));
+
+    quad_scale.x -= quad_scale_speed * timestep;
+    quad_scale.y -= quad_scale_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_RIGHT)) {
+    quad_position.x += quad_position_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT)) {
+    quad_position.x -= quad_position_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_UP)) {
+    quad_position.y -= quad_position_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_DOWN)) {
+    quad_position.y += quad_position_speed * timestep;
   }
 
   return true;
@@ -279,8 +313,13 @@ b8 on_render(renderer_t *renderer) {
   uniform_buffer_update(uniform_buffer, &uniform_buffer_object);
 
   /* instance buffer object update */
+  matrix4f32_t quad_model_matrix = matrix4f32_identity();
+  quad_model_matrix = matrix4f32_scale(quad_model_matrix, quad_scale);
+  quad_model_matrix = matrix4f32_translate(quad_model_matrix, quad_position);
+  quad_model_matrix = matrix4f32_rotate_euler(quad_model_matrix, quad_rotation);
+
   quad_instance_buffer_objects[0] = (instance_buffer_object_t){
-      .model = matrix4f32_translate(matrix4f32_identity(), (vector3f32_t){{-0.4f, -0.3f, 0}}),
+      .model = quad_model_matrix,
   };
 
   quad_instance_buffer_objects[1] = (instance_buffer_object_t){
