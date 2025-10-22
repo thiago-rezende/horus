@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+ - [5c36604] chore(sandbox): update sandbox application to use the new matrix rotation and scaling functions (Thiago Rezende)
+ - [3544ac6] test(math): add matrix4f32 euler rotation function unit test (Thiago Rezende)
+ - [40f64f9] feat(math): add matrix4f32 euler rotation function (Thiago Rezende)
+ - [13ebbb7] test(math): add matrix4f32 scaling function unit test (Thiago Rezende)
+ - [8827137] feat(math): add matrix4f32 scaling function (Thiago Rezende)
+ - [c20e030] feat(window|windows): update default cursor to IDC_ARROW (Thiago Rezende)
+ - [ae02abd] refactor(input): update keyboard pressed state check to return true with held state too (Thiago Rezende)
+ - [abbe78f] chore(renderer|vulkan): add TODO for future refactor of the instance buffer to use staging buffers (Thiago Rezende)
+ - [67eaba0] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [afc747b] docs: update the sandbox screenshot to show the instance buffer support (Thiago Rezende)
  - [c9ad31e] feat(renderer): add instance buffer support and its vulkan implementation (Thiago Rezende)
  - [1d65893] chore(assets): remove unused shader code from default.slang (Thiago Rezende)
