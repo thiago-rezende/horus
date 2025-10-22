@@ -68,6 +68,8 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
 
   AdjustWindowRectEx(&rectangle, WS_OVERLAPPEDWINDOW, 0, WS_EX_APPWINDOW);
 
+  HCURSOR hArrowCursor = LoadCursor(NULL, IDC_ARROW);
+
   window->context.window_class.cbSize = sizeof(window->context.window_class);
   window->context.window_class.style = CS_HREDRAW | CS_VREDRAW;
   window->context.window_class.lpfnWndProc = windows_handle_event_setup;
@@ -75,7 +77,7 @@ platform_window_t *platform_window_create(char *title, platform_window_size_t si
   window->context.window_class.cbWndExtra = 0;
   window->context.window_class.hInstance = window->context.hinstance;
   window->context.window_class.hIcon = NULL;
-  window->context.window_class.hCursor = NULL;
+  window->context.window_class.hCursor = hArrowCursor;
   window->context.window_class.hbrBackground = GetStockObject(BLACK_BRUSH);
   window->context.window_class.lpszMenuName = NULL;
   window->context.window_class.lpszClassName = window->context.window_class_name;
