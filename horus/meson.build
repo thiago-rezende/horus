@@ -106,6 +106,11 @@ horus_dependencies = [
 
 # horus dependencies [ linux ]
 if host_machine.system() == 'linux'
+  cc = meson.get_compiler('c')
+
+  # horus system dependencies [ linux ]
+  m_dep = cc.find_library('m', required: true)
+
   # horus window dependencies [ linux ]
   xcb_dep = dependency('xcb')
   xcb_xkb_dep = dependency('xcb-xkb')
@@ -115,6 +120,9 @@ if host_machine.system() == 'linux'
   vulkan_dep = dependency('vulkan')
 
   horus_dependencies += [
+    # horus system dependencies [ linux ]
+    m_dep,
+
     # horus window dependencies [ linux ]
     xcb_dep,
     xcb_xkb_dep,

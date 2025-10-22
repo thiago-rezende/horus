@@ -56,3 +56,6 @@ matrix4f32_t matrix4f32_multiply(matrix4f32_t a, matrix4f32_t b);
 
 /* TODO: inline all possible matrix functions */
 matrix4f32_t matrix4f32_translate(matrix4f32_t matrix, vector3f32_t vector);
+
+/* TODO: inline all possible matrix functions */
+matrix4f32_t matrix4f32_rotate_euler(matrix4f32_t matrix, vector3f32_t degrees);
