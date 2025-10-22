@@ -4,6 +4,20 @@
 /* horus platform layer */
 #include <horus/platform/memory.h>
 
+matrix4f32_t matrix4f32_scale(matrix4f32_t matrix, vector3f32_t vector) {
+  matrix4f32_t result = {0};
+
+  platform_memory_copy(&result, &matrix, sizeof(matrix4f32_t));
+
+  result.column0 *= (__v4f32){vector.x, vector.x, vector.x, 1.0f};
+
+  result.column1 *= (__v4f32){vector.y, vector.y, vector.y, 1.0f};
+
+  result.column2 *= (__v4f32){vector.z, vector.z, vector.z, 1.0f};
+
+  return result;
+}
+
 matrix4f32_t matrix4f32_identity(void) {
   matrix4f32_t matrix = (matrix4f32_t){0};
 

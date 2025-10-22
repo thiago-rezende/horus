@@ -46,6 +46,9 @@ typedef union __matrix4f32 {
 } matrix4f32_t;
 
 /* TODO: inline all possible matrix functions */
+matrix4f32_t matrix4f32_scale(matrix4f32_t matrix, vector3f32_t vector);
+
+/* TODO: inline all possible matrix functions */
 matrix4f32_t matrix4f32_identity(void);
 
 /* TODO: inline all possible matrix functions */
