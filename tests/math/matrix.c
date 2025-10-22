@@ -233,10 +233,8 @@ static void test_matrix4f32_rotate_euler(void **state) {
 
 int main(void) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_matrix4f32_scale),
-      cmocka_unit_test(test_matrix4f32_identity),
-      cmocka_unit_test(test_matrix4f32_multiply),
-      cmocka_unit_test(test_matrix4f32_translate),
+      cmocka_unit_test(test_matrix4f32_scale),        cmocka_unit_test(test_matrix4f32_identity),
+      cmocka_unit_test(test_matrix4f32_multiply),     cmocka_unit_test(test_matrix4f32_translate),
       cmocka_unit_test(test_matrix4f32_rotate_euler),
   };
 
