@@ -546,7 +546,17 @@ b8 platform_input_keyboard_keycode_is_held(keyboard_keycode_t keycode) {
 }
 
 b8 platform_input_keyboard_keycode_is_pressed(keyboard_keycode_t keycode) {
-  return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_PRESSED;
+  keyboard_keycode_state_t state = __platform_input_keyboard_keycode_state(keycode);
+
+  if (state == KEYBOARD_KEYCODE_STATE_PRESSED) {
+    return true;
+  }
+
+  if (state == KEYBOARD_KEYCODE_STATE_HELD) {
+    return true;
+  }
+
+  return false;
 }
 
 b8 platform_input_keyboard_keycode_is_released(keyboard_keycode_t keycode) {
