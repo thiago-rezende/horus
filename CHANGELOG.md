@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+ - [9862dea] lint: fix clang-format errors in matrix unit tests (Thiago Rezende)
+ - [341039a] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [5c36604] chore(sandbox): update sandbox application to use the new matrix rotation and scaling functions (Thiago Rezende)
  - [3544ac6] test(math): add matrix4f32 euler rotation function unit test (Thiago Rezende)
  - [40f64f9] feat(math): add matrix4f32 euler rotation function (Thiago Rezende)
