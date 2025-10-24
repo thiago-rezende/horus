@@ -25,10 +25,10 @@ instance_buffer_object_t quad_instance_buffer_objects[QUAD_INSTANCES_COUNT] = {0
 u32 quad_indices[QUAD_INDICES_COUNT] = {0, 1, 2, 2, 3, 0};
 
 vertex_t quad_vertices[QUAD_VERTICES_COUNT] = {
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.0f}}, .color = {{1.0f, 1.0f, 0.0f, 1.0f}}},
-    (vertex_t){.position = {{0.5f, -0.5f, 0.0f}}, .color = {{1.0f, 1.0f, 0.0f, 1.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.0f}}, .color = {{0.0f, 1.0f, 1.0f, 1.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.0f}}, .color = {{0.0f, 1.0f, 1.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.0f}}, .color = {{255, 255, 0, 255}}},
+    (vertex_t){.position = {{0.5f, -0.5f, 0.0f}}, .color = {{255, 255, 0, 255}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.0f}}, .color = {{0, 255, 255, 255}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.0f}}, .color = {{0, 255, 255, 255}}},
 };
 
 f32 quad_scale_speed = 2.0f;

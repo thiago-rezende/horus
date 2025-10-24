@@ -56,7 +56,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
   VkVertexInputAttributeDescription vertex_input_attribute_description_color = (VkVertexInputAttributeDescription){
       .binding = 0,
       .location = 1,
-      .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+      .format = VK_FORMAT_R8G8B8A8_UNORM,
       .offset = offsetof(vertex_t, color),
   };
 
