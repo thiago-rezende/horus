@@ -7,6 +7,29 @@
 #define HORUS_ENTRYPOINT_DISABLE
 #include <horus/horus.h>
 
+static void test_vector4u8_add(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector4u8_t a = (vector4u8_t){.x = 1, .y = 1, .z = 1, .w = 0};
+  vector4u8_t b = (vector4u8_t){.x = 1, .y = 1, .z = 1, .w = 0};
+
+  /* expected result */
+  vector4u8_t expected = (vector4u8_t){.x = 2, .y = 2, .z = 2, .w = 0};
+
+  /* function call */
+  vector4u8_t result = vector4u8_add(a, b);
+
+  /* general assertion */
+  assert_memory_equal(&result, &expected, sizeof(vector4u8_t));
+
+  /* union assertions */
+  assert_int_equal(result.x, expected.r);
+  assert_int_equal(result.y, expected.g);
+  assert_int_equal(result.z, expected.b);
+  assert_int_equal(result.w, expected.a);
+}
+
 static void test_vector3f32_add(void **state) {
   (void)state; /* unused */
 
@@ -54,6 +77,7 @@ static void test_vector4f32_add(void **state) {
 
 int main(void) {
   const struct CMUnitTest tests[] = {
+      cmocka_unit_test(test_vector4u8_add),
       cmocka_unit_test(test_vector3f32_add),
       cmocka_unit_test(test_vector4f32_add),
   };
