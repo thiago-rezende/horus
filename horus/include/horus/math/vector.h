@@ -3,9 +3,26 @@
 /* horus core layer */
 #include <horus/core/types.h>
 
-/* compiler vectorization types */
-typedef f32 __v3f32 __attribute__((vector_size(sizeof(f32) * 4))); /* vector_size should be a power of 2 */
+/* compiler vectorization types [ vector_size should be a power of 2 ] */
+typedef u8 __v4u8 __attribute__((vector_size(sizeof(u8) * 4)));
+
+typedef f32 __v3f32 __attribute__((vector_size(sizeof(f32) * 4)));
 typedef f32 __v4f32 __attribute__((vector_size(sizeof(f32) * 4)));
+
+typedef union __vector4u8 {
+  u8 buffer[4];
+
+  __v4u8 vector;
+
+  /* clang-format off */
+  struct {
+    union { u8 x, r; };
+    union { u8 y, g; };
+    union { u8 z, b; };
+    union { u8 w, a; };
+  };
+  /* clang-format on */
+} vector4u8_t;
 
 typedef union __vector3f32 {
   f32 buffer[4];
@@ -39,6 +56,9 @@ typedef union __vector4f32 {
   };
   /* clang-format on */
 } vector4f32_t;
+
+/* TODO: inline all possible vector functions */
+vector4u8_t vector4u8_add(vector4u8_t a, vector4u8_t b);
 
 /* TODO: inline all possible vector functions */
 vector3f32_t vector3f32_add(vector3f32_t a, vector3f32_t b);

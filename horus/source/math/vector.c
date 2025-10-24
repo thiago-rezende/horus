@@ -1,6 +1,14 @@
 /* horus math layer */
 #include <horus/math/vector.h>
 
+vector4u8_t vector4u8_add(vector4u8_t a, vector4u8_t b) {
+  vector4u8_t result;
+
+  result.vector = a.vector + b.vector;
+
+  return result;
+}
+
 vector3f32_t vector3f32_add(vector3f32_t a, vector3f32_t b) {
   vector3f32_t result;
 
