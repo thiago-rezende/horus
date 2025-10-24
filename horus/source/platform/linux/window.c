@@ -259,11 +259,6 @@ b8 platform_window_process_events(platform_window_t *window) {
         (void)button_release_event;
 
         if (__platform_window_is_mouse_button_scroll(button_release_event->detail)) {
-          if (!__platform_input_mouse_scroll_set_state(MOUSE_SCROLL_STATE_NONE)) {
-            logger_error_format("<window:%p> <state:%s> __platform_input_mouse_scroll_set_state failed", (void *)window,
-                                input_mouse_scroll_state_string(MOUSE_SCROLL_STATE_NONE));
-          }
-
           break;
         }
 
