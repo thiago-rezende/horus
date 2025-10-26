@@ -35,6 +35,14 @@ vector3f32_t vector3f32_cross(vector3f32_t a, vector3f32_t b) {
   return result;
 }
 
+vector3f32_t vector3f32_scalar(vector3f32_t vector, f32 scalar) {
+  vector3f32_t result;
+
+  result.vector = vector.vector * (__v3f32){scalar, scalar, scalar, 1.0f};
+
+  return result;
+}
+
 vector3f32_t vector3f32_hadamard(vector3f32_t a, vector3f32_t b) {
   vector3f32_t result;
 

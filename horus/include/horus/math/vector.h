@@ -70,6 +70,9 @@ f32 vector3f32_dot(vector3f32_t a, vector3f32_t b);
 vector3f32_t vector3f32_cross(vector3f32_t a, vector3f32_t b);
 
 /* TODO: inline all possible vector functions */
+vector3f32_t vector3f32_scalar(vector3f32_t vector, f32 scalar);
+
+/* TODO: inline all possible vector functions */
 vector3f32_t vector3f32_hadamard(vector3f32_t a, vector3f32_t b);
 
 /* TODO: inline all possible vector functions */
