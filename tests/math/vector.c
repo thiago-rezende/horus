@@ -52,6 +52,67 @@ static void test_vector3f32_add(void **state) {
   assert_float_equal(result.z, expected.b, epsilon_f32);
 }
 
+static void test_vector3f32_dot(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector3f32_t a = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
+  vector3f32_t b = (vector3f32_t){.x = 1.0f, .y = 2.0f, .z = 3.0f, .__padding = 0};
+
+  /* expected result */
+  f32 expected = 6.0f;
+
+  /* function call */
+  f32 result = vector3f32_dot(a, b);
+
+  /* general assertion */
+  assert_float_equal(result, expected, epsilon_f32);
+}
+
+static void test_vector3f32_cross(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector3f32_t a = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
+  vector3f32_t b = (vector3f32_t){.x = 1.0f, .y = 2.0f, .z = 3.0f, .__padding = 0};
+
+  /* expected result */
+  vector3f32_t expected = (vector3f32_t){.x = 1.0f, .y = -2.0f, .z = 1.0f, .__padding = 0};
+
+  /* function call */
+  vector3f32_t result = vector3f32_cross(a, b);
+
+  /* general assertion */
+  assert_memory_equal(&result, &expected, sizeof(vector3f32_t));
+
+  /* union assertions */
+  assert_float_equal(result.x, expected.r, epsilon_f32);
+  assert_float_equal(result.y, expected.g, epsilon_f32);
+  assert_float_equal(result.z, expected.b, epsilon_f32);
+}
+
+static void test_vector3f32_hadamard(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector3f32_t a = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
+  vector3f32_t b = (vector3f32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .__padding = 0};
+
+  /* expected result */
+  vector3f32_t expected = (vector3f32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .__padding = 0};
+
+  /* function call */
+  vector3f32_t result = vector3f32_hadamard(a, b);
+
+  /* general assertion */
+  assert_memory_equal(&result, &expected, sizeof(vector3f32_t));
+
+  /* union assertions */
+  assert_float_equal(result.x, expected.r, epsilon_f32);
+  assert_float_equal(result.y, expected.g, epsilon_f32);
+  assert_float_equal(result.z, expected.b, epsilon_f32);
+}
+
 static void test_vector4f32_add(void **state) {
   (void)state; /* unused */
 
@@ -77,8 +138,14 @@ static void test_vector4f32_add(void **state) {
 
 int main(void) {
   const struct CMUnitTest tests[] = {
+      /* vector4u8_t tests */
       cmocka_unit_test(test_vector4u8_add),
+      /* vector3f32 tests */
       cmocka_unit_test(test_vector3f32_add),
+      cmocka_unit_test(test_vector3f32_dot),
+      cmocka_unit_test(test_vector3f32_cross),
+      cmocka_unit_test(test_vector3f32_hadamard),
+      /* vector4f32 tests */
       cmocka_unit_test(test_vector4f32_add),
   };
 
