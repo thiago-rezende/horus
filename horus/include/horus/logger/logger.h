@@ -16,17 +16,17 @@ typedef enum __logger_level {
 b8 __logger_general(logger_level_t level, const char *message);
 b8 __logger_general_format(logger_level_t level, const char *message, ...);
 
-#define logger_critical(message, ...) __logger_general(LOGGER_LEVEL_CRITICAL, message)
+#define logger_critical(message) __logger_general(LOGGER_LEVEL_CRITICAL, message)
 
-#define logger_error(message, ...) __logger_general(LOGGER_LEVEL_ERROR, message)
+#define logger_error(message) __logger_general(LOGGER_LEVEL_ERROR, message)
 
-#define logger_warning(message, ...) __logger_general(LOGGER_LEVEL_WARNING, message)
+#define logger_warning(message) __logger_general(LOGGER_LEVEL_WARNING, message)
 
-#define logger_info(message, ...) __logger_general(LOGGER_LEVEL_INFO, message)
+#define logger_info(message) __logger_general(LOGGER_LEVEL_INFO, message)
 
-#define logger_debug(message, ...) __logger_general(LOGGER_LEVEL_DEBUG, message)
+#define logger_debug(message) __logger_general(LOGGER_LEVEL_DEBUG, message)
 
-#define logger_trace(message, ...) __logger_general(LOGGER_LEVEL_TRACE, message)
+#define logger_trace(message) __logger_general(LOGGER_LEVEL_TRACE, message)
 
 #define logger_critical_format(message, ...) __logger_general_format(LOGGER_LEVEL_CRITICAL, message, __VA_ARGS__)
 
