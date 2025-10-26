@@ -61,13 +61,13 @@ matrix4f32_t matrix4f32_rotate_euler(matrix4f32_t matrix, vector3f32_t degrees) 
 
   platform_memory_copy(&result, &matrix, sizeof(matrix4f32_t));
 
-  float radians_x = degrees.x * (pi_f32 / 180.0f);
-  float radians_y = degrees.y * (pi_f32 / 180.0f);
-  float radians_z = degrees.z * (pi_f32 / 180.0f);
+  f32 radians_x = degrees.x * (pi_f32 / 180.0f);
+  f32 radians_y = degrees.y * (pi_f32 / 180.0f);
+  f32 radians_z = degrees.z * (pi_f32 / 180.0f);
 
   if (radians_x != 0.0f) {
-    float cx = cosf(radians_x);
-    float sx = sinf(radians_x);
+    f32 cx = cosf(radians_x);
+    f32 sx = sinf(radians_x);
 
     __v4f32 c1 = result.column1;
     __v4f32 c2 = result.column2;
@@ -77,8 +77,8 @@ matrix4f32_t matrix4f32_rotate_euler(matrix4f32_t matrix, vector3f32_t degrees) 
   }
 
   if (radians_y != 0.0f) {
-    float cy = cosf(radians_y);
-    float sy = sinf(radians_y);
+    f32 cy = cosf(radians_y);
+    f32 sy = sinf(radians_y);
 
     __v4f32 c0 = result.column0;
     __v4f32 c2 = result.column2;
@@ -88,8 +88,8 @@ matrix4f32_t matrix4f32_rotate_euler(matrix4f32_t matrix, vector3f32_t degrees) 
   }
 
   if (radians_z != 0.0f) {
-    float cz = cosf(radians_z);
-    float sz = sinf(radians_z);
+    f32 cz = cosf(radians_z);
+    f32 sz = sinf(radians_z);
 
     __v4f32 c0 = result.column0;
     __v4f32 c1 = result.column1;

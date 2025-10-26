@@ -11,11 +11,11 @@ static void test_quaternionf32_add(void **state) {
   (void)state; /* unused */
 
   /* default attrubutes */
-  quaternionf32_t a = (quaternionf32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
-  quaternionf32_t b = (quaternionf32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
+  quaternionf32_t a = (quaternionf32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0.0f};
+  quaternionf32_t b = (quaternionf32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0.0f};
 
   /* expected result */
-  quaternionf32_t expected = (quaternionf32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .w = 0};
+  quaternionf32_t expected = (quaternionf32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .w = 0.0f};
 
   /* function call */
   quaternionf32_t result = quaternionf32_add(a, b);
