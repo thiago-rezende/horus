@@ -11,7 +11,6 @@ quaternionf32_t quaternionf32_add(quaternionf32_t a, quaternionf32_t b) {
   return result;
 }
 
-/* TODO: inline all possible quaternion functions */
 quaternionf32_t quaternionf32_multiply(quaternionf32_t a, quaternionf32_t b) {
   quaternionf32_t result;
 
@@ -24,7 +23,6 @@ quaternionf32_t quaternionf32_multiply(quaternionf32_t a, quaternionf32_t b) {
   return result;
 }
 
-/* TODO: inline all possible quaternion functions */
 quaternionf32_t quaternionf32_rotate_euler(quaternionf32_t quaternion, vector3f32_t degrees) {
   quaternionf32_t result;
   quaternionf32_t rotation;
@@ -56,6 +54,37 @@ quaternionf32_t quaternionf32_rotate_euler(quaternionf32_t quaternion, vector3f3
   rotation.w = cx * cy_cz - sx * sy_sz;
 
   result = quaternionf32_multiply(quaternion, rotation);
+
+  return result;
+}
+
+matrix4f32_t quaternionf32_to_matrix(quaternionf32_t quaternion) {
+  matrix4f32_t result = matrix4f32_identity();
+
+  f32 x = quaternion.x;
+  f32 y = quaternion.y;
+  f32 z = quaternion.z;
+  f32 w = quaternion.w;
+
+  f32 x2 = x + x;
+  f32 y2 = y + y;
+  f32 z2 = z + z;
+
+  f32 xx = x * x2;
+  f32 yy = y * y2;
+  f32 zz = z * z2;
+
+  f32 xy = x * y2;
+  f32 xz = x * z2;
+  f32 yz = y * z2;
+
+  f32 wx = w * x2;
+  f32 wy = w * y2;
+  f32 wz = w * z2;
+
+  result.column0 = (__v4f32){1.0f - yy - zz, xy + wz, xz - wy, 0.0f};
+  result.column1 = (__v4f32){xy - wz, 1.0f - xx - zz, yz + wx, 0.0f};
+  result.column2 = (__v4f32){xz + wy, yz - wx, 1.0f - xx - yy, 0.0f};
 
   return result;
 }

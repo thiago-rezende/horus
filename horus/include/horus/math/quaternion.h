@@ -4,6 +4,7 @@
 #include <horus/core/types.h>
 
 /* horus math layer */
+#include <horus/math/matrix.h>
 #include <horus/math/vector.h>
 
 typedef union __quaternionf32 {
@@ -29,3 +30,6 @@ quaternionf32_t quaternionf32_multiply(quaternionf32_t a, quaternionf32_t b);
 
 /* TODO: inline all possible quaternion functions */
 quaternionf32_t quaternionf32_rotate_euler(quaternionf32_t quaternion, vector3f32_t degrees);
+
+/* TODO: inline all possible quaternion functions */
+matrix4f32_t quaternionf32_to_matrix(quaternionf32_t quaternion);
