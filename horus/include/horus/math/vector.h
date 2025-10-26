@@ -64,4 +64,13 @@ vector4u8_t vector4u8_add(vector4u8_t a, vector4u8_t b);
 vector3f32_t vector3f32_add(vector3f32_t a, vector3f32_t b);
 
 /* TODO: inline all possible vector functions */
+f32 vector3f32_dot(vector3f32_t a, vector3f32_t b);
+
+/* TODO: inline all possible vector functions */
+vector3f32_t vector3f32_cross(vector3f32_t a, vector3f32_t b);
+
+/* TODO: inline all possible vector functions */
+vector3f32_t vector3f32_hadamard(vector3f32_t a, vector3f32_t b);
+
+/* TODO: inline all possible vector functions */
 vector4f32_t vector4f32_add(vector4f32_t a, vector4f32_t b);
