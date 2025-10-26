@@ -30,7 +30,11 @@ b8 __camera_update_orthogonal(camera_t *camera, camera_update_info_t info);
 b8 __camera_update_first_person(camera_t *camera, camera_update_info_t info);
 b8 __camera_update_third_person(camera_t *camera, camera_update_info_t info);
 
+b8 __camera_update_perspective(camera_t *camera, camera_update_info_t info);
+b8 __camera_update_orthographic(camera_t *camera, camera_update_info_t info);
+
 typedef b8 (*camera_update_fn_t)(camera_t *camera, camera_update_info_t info);
+typedef b8 (*camera_update_projection_fn_t)(camera_t *camera, camera_update_info_t info);
 
 static camera_update_fn_t camera_update_functions[CAMERA_TYPE_COUNT] = {
     [CAMERA_TYPE_NONE] = NULL,
@@ -40,6 +44,12 @@ static camera_update_fn_t camera_update_functions[CAMERA_TYPE_COUNT] = {
     [CAMERA_TYPE_ORTHOGONAL] = __camera_update_orthogonal,
     [CAMERA_TYPE_FIRST_PERSON] = __camera_update_first_person,
     [CAMERA_TYPE_THIRD_PERSON] = __camera_update_third_person,
+};
+
+static camera_update_projection_fn_t camera_update_projection_functions[CAMERA_TYPE_COUNT] = {
+    [CAMERA_TYPE_NONE] = NULL,
+    [CAMERA_PROJECTION_PERSPECTIVE] = __camera_update_perspective,
+    [CAMERA_PROJECTION_ORTHOGRAPHIC] = __camera_update_orthographic,
 };
 
 camera_t *camera_create(camera_create_info_t info) {
@@ -86,15 +96,34 @@ b8 camera_update(camera_t *camera, camera_update_info_t info) {
   (void)camera; /* unused */
 
   if (camera->type < CAMERA_TYPE_NONE || camera->type >= CAMERA_TYPE_COUNT) {
-    logger_critical_format("<camera_type:%u> unknown camera type", camera->type);
+    logger_critical_format("<camera:%p> <type:%d> unknown camera type", camera, camera->type);
+
+    return false;
+  }
+
+  if (camera->projection < CAMERA_PROJECTION_NONE || camera->projection >= CAMERA_PROJECTION_COUNT) {
+    logger_critical_format("<camera:%p> <type:%s> <projection:%d> unknown camera projection", camera,
+                           camera_type_string(camera->type), camera->projection);
 
     return false;
   }
 
   camera_update_fn_t camera_update_function = camera_update_functions[camera->type];
+  camera_update_projection_fn_t camera_update_projection_function =
+      camera_update_projection_functions[camera->projection];
 
-  if (camera_update_function) {
-    return camera_update_function(camera, info);
+  if (camera_update_function && !camera_update_function(camera, info)) {
+    logger_critical_format("<camera:%p> <type:%s> <projection:%s> camera update function failed", camera,
+                           camera_type_string(camera->type), camera_projection_string(camera->projection));
+
+    return false;
+  }
+
+  if (camera_update_projection_function && !camera_update_projection_function(camera, info)) {
+    logger_critical_format("<camera:%p> <type:%s> <projection:%s> camera update projection function failed", camera,
+                           camera_type_string(camera->type), camera_projection_string(camera->projection));
+
+    return false;
   }
 
   return true;
@@ -166,6 +195,24 @@ b8 __camera_update_third_person(camera_t *camera, camera_update_info_t info) {
   (void)camera; /* unused */
 
   logger_critical("<__camera_update_third_person> not implemented");
+
+  return false;
+}
+
+b8 __camera_update_perspective(camera_t *camera, camera_update_info_t info) {
+  (void)info;   /* unused */
+  (void)camera; /* unused */
+
+  logger_critical("<__camera_update_perspective> not implemented");
+
+  return false;
+}
+
+b8 __camera_update_orthographic(camera_t *camera, camera_update_info_t info) {
+  (void)info;   /* unused */
+  (void)camera; /* unused */
+
+  logger_critical("<__camera_update_orthographic> not implemented");
 
   return false;
 }
