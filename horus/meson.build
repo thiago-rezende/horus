@@ -23,6 +23,7 @@ horus_sources = [
   # horus math layer
   'source/math/matrix.c',
   'source/math/vector.c',
+  'source/math/quaternion.c',
 
   # horus application layer
   'source/application/application.c',

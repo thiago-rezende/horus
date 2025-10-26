@@ -50,6 +50,7 @@ horus_headers = [
   # horus math layer
   'horus/math/matrix.h',
   'horus/math/vector.h',
+  'horus/math/quaternion.h',
 
   # horus types layer
   'horus/types/vertex.h',

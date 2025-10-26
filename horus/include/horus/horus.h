@@ -43,14 +43,15 @@
 #include <horus/events/keyboard.h>
 
 /* horus math layer */
-#include "horus/math/matrix.h"
-#include "horus/math/vector.h"
+#include <horus/math/matrix.h>
+#include <horus/math/vector.h>
+#include <horus/math/quaternion.h>
 
 /* horus types layer */
-#include "horus/types/vertex.h"
+#include <horus/types/vertex.h>
 
 /* horus camera layer */
-#include "horus/camera/camera.h"
+#include <horus/camera/camera.h>
 
 /* horus renderer layer */
 #include <horus/renderer/shader.h>
