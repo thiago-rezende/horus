@@ -53,6 +53,48 @@ static void test_quaternionf32_multiply(void **state) {
   assert_float_equal(result.w, expected.w, epsilon_f32);
 }
 
+static void test_quaternionf32_to_matrix(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  quaternionf32_t quaternion = (quaternionf32_t){.x = 0.0f, .y = 1.0f, .z = 0.0f, .w = 0.0f};
+
+  /* expected result */
+  matrix4f32_t expected = (matrix4f32_t){
+      .column0 = {-1, 0, 0, 0},
+      .column1 = {0, 1, 0, 0},
+      .column2 = {0, 0, -1, 0},
+      .column3 = {0, 0, 0, 1},
+  };
+
+  /* function call */
+  matrix4f32_t result = quaternionf32_to_matrix(quaternion);
+
+  /* general assertion */
+  assert_memory_equal(&result, &expected, sizeof(quaternionf32_t));
+
+  /* union assertions */
+  assert_float_equal(result.x0, expected.x0, epsilon_f32);
+  assert_float_equal(result.y0, expected.y0, epsilon_f32);
+  assert_float_equal(result.z0, expected.z0, epsilon_f32);
+  assert_float_equal(result.w0, expected.w0, epsilon_f32);
+
+  assert_float_equal(result.x1, expected.x1, epsilon_f32);
+  assert_float_equal(result.y1, expected.y1, epsilon_f32);
+  assert_float_equal(result.z1, expected.z1, epsilon_f32);
+  assert_float_equal(result.w1, expected.w1, epsilon_f32);
+
+  assert_float_equal(result.x2, expected.x2, epsilon_f32);
+  assert_float_equal(result.y2, expected.y2, epsilon_f32);
+  assert_float_equal(result.z2, expected.z2, epsilon_f32);
+  assert_float_equal(result.w2, expected.w2, epsilon_f32);
+
+  assert_float_equal(result.x3, expected.x3, epsilon_f32);
+  assert_float_equal(result.y3, expected.y3, epsilon_f32);
+  assert_float_equal(result.z3, expected.z3, epsilon_f32);
+  assert_float_equal(result.w3, expected.w3, epsilon_f32);
+}
+
 static void test_quaternionf32_rotate_euler(void **state) {
   (void)state; /* unused */
 
@@ -77,6 +119,7 @@ int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(test_quaternionf32_add),
       cmocka_unit_test(test_quaternionf32_multiply),
+      cmocka_unit_test(test_quaternionf32_to_matrix),
       cmocka_unit_test(test_quaternionf32_rotate_euler),
   };
 
