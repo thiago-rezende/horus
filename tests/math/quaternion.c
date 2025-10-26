@@ -53,10 +53,31 @@ static void test_quaternionf32_multiply(void **state) {
   assert_float_equal(result.w, expected.w, epsilon_f32);
 }
 
+static void test_quaternionf32_rotate_euler(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  quaternionf32_t quaternion = (quaternionf32_t){.x = 0.0f, .y = 0.0f, .z = 0.0f, .w = 1.0f};
+  vector3f32_t degrees = (vector3f32_t){.x = 180.0f, .y = 0.0f, .z = 0.0f, .__padding = 0.0f};
+
+  /* expected result */
+  quaternionf32_t expected = (quaternionf32_t){.x = 1.0f, .y = 0.0f, .z = 0.0f, .w = 0.0f};
+
+  /* function call */
+  quaternionf32_t result = quaternionf32_rotate_euler(quaternion, degrees);
+
+  /* union assertions */
+  assert_float_equal(result.x, expected.x, epsilon_f32);
+  assert_float_equal(result.y, expected.y, epsilon_f32);
+  assert_float_equal(result.z, expected.z, epsilon_f32);
+  assert_float_equal(result.w, expected.w, epsilon_f32);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(test_quaternionf32_add),
       cmocka_unit_test(test_quaternionf32_multiply),
+      cmocka_unit_test(test_quaternionf32_rotate_euler),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);
