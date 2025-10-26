@@ -27,6 +27,9 @@ horus_sources = [
   # horus application layer
   'source/application/application.c',
 
+  # horus camera layer
+  'source/camera/camera.c',
+
   # horus renderer layer
   'source/renderer/general.c',
 ]

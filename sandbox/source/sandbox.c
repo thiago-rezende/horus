@@ -43,6 +43,19 @@ vector3f32_t quad_scale = {{1.0f, 1.0f, 1.0f}};
 vector3f32_t quad_position = {{-0.4f, -0.3f, 0}};
 vector3f32_t quad_rotation = {{0.0f, 0.0f, 0.0f}};
 
+/* camera global variables */
+camera_t *camera = NULL;
+camera_type_t camera_type = CAMERA_TYPE_NONE;
+camera_projection_t camera_projection = CAMERA_PROJECTION_NONE;
+
+vector3f32_t camera_up = {0};
+vector3f32_t camera_target = {0};
+vector3f32_t camera_position = {0};
+
+f32 camera_far_plane = 0.0f;
+f32 camera_near_plane = 0.0f;
+f32 camera_field_of_view = 0.0f;
+
 application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
   platform_memory_clear(application, sizeof(application_t));
@@ -119,12 +132,44 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
 
   logger_info_format("<renderer:%p> <instance_buffer:%p> created", (void *)renderer, (void *)quad_instance_buffer);
 
+  /* TODO: proper error handling */
+  platform_window_size_t window_size = platform_window_size(window);
+
+  camera_create_info_t camera_create_info = (camera_create_info_t){
+      /* general info */
+      .type = camera_type,
+      .projection = camera_projection,
+
+      /* position info */
+      .up = camera_up,
+      .target = camera_target,
+      .position = camera_position,
+
+      /* frustum info */
+      .far_plane = camera_far_plane,
+      .near_plane = camera_near_plane,
+      .field_of_view = camera_field_of_view,
+
+      /* projection info */
+      .width = window_size.width,
+      .height = window_size.height,
+  };
+
+  camera = camera_create(camera_create_info);
+
+  logger_info_format("<camera:%p> <type:%s> <projection:%s> created", (void *)camera, camera_type_string(camera->type),
+                     camera_projection_string(camera->projection));
+
   return true;
 }
 
 b8 on_destroy(application_t *application, platform_window_t *window, renderer_t *renderer) {
   (void)window;      /* unused */
   (void)application; /* unused */
+
+  camera_destroy(camera);
+
+  logger_info_format("<camera:%p> destroyed", (void *)camera);
 
   instance_buffer_destroy(quad_instance_buffer);
 
@@ -307,6 +352,24 @@ b8 on_update(f64 timestep) {
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_DOWN)) {
     quad_position.y += quad_position_speed * timestep;
   }
+
+  platform_window_size_t size = platform_window_size(window);
+
+  camera_update_info_t camera_update_info = (camera_update_info_t){
+      /* general info */
+      .timestep = timestep,
+
+      /* position info */
+      .up = camera_up,
+      .target = camera_target,
+      .position = camera_position,
+
+      /* projection info */
+      .width = size.width,
+      .height = size.height,
+  };
+
+  camera_update(camera, camera_update_info);
 
   return true;
 }

@@ -49,6 +49,9 @@
 /* horus types layer */
 #include "horus/types/vertex.h"
 
+/* horus camera layer */
+#include "horus/camera/camera.h"
+
 /* horus renderer layer */
 #include <horus/renderer/shader.h>
 #include <horus/renderer/pipeline.h>

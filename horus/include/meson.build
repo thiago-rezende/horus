@@ -54,6 +54,9 @@ horus_headers = [
   # horus types layer
   'horus/types/vertex.h',
 
+  # horus camera layer
+  'horus/camera/camera.h',
+
   # horus renderer layer
   'horus/renderer/shader.h',
   'horus/renderer/general.h',
