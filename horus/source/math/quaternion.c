@@ -11,6 +11,17 @@ quaternionf32_t quaternionf32_add(quaternionf32_t a, quaternionf32_t b) {
   return result;
 }
 
+quaternionf32_t quaternionf32_identity(void) {
+  quaternionf32_t result = (quaternionf32_t){
+      .x = 0,
+      .y = 0,
+      .z = 0,
+      .w = 1,
+  };
+
+  return result;
+}
+
 quaternionf32_t quaternionf32_multiply(quaternionf32_t a, quaternionf32_t b) {
   quaternionf32_t result;
 
