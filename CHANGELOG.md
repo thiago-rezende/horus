@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+ - [ea83ddb] feat(camera): begin camera system implementation with code layout and boilerplate (Thiago Rezende)
+ - [14d5e9d] feat(application): update application on_create and on_destroy to recieve a reference from window (Thiago Rezende)
+ - [0fcf580] fix(logger): remove unnecessary variadic arguments from non format logger_* variants (Thiago Rezende)
+ - [6c154ea] fix(window|linux): remove reset of mouse scroll state on button release for event propagation (Thiago Rezende)
+ - [6dfb54a] refactor(vertex): update vertex color to vector4u8_t and its underlying vulkan implementation (Thiago Rezende)
+ - [cf62714] test(math): add vector48u_t addition function unit test (Thiago Rezende)
+ - [253fd06] feat(math): add vector4u8_t and simple addition function (Thiago Rezende)
+ - [c710fc2] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [9862dea] lint: fix clang-format errors in matrix unit tests (Thiago Rezende)
  - [341039a] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [5c36604] chore(sandbox): update sandbox application to use the new matrix rotation and scaling functions (Thiago Rezende)
