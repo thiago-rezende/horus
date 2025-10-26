@@ -48,9 +48,14 @@ camera_t *camera = NULL;
 camera_type_t camera_type = CAMERA_TYPE_NONE;
 camera_projection_t camera_projection = CAMERA_PROJECTION_NONE;
 
-vector3f32_t camera_up = {0};
+f32 camera_speed = 0.0f;
+
 vector3f32_t camera_target = {0};
 vector3f32_t camera_position = {0};
+
+f32 camera_yaw = 0.0f;
+f32 camera_roll = 0.0f;
+f32 camera_pitch = 0.0f;
 
 f32 camera_far_plane = 0.0f;
 f32 camera_near_plane = 0.0f;
@@ -140,10 +145,17 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
       .type = camera_type,
       .projection = camera_projection,
 
+      /* movement info */
+      .speed = camera_speed,
+
       /* position info */
-      .up = camera_up,
       .target = camera_target,
       .position = camera_position,
+
+      /* rotation info */
+      .yaw = camera_yaw,
+      .roll = camera_roll,
+      .pitch = camera_pitch,
 
       /* frustum info */
       .far_plane = camera_far_plane,
@@ -360,9 +372,7 @@ b8 on_update(f64 timestep) {
       .timestep = timestep,
 
       /* position info */
-      .up = camera_up,
       .target = camera_target,
-      .position = camera_position,
 
       /* projection info */
       .width = size.width,

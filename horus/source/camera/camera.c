@@ -49,12 +49,18 @@ camera_t *camera_create(camera_create_info_t info) {
       .type = info.type,
       .projection = info.projection,
 
+      .speed = info.speed,
+
       .view_matrix = matrix4f32_identity(),
       .projection_matrix = matrix4f32_identity(),
 
-      .up = info.up,
+      .up = (vector3f32_t){0}, /* TODO: build the up vector from rotation angles */
       .target = info.target,
       .position = info.position,
+
+      .yaw = info.yaw,
+      .roll = info.roll,
+      .pitch = info.pitch,
 
       .far_plane = info.far_plane,
       .near_plane = info.near_plane,

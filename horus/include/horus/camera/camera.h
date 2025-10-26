@@ -30,10 +30,17 @@ typedef struct __camera_create_info {
   camera_type_t type;
   camera_projection_t projection;
 
+  /* movement info */
+  f32 speed;
+
   /* position info */
-  vector3f32_t up;
   vector3f32_t target;
   vector3f32_t position;
+
+  /* rotation info */
+  f32 yaw;
+  f32 roll;
+  f32 pitch;
 
   /* frustum info */
   f32 far_plane;
@@ -50,9 +57,7 @@ typedef struct __camera_update_info {
   f64 timestep;
 
   /* position info */
-  vector3f32_t up;
   vector3f32_t target;
-  vector3f32_t position;
 
   /* projection info */
   u16 width;
@@ -63,12 +68,18 @@ typedef struct __camera {
   camera_type_t type;
   camera_projection_t projection;
 
+  f32 speed;
+
   matrix4f32_t view_matrix;
   matrix4f32_t projection_matrix;
 
   vector3f32_t up;
   vector3f32_t target;
   vector3f32_t position;
+
+  f32 yaw;
+  f32 roll;
+  f32 pitch;
 
   f32 far_plane;
   f32 near_plane;
