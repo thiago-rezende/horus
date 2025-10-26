@@ -91,6 +91,28 @@ static void test_vector3f32_cross(void **state) {
   assert_float_equal(result.z, expected.b, epsilon_f32);
 }
 
+static void test_vector3f32_scalar(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector3f32_t vector = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .__padding = 0};
+  f32 scalar = 2.0f;
+
+  /* expected result */
+  vector3f32_t expected = (vector3f32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .__padding = 0};
+
+  /* function call */
+  vector3f32_t result = vector3f32_scalar(vector, scalar);
+
+  /* general assertion */
+  assert_memory_equal(&result, &expected, sizeof(vector3f32_t));
+
+  /* union assertions */
+  assert_float_equal(result.x, expected.r, epsilon_f32);
+  assert_float_equal(result.y, expected.g, epsilon_f32);
+  assert_float_equal(result.z, expected.b, epsilon_f32);
+}
+
 static void test_vector3f32_hadamard(void **state) {
   (void)state; /* unused */
 
@@ -117,11 +139,11 @@ static void test_vector4f32_add(void **state) {
   (void)state; /* unused */
 
   /* default attrubutes */
-  vector4f32_t a = (vector4f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
-  vector4f32_t b = (vector4f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0};
+  vector4f32_t a = (vector4f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0.0f};
+  vector4f32_t b = (vector4f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f, .w = 0.0f};
 
   /* expected result */
-  vector4f32_t expected = (vector4f32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .w = 0};
+  vector4f32_t expected = (vector4f32_t){.x = 2.0f, .y = 2.0f, .z = 2.0f, .w = 0.0f};
 
   /* function call */
   vector4f32_t result = vector4f32_add(a, b);
@@ -144,6 +166,7 @@ int main(void) {
       cmocka_unit_test(test_vector3f32_add),
       cmocka_unit_test(test_vector3f32_dot),
       cmocka_unit_test(test_vector3f32_cross),
+      cmocka_unit_test(test_vector3f32_scalar),
       cmocka_unit_test(test_vector3f32_hadamard),
       /* vector4f32 tests */
       cmocka_unit_test(test_vector4f32_add),
