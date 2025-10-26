@@ -2,6 +2,7 @@
 math_sources = [
   'matrix.c',
   'vector.c',
+  'quaternion.c',
 ]
 
 # math layer tests executables
