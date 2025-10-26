@@ -26,3 +26,6 @@ quaternionf32_t quaternionf32_add(quaternionf32_t a, quaternionf32_t b);
 
 /* TODO: inline all possible quaternion functions */
 quaternionf32_t quaternionf32_multiply(quaternionf32_t a, quaternionf32_t b);
+
+/* TODO: inline all possible quaternion functions */
+quaternionf32_t quaternionf32_rotate_euler(quaternionf32_t quaternion, vector3f32_t degrees);
