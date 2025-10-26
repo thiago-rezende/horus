@@ -76,7 +76,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
   }
 
   if (application->on_create) {
-    if (!application->on_create(application, renderer)) {
+    if (!application->on_create(application, window, renderer)) {
       logger_error_format("<application:%p> <on_create> failed", (void *)application);
     }
   }
@@ -125,7 +125,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
   }
 
   if (application->on_destroy) {
-    if (!application->on_destroy(application, renderer)) {
+    if (!application->on_destroy(application, window, renderer)) {
       logger_error_format("<application:%p> <on_destroy> failed", (void *)application);
     }
   }

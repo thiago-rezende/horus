@@ -6,16 +6,20 @@
 #define QUAD_VERTICES_COUNT 4
 #define QUAD_INSTANCES_COUNT 2
 
+/* shader modules global variables */
 const char *default_shader_module_path = "assets/shaders/build/default.spv";
 
 shader_module_t *default_shader_module = NULL;
 
+/* graphics pipelines global variables */
 graphics_pipeline_t *default_graphics_pipeline = NULL;
 
+/* uniform buffer global variables */
 f32 start_absolute_time = 0.0f;
 uniform_buffer_t *uniform_buffer = NULL;
 uniform_buffer_object_t uniform_buffer_object = {0};
 
+/* quad buffers global variables */
 index_buffer_t *quad_index_buffer = NULL;
 vertex_buffer_t *quad_vertex_buffer = NULL;
 
@@ -79,31 +83,38 @@ b8 application_destroy(application_t *application) {
   return true;
 }
 
-b8 on_create(application_t *application, renderer_t *renderer) {
+b8 on_create(application_t *application, platform_window_t *window, renderer_t *renderer) {
+  (void)window;      /* unused */
   (void)application; /* unused */
 
+  /* TODO: proper error handling */
   default_shader_module = shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT,
                                                            (char *)default_shader_module_path);
 
   logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)default_shader_module,
                      default_shader_module_path);
 
+  /* TODO: proper error handling */
   default_graphics_pipeline = graphics_pipeline_create(renderer, default_shader_module);
 
   logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)default_graphics_pipeline);
 
+  /* TODO: proper error handling */
   uniform_buffer = uniform_buffer_create(renderer, &uniform_buffer_object);
 
   logger_info_format("<renderer:%p> <uniform_buffer:%p> created", (void *)renderer, (void *)uniform_buffer);
 
+  /* TODO: proper error handling */
   quad_index_buffer = index_buffer_create(renderer, quad_indices, QUAD_INDICES_COUNT);
 
   logger_info_format("<renderer:%p> <index_buffer:%p> created", (void *)renderer, (void *)quad_index_buffer);
 
+  /* TODO: proper error handling */
   quad_vertex_buffer = vertex_buffer_create(renderer, quad_vertices, QUAD_VERTICES_COUNT);
 
   logger_info_format("<renderer:%p> <vertex_buffer:%p> created", (void *)renderer, (void *)quad_vertex_buffer);
 
+  /* TODO: proper error handling */
   quad_instance_buffer = instance_buffer_create(renderer, quad_instance_buffer_objects, QUAD_INSTANCES_COUNT);
 
   logger_info_format("<renderer:%p> <instance_buffer:%p> created", (void *)renderer, (void *)quad_instance_buffer);
@@ -111,7 +122,8 @@ b8 on_create(application_t *application, renderer_t *renderer) {
   return true;
 }
 
-b8 on_destroy(application_t *application, renderer_t *renderer) {
+b8 on_destroy(application_t *application, platform_window_t *window, renderer_t *renderer) {
+  (void)window;      /* unused */
   (void)application; /* unused */
 
   instance_buffer_destroy(quad_instance_buffer);

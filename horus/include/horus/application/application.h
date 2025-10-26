@@ -3,6 +3,9 @@
 /* horus core layer */
 #include <horus/core/types.h>
 
+/* horus platform layer */
+#include <horus/platform/window.h>
+
 /* horus events layer */
 #include <horus/events/base.h>
 
@@ -22,8 +25,8 @@ struct __application {
 
   configuration_t configuration;
 
-  b8 (*on_create)(application_t *application, renderer_t *renderer);
-  b8 (*on_destroy)(application_t *application, renderer_t *renderer);
+  b8 (*on_create)(application_t *application, platform_window_t *window, renderer_t *renderer);
+  b8 (*on_destroy)(application_t *application, platform_window_t *window, renderer_t *renderer);
 
   b8 (*on_event)(event_t *event);
   b8 (*on_render)(renderer_t *renderer);
