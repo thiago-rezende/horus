@@ -622,7 +622,7 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
       xcb_xkb_use_extension_reply(connection, xkb_use_extension_cookie, &xkb_use_extension_reply_error);
 
   if (xkb_use_extension_reply == NULL || xkb_use_extension_reply_error != NULL) {
-    logger_critical(
+    logger_critical_format(
         "<xcb_connection:%p> <xkb_use_extension_reply:%p> <error:%p> <code:%u> xcb_xkb_use_extension failed",
         connection, xkb_use_extension_reply, xkb_use_extension_reply_error,
         xkb_use_extension_reply_error ? xkb_use_extension_reply_error->error_code : 0);
@@ -645,7 +645,7 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
       xcb_xkb_per_client_flags_reply(connection, xcb_xkb_per_client_flags_cookie, &xkb_per_client_flags_reply_error);
 
   if (xkb_per_client_flags_reply == NULL || xkb_per_client_flags_reply_error != NULL) {
-    logger_critical(
+    logger_critical_format(
         "<xcb_connection:%p> <xcb_xkb_per_client_flags_reply:%p> <error:%p> <code:%u> xcb_xkb_per_client_flags failed",
         connection, xkb_per_client_flags_reply, xkb_per_client_flags_reply_error,
         xkb_per_client_flags_reply_error ? xkb_per_client_flags_reply_error->error_code : 0);
@@ -666,8 +666,8 @@ b8 __platform_window_setup_xkb_extension(xcb_connection_t *connection) {
   xcb_generic_error_t *xcb_xkb_select_events_error = xcb_request_check(connection, xcb_xkb_select_events_cookie);
 
   if (xcb_xkb_select_events_error != NULL) {
-    logger_critical("<xcb_connection:%p> <error:%p> <code:%u> xcb_xkb_select_events failed", connection,
-                    xcb_xkb_select_events_error, xcb_xkb_select_events_error->error_code);
+    logger_critical_format("<xcb_connection:%p> <error:%p> <code:%u> xcb_xkb_select_events failed", connection,
+                           xcb_xkb_select_events_error, xcb_xkb_select_events_error->error_code);
 
     free(xcb_xkb_select_events_error);
 
