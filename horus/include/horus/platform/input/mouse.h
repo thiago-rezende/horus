@@ -13,5 +13,8 @@ b8 platform_input_mouse_button_is_released(mouse_button_t button);
 b8 platform_input_mouse_scroll_is_up(void);
 b8 platform_input_mouse_scroll_is_down(void);
 
+b8 platform_input_mouse_button_clear_state(void);
+b8 platform_input_mouse_scroll_clear_state(void);
+
 mouse_scroll_state_t platform_input_mouse_scroll_state(void);
 mouse_button_state_t platform_input_mouse_button_state(mouse_button_t button);

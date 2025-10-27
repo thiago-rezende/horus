@@ -563,6 +563,10 @@ b8 platform_input_keyboard_keycode_is_released(keyboard_keycode_t keycode) {
   return __platform_input_keyboard_keycode_state(keycode) == KEYBOARD_KEYCODE_STATE_RELEASED;
 }
 
+b8 platform_input_keyboard_clear_state(void) {
+  return __platform_input_keyboard_keycode_clear_state();
+}
+
 keyboard_keycode_state_t platform_input_keyboard_keycode_state(keyboard_keycode_t keycode) {
   return __platform_input_keyboard_keycode_state(keycode);
 }

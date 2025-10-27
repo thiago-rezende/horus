@@ -94,3 +94,10 @@ b8 input_mouse_scroll_is_down(void) {
 mouse_scroll_state_t input_mouse_scroll_state(void) {
   return platform_input_mouse_scroll_state();
 }
+
+b8 input_mouse_clear_state(void) {
+  b8 mouse_button_clear_state_result = platform_input_mouse_button_clear_state();
+  b8 mouse_scroll_clear_state_result = platform_input_mouse_scroll_clear_state();
+
+  return mouse_button_clear_state_result && mouse_scroll_clear_state_result;
+}

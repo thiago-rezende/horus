@@ -10,6 +10,10 @@
 #include <horus/platform/time.h>
 #include <horus/platform/window.h>
 
+/* horus input layer */
+#include <horus/input/mouse.h>
+#include <horus/input/keyboard.h>
+
 /* horus application layer */
 #include <horus/application/application.h>
 
@@ -80,6 +84,9 @@ int main(int argc, char **argv, char **envp) {
   f64 timestep = 0;
   f64 current_absolute_time = platform_absolute_time();
   f64 previous_absolute_time = platform_absolute_time();
+
+  input_mouse_clear_state();
+  input_keyboard_clear_state();
 
   while (!platform_window_should_close(window)) {
     platform_window_process_events(window);

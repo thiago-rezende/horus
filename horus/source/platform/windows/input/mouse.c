@@ -219,6 +219,14 @@ b8 platform_input_mouse_scroll_is_down(void) {
   return __platform_input_mouse_scroll_current_state == MOUSE_SCROLL_STATE_DOWN;
 }
 
+b8 platform_input_mouse_button_clear_state(void) {
+  return __platform_input_mouse_button_clear_state();
+}
+
+b8 platform_input_mouse_scroll_clear_state(void) {
+  return __platform_input_mouse_scroll_clear_state();
+}
+
 mouse_scroll_state_t platform_input_mouse_scroll_state(void) {
   return __platform_input_mouse_scroll_state();
 }

@@ -58,3 +58,5 @@ b8 input_mouse_scroll_is_up(void);
 b8 input_mouse_scroll_is_down(void);
 
 mouse_scroll_state_t input_mouse_scroll_state(void);
+
+b8 input_mouse_clear_state(void);

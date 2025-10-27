@@ -139,3 +139,5 @@ b8 input_keyboard_keycode_is_pressed(keyboard_keycode_t keycode);
 b8 input_keyboard_keycode_is_released(keyboard_keycode_t keycode);
 
 keyboard_keycode_state_t input_keyboard_keycode_state(keyboard_keycode_t keycode);
+
+b8 input_keyboard_clear_state(void);
