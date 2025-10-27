@@ -37,11 +37,11 @@ vertex_t quad_vertices[QUAD_VERTICES_COUNT] = {
 
 f32 quad_scale_speed = 2.0f;
 f32 quad_position_speed = 1.0f;
-f32 quad_rotation_angle = 1.0f;
+f32 quad_rotation_angle = 45.0f;
 
 vector3f32_t quad_scale = {{1.0f, 1.0f, 1.0f}};
 vector3f32_t quad_position = {{-0.4f, -0.3f, 0}};
-vector3f32_t quad_rotation = {{0.0f, 0.0f, 0.0f}};
+quaternionf32_t quad_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
 /* camera global variables */
 camera_t *camera = NULL;
@@ -303,7 +303,8 @@ b8 on_update(f64 timestep) {
     logger_debug_format("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
                         input_mouse_button_string(MOUSE_BUTTON_LEFT));
 
-    quad_rotation.z += quad_rotation_angle;
+    quad_rotation =
+        quaternionf32_rotate_euler(quad_rotation, (vector3f32_t){{0.0f, 0.0f, quad_rotation_angle * timestep}});
   }
 
   if (input_mouse_button_is_released(MOUSE_BUTTON_LEFT)) {
@@ -325,7 +326,8 @@ b8 on_update(f64 timestep) {
     logger_debug_format("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
                         input_mouse_button_string(MOUSE_BUTTON_RIGHT));
 
-    quad_rotation.z -= quad_rotation_angle;
+    quad_rotation =
+        quaternionf32_rotate_euler(quad_rotation, (vector3f32_t){{0.0f, 0.0f, -1.0f * quad_rotation_angle * timestep}});
   }
 
   if (input_mouse_button_is_released(MOUSE_BUTTON_RIGHT)) {
@@ -400,8 +402,8 @@ b8 on_render(renderer_t *renderer) {
   /* instance buffer object update */
   matrix4f32_t quad_model_matrix = matrix4f32_identity();
   quad_model_matrix = matrix4f32_scale(quad_model_matrix, quad_scale);
+  quad_model_matrix = matrix4f32_multiply(quad_model_matrix, quaternionf32_to_matrix(quad_rotation));
   quad_model_matrix = matrix4f32_translate(quad_model_matrix, quad_position);
-  quad_model_matrix = matrix4f32_rotate_euler(quad_model_matrix, quad_rotation);
 
   quad_instance_buffer_objects[0] = (instance_buffer_object_t){
       .model = quad_model_matrix,
