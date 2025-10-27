@@ -68,9 +68,7 @@ camera_t *camera_create(camera_create_info_t info) {
       .target = info.target,
       .position = info.position,
 
-      .yaw = info.yaw,
-      .roll = info.roll,
-      .pitch = info.pitch,
+      .rotation = info.rotation,
 
       .far_plane = info.far_plane,
       .near_plane = info.near_plane,

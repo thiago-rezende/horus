@@ -53,9 +53,7 @@ f32 camera_speed = 0.0f;
 vector3f32_t camera_target = {0};
 vector3f32_t camera_position = {0};
 
-f32 camera_yaw = 0.0f;
-f32 camera_roll = 0.0f;
-f32 camera_pitch = 0.0f;
+quaternionf32_t camera_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
 f32 camera_far_plane = 0.0f;
 f32 camera_near_plane = 0.0f;
@@ -153,9 +151,7 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
       .position = camera_position,
 
       /* rotation info */
-      .yaw = camera_yaw,
-      .roll = camera_roll,
-      .pitch = camera_pitch,
+      .rotation = camera_rotation,
 
       /* frustum info */
       .far_plane = camera_far_plane,
@@ -393,8 +389,8 @@ b8 on_render(renderer_t *renderer) {
 
   uniform_buffer_object = (uniform_buffer_object_t){
       .time = elapsed_time,
-      .view = matrix4f32_identity(),
-      .projection = matrix4f32_identity(),
+      .view = camera->view_matrix,
+      .projection = camera->projection_matrix,
   };
 
   uniform_buffer_update(uniform_buffer, &uniform_buffer_object);

@@ -6,6 +6,7 @@
 /* horus math layer */
 #include <horus/math/matrix.h>
 #include <horus/math/vector.h>
+#include <horus/math/quaternion.h>
 
 typedef enum __camera_type {
   CAMERA_TYPE_NONE = 0,
@@ -38,9 +39,7 @@ typedef struct __camera_create_info {
   vector3f32_t position;
 
   /* rotation info */
-  f32 yaw;
-  f32 roll;
-  f32 pitch;
+  quaternionf32_t rotation;
 
   /* frustum info */
   f32 far_plane;
@@ -77,9 +76,7 @@ typedef struct __camera {
   vector3f32_t target;
   vector3f32_t position;
 
-  f32 yaw;
-  f32 roll;
-  f32 pitch;
+  quaternionf32_t rotation;
 
   f32 far_plane;
   f32 near_plane;
