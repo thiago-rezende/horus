@@ -6,6 +6,9 @@
 /* horus platform layer */
 #include <horus/platform/memory.h>
 
+/* horus logger layer */
+#include <horus/logger/logger.h>
+
 matrix4f32_t matrix4f32_scale(matrix4f32_t matrix, vector3f32_t vector) {
   matrix4f32_t result = {0};
 
@@ -97,6 +100,55 @@ matrix4f32_t matrix4f32_rotate_euler(matrix4f32_t matrix, vector3f32_t degrees) 
     result.column0 = (c0 * cz) + (c1 * sz);
     result.column1 = (c1 * cz) - (c0 * sz);
   }
+
+  return result;
+}
+
+matrix4f32_t matrix4f32_perspective(f32 aspect, f32 fov, f32 near, f32 far) {
+  matrix4f32_t result = matrix4f32_identity();
+
+  if (near <= 0.0f || far <= near || aspect == 0.0f) {
+    logger_error("<matrix4f32_perspective> invalid arguments");
+
+    return result;
+  }
+
+  f32 fov_radians = fov * (pi_f32 / 180.0f);
+
+  f32 tan_half_fov = tan(fov_radians / 2.0f);
+
+  f32 fov_factor = 1.0f / tan_half_fov;
+
+  f32 near_far_inverse_range = 1.0f / (far - near);
+
+  f32 z_scale = -(far + near) * near_far_inverse_range;
+  f32 z_offset = -2.0f * far * near * near_far_inverse_range;
+
+  result.column0 = (__v4f32){fov_factor / aspect, 0.0f, 0.0f, 0.0f};
+  result.column1 = (__v4f32){0.0f, fov_factor, 0.0f, 0.0f};
+  result.column2 = (__v4f32){0.0f, 0.0f, z_scale, -1.0f};
+  result.column3 = (__v4f32){0.0f, 0.0f, z_offset, 0.0f};
+
+  return result;
+}
+
+matrix4f32_t matrix4f32_orthographic(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far) {
+  matrix4f32_t result = {0};
+
+  if (left == right || bottom == top || near == far) {
+    logger_error("<matrix4f32_perspective> invalid arguments");
+
+    return result;
+  }
+
+  f32 inverse_dx = 1.0f / (right - left);
+  f32 inverse_dy = 1.0f / (top - bottom);
+  f32 inverse_dz = 1.0f / (near - far);
+
+  result.column0 = (__v4f32){2.0f * inverse_dx, 0.0f, 0.0f, -(right + left) * inverse_dx};
+  result.column1 = (__v4f32){0.0f, 2.0f * inverse_dy, 0.0f, -(top + bottom) * inverse_dy};
+  result.column2 = (__v4f32){0.0f, 0.0f, 2.0f * inverse_dz, -(near + far) * inverse_dz};
+  result.column3 = (__v4f32){0.0f, 0.0f, 0.0f, 1.0f};
 
   return result;
 }
