@@ -231,11 +231,110 @@ static void test_matrix4f32_rotate_euler(void **state) {
   assert_float_equal(result.w3, expected.w3, epsilon_f32);
 }
 
+static void test_matrix4f32_perspective(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  f32 aspect = 1.0f;
+  f32 fov = 90.0f;
+  f32 near = 0.1f;
+  f32 far = 100.0f;
+
+  /* expected result */
+  const f32 expected_xy_scale = 1.0f;
+  const f32 expected_z_scale_factor = -((far + near) / (far - near));
+  const f32 expected_z_offset_factor = -((2.0f * far * near) / (far - near));
+
+  matrix4f32_t expected = (matrix4f32_t){
+      .column0 = {expected_xy_scale, 0, 0, 0},
+      .column1 = {0, expected_xy_scale, 0, 0},
+      .column2 = {0, 0, expected_z_scale_factor, -1},
+      .column3 = {0, 0, expected_z_offset_factor, 0},
+  };
+
+  /* function call */
+  matrix4f32_t result = matrix4f32_perspective(aspect, fov, near, far);
+
+  /* union assertions */
+  assert_float_equal(result.x0, expected.x0, epsilon_f32);
+  assert_float_equal(result.y0, expected.y0, epsilon_f32);
+  assert_float_equal(result.z0, expected.z0, epsilon_f32);
+  assert_float_equal(result.w0, expected.w0, epsilon_f32);
+
+  assert_float_equal(result.x1, expected.x1, epsilon_f32);
+  assert_float_equal(result.y1, expected.y1, epsilon_f32);
+  assert_float_equal(result.z1, expected.z1, epsilon_f32);
+  assert_float_equal(result.w1, expected.w1, epsilon_f32);
+
+  assert_float_equal(result.x2, expected.x2, epsilon_f32);
+  assert_float_equal(result.y2, expected.y2, epsilon_f32);
+  assert_float_equal(result.z2, expected.z2, epsilon_f32);
+  assert_float_equal(result.w2, expected.w2, epsilon_f32);
+
+  assert_float_equal(result.x3, expected.x3, epsilon_f32);
+  assert_float_equal(result.y3, expected.y3, epsilon_f32);
+  assert_float_equal(result.z3, expected.z3, epsilon_f32);
+  assert_float_equal(result.w3, expected.w3, epsilon_f32);
+}
+
+static void test_matrix4f32_orthographic(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  f32 left = -10.0f;
+  f32 right = 10.0f;
+  f32 bottom = -5.0f;
+  f32 top = 5.0f;
+  f32 near = 1.0f;
+  f32 far = 10.0f;
+
+  /* expected result */
+  const f32 expected_z_scale = 2.0f / (near - far);
+  const f32 expected_z_translate = -(near + far) / (near - far);
+
+  matrix4f32_t expected = (matrix4f32_t){
+      .column0 = {0.1, 0, 0, 0},
+      .column1 = {0, 0.2, 0, 0},
+      .column2 = {0, 0, expected_z_scale, expected_z_translate},
+      .column3 = {0, 0, 0, 1},
+  };
+
+  /* function call */
+  matrix4f32_t result = matrix4f32_orthographic(left, right, bottom, top, near, far);
+
+  /* union assertions */
+  assert_float_equal(result.x0, expected.x0, epsilon_f32);
+  assert_float_equal(result.y0, expected.y0, epsilon_f32);
+  assert_float_equal(result.z0, expected.z0, epsilon_f32);
+  assert_float_equal(result.w0, expected.w0, epsilon_f32);
+
+  assert_float_equal(result.x1, expected.x1, epsilon_f32);
+  assert_float_equal(result.y1, expected.y1, epsilon_f32);
+  assert_float_equal(result.z1, expected.z1, epsilon_f32);
+  assert_float_equal(result.w1, expected.w1, epsilon_f32);
+
+  assert_float_equal(result.x2, expected.x2, epsilon_f32);
+  assert_float_equal(result.y2, expected.y2, epsilon_f32);
+  assert_float_equal(result.z2, expected.z2, epsilon_f32);
+  assert_float_equal(result.w2, expected.w2, epsilon_f32);
+
+  assert_float_equal(result.x3, expected.x3, epsilon_f32);
+  assert_float_equal(result.y3, expected.y3, epsilon_f32);
+  assert_float_equal(result.z3, expected.z3, epsilon_f32);
+  assert_float_equal(result.w3, expected.w3, epsilon_f32);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_matrix4f32_scale),        cmocka_unit_test(test_matrix4f32_identity),
-      cmocka_unit_test(test_matrix4f32_multiply),     cmocka_unit_test(test_matrix4f32_translate),
+      /* operations */
+      cmocka_unit_test(test_matrix4f32_scale),
+      cmocka_unit_test(test_matrix4f32_identity),
+      cmocka_unit_test(test_matrix4f32_multiply),
+      cmocka_unit_test(test_matrix4f32_translate),
       cmocka_unit_test(test_matrix4f32_rotate_euler),
+      /* projections */
+      cmocka_unit_test(test_matrix4f32_perspective),
+      cmocka_unit_test(test_matrix4f32_orthographic),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);
