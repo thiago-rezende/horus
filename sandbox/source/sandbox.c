@@ -45,12 +45,13 @@ quaternionf32_t quad_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
 /* camera global variables */
 camera_t *camera = NULL;
-camera_type_t camera_type = CAMERA_TYPE_NONE;
+camera_type_t camera_type = CAMERA_TYPE_FIXED;
 camera_projection_t camera_projection = CAMERA_PROJECTION_PERSPECTIVE;
 
 f32 camera_speed = 1.0f;
 f32 camera_rotation_angle = 45.0f;
 
+vector3f32_t camera_up = {{0.0f, 1.0f, 0.0f}};
 vector3f32_t camera_target = {0};
 vector3f32_t camera_position = {{0.0f, 0.0f, 2.0f}};
 
@@ -149,6 +150,7 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
       .speed = camera_speed,
 
       /* position info */
+      .up = camera_up,
       .target = camera_target,
       .position = camera_position,
 

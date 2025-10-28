@@ -66,7 +66,7 @@ camera_t *camera_create(camera_create_info_t info) {
       .view_matrix = matrix4f32_identity(),
       .projection_matrix = matrix4f32_identity(),
 
-      .up = (vector3f32_t){0}, /* TODO: build the up vector from rotation angles */
+      .up = info.up,
       .target = info.target,
       .position = info.position,
 
@@ -108,6 +108,8 @@ b8 camera_update(camera_t *camera, camera_update_info_t info) {
 
     return false;
   }
+
+  camera->target = info.target;
 
   camera->width = info.width;
   camera->height = info.height;
@@ -152,12 +154,19 @@ const char *camera_projection_string(camera_projection_t projection) {
 }
 
 b8 __camera_update_fixed(camera_t *camera, camera_update_info_t info) {
-  (void)info;   /* unused */
-  (void)camera; /* unused */
+  (void)info; /* unused */
 
-  logger_critical("<__camera_update_fixed> not implemented");
+  vector3f32_t z_axis = vector3f32_subtract(camera->position, camera->target);
+  z_axis = vector3f32_normalize(z_axis);
 
-  return false;
+  vector3f32_t x_axis = vector3f32_cross(camera->up, z_axis);
+  x_axis = vector3f32_normalize(x_axis);
+
+  vector3f32_t y_axis = vector3f32_cross(z_axis, x_axis);
+
+  camera->rotation = quaternionf32_from_axes(x_axis, y_axis, z_axis);
+
+  return true;
 }
 
 b8 __camera_update_spline(camera_t *camera, camera_update_info_t info) {

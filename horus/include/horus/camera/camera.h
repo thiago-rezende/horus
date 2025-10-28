@@ -35,6 +35,7 @@ typedef struct __camera_create_info {
   f32 speed;
 
   /* position info */
+  vector3f32_t up;
   vector3f32_t target;
   vector3f32_t position;
 
