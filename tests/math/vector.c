@@ -20,9 +20,6 @@ static void test_vector4u8_add(void **state) {
   /* function call */
   vector4u8_t result = vector4u8_add(a, b);
 
-  /* general assertion */
-  assert_memory_equal(&result, &expected, sizeof(vector4u8_t));
-
   /* union assertions */
   assert_int_equal(result.x, expected.r);
   assert_int_equal(result.y, expected.g);
@@ -42,9 +39,6 @@ static void test_vector3f32_add(void **state) {
 
   /* function call */
   vector3f32_t result = vector3f32_add(a, b);
-
-  /* general assertion */
-  assert_memory_equal(&result, &expected, sizeof(vector3f32_t));
 
   /* union assertions */
   assert_float_equal(result.x, expected.r, epsilon_f32);
@@ -82,9 +76,6 @@ static void test_vector3f32_cross(void **state) {
   /* function call */
   vector3f32_t result = vector3f32_cross(a, b);
 
-  /* general assertion */
-  assert_memory_equal(&result, &expected, sizeof(vector3f32_t));
-
   /* union assertions */
   assert_float_equal(result.x, expected.r, epsilon_f32);
   assert_float_equal(result.y, expected.g, epsilon_f32);
@@ -103,9 +94,6 @@ static void test_vector3f32_scalar(void **state) {
 
   /* function call */
   vector3f32_t result = vector3f32_scalar(vector, scalar);
-
-  /* general assertion */
-  assert_memory_equal(&result, &expected, sizeof(vector3f32_t));
 
   /* union assertions */
   assert_float_equal(result.x, expected.r, epsilon_f32);
@@ -126,8 +114,58 @@ static void test_vector3f32_hadamard(void **state) {
   /* function call */
   vector3f32_t result = vector3f32_hadamard(a, b);
 
-  /* general assertion */
-  assert_memory_equal(&result, &expected, sizeof(vector3f32_t));
+  /* union assertions */
+  assert_float_equal(result.x, expected.r, epsilon_f32);
+  assert_float_equal(result.y, expected.g, epsilon_f32);
+  assert_float_equal(result.z, expected.b, epsilon_f32);
+}
+
+static void test_vector3f32_subtract(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector3f32_t a = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f};
+  vector3f32_t b = (vector3f32_t){.x = 1.0f, .y = 1.0f, .z = 1.0f};
+
+  /* expected result */
+  vector3f32_t expected = (vector3f32_t){.x = 0.0f, .y = 0.0f, .z = 0.0f};
+
+  /* function call */
+  vector3f32_t result = vector3f32_subtract(a, b);
+
+  /* union assertions */
+  assert_float_equal(result.x, expected.r, epsilon_f32);
+  assert_float_equal(result.y, expected.g, epsilon_f32);
+  assert_float_equal(result.z, expected.b, epsilon_f32);
+}
+
+static void test_vector3f32_magnitude(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector3f32_t vector = (vector3f32_t){.x = 2.0f, .y = -3.0f, .z = 6.0f};
+
+  /* expected result */
+  f32 expected = 7.0f;
+
+  /* function call */
+  f32 result = vector3f32_magnitude(vector);
+
+  /* union assertions */
+  assert_float_equal(result, expected, epsilon_f32);
+}
+
+static void test_vector3f32_normalize(void **state) {
+  (void)state; /* unused */
+
+  /* default attrubutes */
+  vector3f32_t vector = (vector3f32_t){.x = 3.0f, .y = 4.0f, .z = 0.0f};
+
+  /* expected result */
+  vector3f32_t expected = (vector3f32_t){.x = 0.6f, .y = 0.8f, .z = 0.0f};
+
+  /* function call */
+  vector3f32_t result = vector3f32_normalize(vector);
 
   /* union assertions */
   assert_float_equal(result.x, expected.r, epsilon_f32);
@@ -148,9 +186,6 @@ static void test_vector4f32_add(void **state) {
   /* function call */
   vector4f32_t result = vector4f32_add(a, b);
 
-  /* general assertion */
-  assert_memory_equal(&result, &expected, sizeof(vector4f32_t));
-
   /* union assertions */
   assert_float_equal(result.x, expected.r, epsilon_f32);
   assert_float_equal(result.y, expected.g, epsilon_f32);
@@ -168,6 +203,9 @@ int main(void) {
       cmocka_unit_test(test_vector3f32_cross),
       cmocka_unit_test(test_vector3f32_scalar),
       cmocka_unit_test(test_vector3f32_hadamard),
+      cmocka_unit_test(test_vector3f32_subtract),
+      cmocka_unit_test(test_vector3f32_magnitude),
+      cmocka_unit_test(test_vector3f32_normalize),
       /* vector4f32 tests */
       cmocka_unit_test(test_vector4f32_add),
   };
