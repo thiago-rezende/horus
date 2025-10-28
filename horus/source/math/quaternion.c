@@ -69,6 +69,51 @@ quaternionf32_t quaternionf32_rotate_euler(quaternionf32_t quaternion, vector3f3
   return result;
 }
 
+quaternionf32_t quaternionf32_from_axes(vector3f32_t x_axis, vector3f32_t y_axis, vector3f32_t z_axis) {
+  quaternionf32_t result = {0};
+
+  matrix4f32_t axes = (matrix4f32_t){
+      .column0 = (__v4f32){x_axis.x, x_axis.y, x_axis.z, 0.0f},
+      .column1 = (__v4f32){y_axis.x, y_axis.y, y_axis.z, 0.0f},
+      .column2 = (__v4f32){z_axis.x, z_axis.y, z_axis.z, 0.0f},
+      .column3 = (__v4f32){0.0f, 0.0f, 0.0f, 1.0f},
+  };
+
+  f32 trace = axes.a00 + axes.a11 + axes.a22;
+
+  if (trace > 0.0f) {
+    f32 scale_factor = sqrtf(trace + 1.0f) * 2.0f;
+
+    result.x = (axes.a21 - axes.a12) / scale_factor;
+    result.y = (axes.a02 - axes.a20) / scale_factor;
+    result.z = (axes.a10 - axes.a01) / scale_factor;
+    result.w = 0.25f * scale_factor;
+  } else if ((axes.a00 > axes.a11) && (axes.a00 > axes.a22)) {
+    f32 scale_factor = sqrtf(1.0f + axes.a00 - axes.a11 - axes.a22) * 2.0f;
+
+    result.x = 0.25f * scale_factor;
+    result.y = (axes.a01 + axes.a10) / scale_factor;
+    result.z = (axes.a02 + axes.a20) / scale_factor;
+    result.w = (axes.a21 - axes.a12) / scale_factor;
+  } else if (axes.a11 > axes.a22) {
+    f32 scale_factor = sqrtf(1.0f + axes.a11 - axes.a00 - axes.a22) * 2.0f;
+
+    result.x = (axes.a01 + axes.a10) / scale_factor;
+    result.y = 0.25f * scale_factor;
+    result.z = (axes.a12 + axes.a21) / scale_factor;
+    result.w = (axes.a02 - axes.a20) / scale_factor;
+  } else {
+    f32 scale_factor = sqrtf(1.0f + axes.a22 - axes.a00 - axes.a11) * 2.0f;
+
+    result.x = (axes.a02 + axes.a20) / scale_factor;
+    result.y = (axes.a12 + axes.a21) / scale_factor;
+    result.z = 0.25f * scale_factor;
+    result.w = (axes.a10 - axes.a01) / scale_factor;
+  }
+
+  return result;
+}
+
 matrix4f32_t quaternionf32_to_matrix(quaternionf32_t quaternion) {
   matrix4f32_t result = matrix4f32_identity();
 
