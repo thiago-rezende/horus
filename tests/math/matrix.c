@@ -4,6 +4,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include <math.h>
 #include <stdio.h>
 
 #define HORUS_ENTRYPOINT_DISABLE
@@ -240,16 +241,22 @@ static void test_matrix4f32_perspective(void **state) {
   f32 near = 0.1f;
   f32 far = 100.0f;
 
+  f32 fov_radians = fov * (pi_f32 / 180.0f);
+  f32 tan_half_fov = tan(fov_radians / 2.0f);
+  f32 fov_factor = 1.0f / tan_half_fov;
+  f32 near_minus_far_inverse = 1.0f / (near - far);
+
   /* expected result */
-  const f32 expected_xy_scale = 1.0f;
-  const f32 expected_z_scale_factor = -((far + near) / (far - near));
-  const f32 expected_z_offset_factor = -((2.0f * far * near) / (far - near));
+  const f32 expected_x_scale = fov_factor / aspect;
+  const f32 expected_y_scale = fov_factor;
+  const f32 expected_z_scale = far * near_minus_far_inverse;
+  const f32 expected_z_offset = far * near * near_minus_far_inverse;
 
   matrix4f32_t expected = (matrix4f32_t){
-      .column0 = {expected_xy_scale, 0, 0, 0},
-      .column1 = {0, expected_xy_scale, 0, 0},
-      .column2 = {0, 0, expected_z_scale_factor, -1},
-      .column3 = {0, 0, expected_z_offset_factor, 0},
+      .column0 = {expected_x_scale, 0, 0, 0},
+      .column1 = {0, expected_y_scale, 0, 0},
+      .column2 = {0, 0, expected_z_scale, -1},
+      .column3 = {0, 0, expected_z_offset, 0},
   };
 
   /* function call */
@@ -289,14 +296,22 @@ static void test_matrix4f32_orthographic(void **state) {
   f32 far = 10.0f;
 
   /* expected result */
-  const f32 expected_z_scale = 2.0f / (near - far);
-  const f32 expected_z_translate = -(near + far) / (near - far);
+  f32 inverse_dx = 1.0f / (right - left);
+  f32 inverse_dy = 1.0f / (top - bottom);
+  f32 near_minus_far_inverse = 1.0f / (near - far);
+
+  const f32 expected_x_scale = 2.0f * inverse_dx;
+  const f32 expected_y_scale = 2.0f * inverse_dy;
+  const f32 expected_x_translate = -(right + left) * inverse_dx;
+  const f32 expected_y_translate = -(top + bottom) * inverse_dy;
+  const f32 expected_z_scale = near_minus_far_inverse;
+  const f32 expected_z_translate = near * near_minus_far_inverse;
 
   matrix4f32_t expected = (matrix4f32_t){
-      .column0 = {0.1, 0, 0, 0},
-      .column1 = {0, 0.2, 0, 0},
-      .column2 = {0, 0, expected_z_scale, expected_z_translate},
-      .column3 = {0, 0, 0, 1},
+      .column0 = {expected_x_scale, 0, 0, expected_x_translate},
+      .column1 = {0, expected_y_scale, 0, expected_y_translate},
+      .column2 = {0, 0, expected_z_scale, 0.0f},
+      .column3 = {0, 0, expected_z_translate, 1.0f},
   };
 
   /* function call */

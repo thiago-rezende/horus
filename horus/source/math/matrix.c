@@ -114,18 +114,19 @@ matrix4f32_t matrix4f32_perspective(f32 aspect, f32 fov, f32 near, f32 far) {
   }
 
   f32 fov_radians = fov * (pi_f32 / 180.0f);
-
   f32 tan_half_fov = tan(fov_radians / 2.0f);
-
   f32 fov_factor = 1.0f / tan_half_fov;
 
-  f32 near_far_inverse_range = 1.0f / (far - near);
+  f32 near_minus_far_inverse = 1.0f / (near - far);
 
-  f32 z_scale = -(far + near) * near_far_inverse_range;
-  f32 z_offset = -2.0f * far * near * near_far_inverse_range;
+  f32 z_scale = far * near_minus_far_inverse;
+  f32 z_offset = far * near * near_minus_far_inverse;
 
-  result.column0 = (__v4f32){fov_factor / aspect, 0.0f, 0.0f, 0.0f};
-  result.column1 = (__v4f32){0.0f, fov_factor, 0.0f, 0.0f};
+  f32 x_scale = fov_factor / aspect;
+  f32 y_scale = fov_factor;
+
+  result.column0 = (__v4f32){x_scale, 0.0f, 0.0f, 0.0f};
+  result.column1 = (__v4f32){0.0f, y_scale, 0.0f, 0.0f};
   result.column2 = (__v4f32){0.0f, 0.0f, z_scale, -1.0f};
   result.column3 = (__v4f32){0.0f, 0.0f, z_offset, 0.0f};
 
@@ -143,12 +144,16 @@ matrix4f32_t matrix4f32_orthographic(f32 left, f32 right, f32 bottom, f32 top, f
 
   f32 inverse_dx = 1.0f / (right - left);
   f32 inverse_dy = 1.0f / (top - bottom);
-  f32 inverse_dz = 1.0f / (near - far);
+
+  f32 near_minus_far_inverse = 1.0f / (near - far);
+
+  f32 z_scale = near_minus_far_inverse;
+  f32 z_translate = near * near_minus_far_inverse;
 
   result.column0 = (__v4f32){2.0f * inverse_dx, 0.0f, 0.0f, -(right + left) * inverse_dx};
   result.column1 = (__v4f32){0.0f, 2.0f * inverse_dy, 0.0f, -(top + bottom) * inverse_dy};
-  result.column2 = (__v4f32){0.0f, 0.0f, 2.0f * inverse_dz, -(near + far) * inverse_dz};
-  result.column3 = (__v4f32){0.0f, 0.0f, 0.0f, 1.0f};
+  result.column2 = (__v4f32){0.0f, 0.0f, z_scale, 0.0f};
+  result.column3 = (__v4f32){0.0f, 0.0f, z_translate, 1.0f};
 
   return result;
 }

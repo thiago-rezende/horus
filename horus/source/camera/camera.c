@@ -30,11 +30,13 @@ b8 __camera_update_orthogonal(camera_t *camera, camera_update_info_t info);
 b8 __camera_update_first_person(camera_t *camera, camera_update_info_t info);
 b8 __camera_update_third_person(camera_t *camera, camera_update_info_t info);
 
-b8 __camera_update_perspective(camera_t *camera, camera_update_info_t info);
-b8 __camera_update_orthographic(camera_t *camera, camera_update_info_t info);
+b8 __camera_update_perspective(camera_t *camera);
+b8 __camera_update_orthographic(camera_t *camera);
+
+b8 __camera_update_view_matrix(camera_t *camera);
 
 typedef b8 (*camera_update_fn_t)(camera_t *camera, camera_update_info_t info);
-typedef b8 (*camera_update_projection_fn_t)(camera_t *camera, camera_update_info_t info);
+typedef b8 (*camera_update_projection_fn_t)(camera_t *camera);
 
 static camera_update_fn_t camera_update_functions[CAMERA_TYPE_COUNT] = {
     [CAMERA_TYPE_NONE] = NULL,
@@ -70,6 +72,7 @@ camera_t *camera_create(camera_create_info_t info) {
 
       .rotation = info.rotation,
 
+      .zoom = info.zoom,
       .far_plane = info.far_plane,
       .near_plane = info.near_plane,
       .field_of_view = info.field_of_view,
@@ -106,6 +109,9 @@ b8 camera_update(camera_t *camera, camera_update_info_t info) {
     return false;
   }
 
+  camera->width = info.width;
+  camera->height = info.height;
+
   camera_update_fn_t camera_update_function = camera_update_functions[camera->type];
   camera_update_projection_fn_t camera_update_projection_function =
       camera_update_projection_functions[camera->projection];
@@ -117,7 +123,9 @@ b8 camera_update(camera_t *camera, camera_update_info_t info) {
     return false;
   }
 
-  if (camera_update_projection_function && !camera_update_projection_function(camera, info)) {
+  __camera_update_view_matrix(camera);
+
+  if (camera_update_projection_function && !camera_update_projection_function(camera)) {
     logger_critical_format("<camera:%p> <type:%s> <projection:%s> camera update projection function failed", camera,
                            camera_type_string(camera->type), camera_projection_string(camera->projection));
 
@@ -197,20 +205,58 @@ b8 __camera_update_third_person(camera_t *camera, camera_update_info_t info) {
   return false;
 }
 
-b8 __camera_update_perspective(camera_t *camera, camera_update_info_t info) {
-  (void)info;   /* unused */
-  (void)camera; /* unused */
+b8 __camera_update_perspective(camera_t *camera) {
+  f32 aspect = (f32)camera->width / (f32)camera->height;
 
-  logger_critical("<__camera_update_perspective> not implemented");
+  camera->projection_matrix =
+      matrix4f32_perspective(aspect, camera->field_of_view, camera->near_plane, camera->far_plane);
 
-  return false;
+  return true;
 }
 
-b8 __camera_update_orthographic(camera_t *camera, camera_update_info_t info) {
-  (void)info;   /* unused */
-  (void)camera; /* unused */
+b8 __camera_update_orthographic(camera_t *camera) {
+  f32 aspect_ratio = (f32)camera->width / (f32)camera->height;
 
-  logger_critical("<__camera_update_orthographic> not implemented");
+  f32 y_size = camera->zoom;
+  f32 x_size = y_size * aspect_ratio;
 
-  return false;
+  camera->projection_matrix =
+      matrix4f32_orthographic(-x_size, x_size, -y_size, y_size, camera->near_plane, camera->far_plane);
+
+  return true;
+}
+
+b8 __camera_update_view_matrix(camera_t *camera) {
+  quaternionf32_t rotation_inverse =
+      (quaternionf32_t){{-(camera->rotation.x), -(camera->rotation.y), -(camera->rotation.z), camera->rotation.w}};
+
+  camera->view_matrix = quaternionf32_to_matrix(rotation_inverse);
+
+  vector3f32_t negative_position = vector3f32_scalar(camera->position, -1.0f);
+
+  vector3f32_t x_axis_row = {{
+      camera->view_matrix.column0[0],
+      camera->view_matrix.column1[0],
+      camera->view_matrix.column2[0],
+  }};
+
+  vector3f32_t y_axis_row = {{
+      camera->view_matrix.column0[1],
+      camera->view_matrix.column1[1],
+      camera->view_matrix.column2[1],
+  }};
+
+  vector3f32_t z_axis_row = {{
+      camera->view_matrix.column0[2],
+      camera->view_matrix.column1[2],
+      camera->view_matrix.column2[2],
+  }};
+
+  f32 t_x = vector3f32_dot(x_axis_row, negative_position);
+  f32 t_y = vector3f32_dot(y_axis_row, negative_position);
+  f32 t_z = vector3f32_dot(z_axis_row, negative_position);
+
+  camera->view_matrix.column3 = (__v4f32){t_x, t_y, t_z, 1.0f};
+
+  return true;
 }

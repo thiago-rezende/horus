@@ -39,25 +39,27 @@ f32 quad_scale_speed = 2.0f;
 f32 quad_position_speed = 1.0f;
 f32 quad_rotation_angle = 45.0f;
 
-vector3f32_t quad_scale = {{1.0f, 1.0f, 1.0f}};
+vector3f32_t quad_scale = {{2.0f, 1.0f, 0.0f}};
 vector3f32_t quad_position = {{-0.4f, -0.3f, 0}};
 quaternionf32_t quad_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
 /* camera global variables */
 camera_t *camera = NULL;
 camera_type_t camera_type = CAMERA_TYPE_NONE;
-camera_projection_t camera_projection = CAMERA_PROJECTION_NONE;
+camera_projection_t camera_projection = CAMERA_PROJECTION_PERSPECTIVE;
 
-f32 camera_speed = 0.0f;
+f32 camera_speed = 1.0f;
+f32 camera_rotation_angle = 45.0f;
 
 vector3f32_t camera_target = {0};
-vector3f32_t camera_position = {0};
+vector3f32_t camera_position = {{0.0f, 0.0f, 2.0f}};
 
 quaternionf32_t camera_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
-f32 camera_far_plane = 0.0f;
-f32 camera_near_plane = 0.0f;
-f32 camera_field_of_view = 0.0f;
+f32 camera_zoom = 2.0f;
+f32 camera_far_plane = 100.0f;
+f32 camera_near_plane = 0.1f;
+f32 camera_field_of_view = 60.0f;
 
 application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
@@ -154,6 +156,7 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
       .rotation = camera_rotation,
 
       /* frustum info */
+      .zoom = camera_zoom,
       .far_plane = camera_far_plane,
       .near_plane = camera_near_plane,
       .field_of_view = camera_field_of_view,
@@ -363,6 +366,48 @@ b8 on_update(f64 timestep) {
     quad_position.y += quad_position_speed * timestep;
   }
 
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_SPACE)) {
+    quad_position.z += quad_position_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_CONTROL)) {
+    quad_position.z -= quad_position_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_P)) {
+    camera->projection = CAMERA_PROJECTION_PERSPECTIVE;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_O)) {
+    camera->projection = CAMERA_PROJECTION_ORTHOGRAPHIC;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_A)) {
+    camera->position.x -= camera_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_D)) {
+    camera->position.x += camera_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_S)) {
+    camera->position.y += camera_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_W)) {
+    camera->position.y -= camera_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_E)) {
+    camera->rotation =
+        quaternionf32_rotate_euler(camera->rotation, (vector3f32_t){{0.0f, 0.0f, camera_rotation_angle * timestep}});
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_Q)) {
+    camera->rotation = quaternionf32_rotate_euler(
+        camera->rotation, (vector3f32_t){{0.0f, 0.0f, -1.0f * camera_rotation_angle * timestep}});
+  }
+
   platform_window_size_t size = platform_window_size(window);
 
   camera_update_info_t camera_update_info = (camera_update_info_t){
@@ -397,8 +442,8 @@ b8 on_render(renderer_t *renderer) {
 
   /* instance buffer object update */
   matrix4f32_t quad_model_matrix = matrix4f32_identity();
-  quad_model_matrix = matrix4f32_scale(quad_model_matrix, quad_scale);
   quad_model_matrix = matrix4f32_multiply(quad_model_matrix, quaternionf32_to_matrix(quad_rotation));
+  quad_model_matrix = matrix4f32_scale(quad_model_matrix, quad_scale);
   quad_model_matrix = matrix4f32_translate(quad_model_matrix, quad_position);
 
   quad_instance_buffer_objects[0] = (instance_buffer_object_t){
@@ -406,7 +451,8 @@ b8 on_render(renderer_t *renderer) {
   };
 
   quad_instance_buffer_objects[1] = (instance_buffer_object_t){
-      .model = matrix4f32_translate(matrix4f32_identity(), (vector3f32_t){{0.4f, 0.3f, 0}}),
+      .model = matrix4f32_translate(matrix4f32_scale(matrix4f32_identity(), (vector3f32_t){{2.0f, 1.0f, 1.0f}}),
+                                    (vector3f32_t){{0.4f, 0.3f, 0}}),
   };
 
   instance_buffer_update(quad_instance_buffer, quad_instance_buffer_objects, QUAD_INSTANCES_COUNT);

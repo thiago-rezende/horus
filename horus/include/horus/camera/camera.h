@@ -42,6 +42,7 @@ typedef struct __camera_create_info {
   quaternionf32_t rotation;
 
   /* frustum info */
+  f32 zoom;
   f32 far_plane;
   f32 near_plane;
   f32 field_of_view;
@@ -78,6 +79,7 @@ typedef struct __camera {
 
   quaternionf32_t rotation;
 
+  f32 zoom;
   f32 far_plane;
   f32 near_plane;
   f32 field_of_view;
