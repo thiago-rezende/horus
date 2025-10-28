@@ -227,36 +227,35 @@ b8 __camera_update_orthographic(camera_t *camera) {
 }
 
 b8 __camera_update_view_matrix(camera_t *camera) {
-  quaternionf32_t rotation_inverse =
-      (quaternionf32_t){{-(camera->rotation.x), -(camera->rotation.y), -(camera->rotation.z), camera->rotation.w}};
+  quaternionf32_t rotation_conjugate = quaternionf32_to_conjugate(camera->rotation);
 
-  camera->view_matrix = quaternionf32_to_matrix(rotation_inverse);
+  camera->view_matrix = quaternionf32_to_matrix(rotation_conjugate);
 
   vector3f32_t negative_position = vector3f32_scalar(camera->position, -1.0f);
 
-  vector3f32_t x_axis_row = {{
+  vector3f32_t x_row = {{
       camera->view_matrix.column0[0],
       camera->view_matrix.column1[0],
       camera->view_matrix.column2[0],
   }};
 
-  vector3f32_t y_axis_row = {{
+  vector3f32_t y_row = {{
       camera->view_matrix.column0[1],
       camera->view_matrix.column1[1],
       camera->view_matrix.column2[1],
   }};
 
-  vector3f32_t z_axis_row = {{
+  vector3f32_t z_row = {{
       camera->view_matrix.column0[2],
       camera->view_matrix.column1[2],
       camera->view_matrix.column2[2],
   }};
 
-  f32 t_x = vector3f32_dot(x_axis_row, negative_position);
-  f32 t_y = vector3f32_dot(y_axis_row, negative_position);
-  f32 t_z = vector3f32_dot(z_axis_row, negative_position);
+  f32 dot_x = vector3f32_dot(x_row, negative_position);
+  f32 dot_y = vector3f32_dot(y_row, negative_position);
+  f32 dot_z = vector3f32_dot(z_row, negative_position);
 
-  camera->view_matrix.column3 = (__v4f32){t_x, t_y, t_z, 1.0f};
+  camera->view_matrix.column3 = (__v4f32){dot_x, dot_y, dot_z, 1.0f};
 
   return true;
 }
