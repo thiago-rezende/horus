@@ -36,3 +36,6 @@ quaternionf32_t quaternionf32_rotate_euler(quaternionf32_t quaternion, vector3f3
 
 /* TODO: inline all possible quaternion functions */
 matrix4f32_t quaternionf32_to_matrix(quaternionf32_t quaternion);
+
+/* TODO: inline all possible quaternion functions */
+quaternionf32_t quaternionf32_to_conjugate(quaternionf32_t quaternion);

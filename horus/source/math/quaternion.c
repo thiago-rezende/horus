@@ -99,3 +99,14 @@ matrix4f32_t quaternionf32_to_matrix(quaternionf32_t quaternion) {
 
   return result;
 }
+
+quaternionf32_t quaternionf32_to_conjugate(quaternionf32_t quaternion) {
+  quaternionf32_t result = (quaternionf32_t){
+      .x = -quaternion.x,
+      .y = -quaternion.y,
+      .z = -quaternion.z,
+      .w = quaternion.w,
+  };
+
+  return result;
+}
