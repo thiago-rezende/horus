@@ -1,5 +1,10 @@
+#include <math.h>
+
 /* horus math layer */
 #include <horus/math/vector.h>
+
+/* horus logger layer */
+#include <horus/logger/logger.h>
 
 vector4u8_t vector4u8_add(vector4u8_t a, vector4u8_t b) {
   vector4u8_t result;
@@ -50,6 +55,43 @@ vector3f32_t vector3f32_hadamard(vector3f32_t a, vector3f32_t b) {
   __v3f32 b_vector = (__v3f32){b.x, b.y, b.z, 0.0f};
 
   result.vector = a_vector * b_vector;
+
+  return result;
+}
+
+vector3f32_t vector3f32_subtract(vector3f32_t a, vector3f32_t b) {
+  vector3f32_t result;
+
+  result.vector = a.vector - b.vector;
+
+  return result;
+}
+
+f32 vector3f32_magnitude(vector3f32_t vector) {
+  f32 result = 0.0f;
+  vector3f32_t squared = {0};
+
+  squared.vector = vector.vector * vector.vector;
+
+  result = sqrtf(squared.x + squared.y + squared.z);
+
+  return result;
+}
+
+vector3f32_t vector3f32_normalize(vector3f32_t vector) {
+  vector3f32_t result = {0};
+
+  f32 magnitude = vector3f32_magnitude(vector);
+
+  if (magnitude == 0.0f) {
+    logger_error("<vector3f32_normalize> zero magnitude");
+
+    return result;
+  }
+
+  f32 inverse_magnitude = 1.0f / magnitude;
+
+  result.vector = vector.vector * (__v3f32){inverse_magnitude, inverse_magnitude, inverse_magnitude, inverse_magnitude};
 
   return result;
 }

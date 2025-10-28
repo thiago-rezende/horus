@@ -76,4 +76,13 @@ vector3f32_t vector3f32_scalar(vector3f32_t vector, f32 scalar);
 vector3f32_t vector3f32_hadamard(vector3f32_t a, vector3f32_t b);
 
 /* TODO: inline all possible vector functions */
+vector3f32_t vector3f32_subtract(vector3f32_t a, vector3f32_t b);
+
+/* TODO: inline all possible vector functions */
+f32 vector3f32_magnitude(vector3f32_t vector);
+
+/* TODO: inline all possible vector functions */
+vector3f32_t vector3f32_normalize(vector3f32_t vector);
+
+/* TODO: inline all possible vector functions */
 vector4f32_t vector4f32_add(vector4f32_t a, vector4f32_t b);
