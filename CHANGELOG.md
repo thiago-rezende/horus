@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+ - [55162db] docs: update the sandbox screenshot to show camera support (Thiago Rezende)
+ - [9db5b05] feat(sandbox): promote example quad to a cube (Thiago Rezende)
+ - [3c3aa0a] feat(camera): add fixed camera update logic (Thiago Rezende)
+ - [b58f39b] test(math): add vector3f32_t subtraction magnitude and normalize functions unit tests (Thiago Rezende)
+ - [0b26812] feat(math): add vector3f32_t subtraction magnitude and normalize functions (Thiago Rezende)
+ - [2b3c586] test(math): add quaternionf32_t creation from axes function unit test (Thiago Rezende)
+ - [6d48969] feat(math): add quaternionf32_t creation from axes function (Thiago Rezende)
+ - [0b927b3] refactor(camera): update __camera_update_view_matrix to use quaternionf32_to_conjugate function (Thiago Rezende)
+ - [bb24dd1] test(math): add quaternionf32 conjugate function unit test (Thiago Rezende)
+ - [487a21c] feat(math): add quaternionf32 conjugate function (Thiago Rezende)
+ - [e430c8e] feat(camera): add perspective and orthographic projections support (Thiago Rezende)
+ - [e5a7834] test(math): add perspective and orthographic projection matrices functions unit tests (Thiago Rezende)
+ - [9571b85] feat(math): add perspective and orthographic projection matrices functions (Thiago Rezende)
+ - [978fc4e] feat(camera): use quaternionf32_t to represent rotation (Thiago Rezende)
+ - [6cd7df2] feat(sandbox): add quaternion rotations to the controllable example quad (Thiago Rezende)
+ - [4380592] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [c6f3820] feat(input): add keyboard and mouse clear state functions (Thiago Rezende)
  - [1a56f6c] test(math): add quaternionf32_t identity function unit test (Thiago Rezende)
  - [621b99e] feat(math): add quaternionf32_t identity function (Thiago Rezende)
