@@ -2,9 +2,9 @@
 
 #include <sandbox/sandbox.h>
 
-#define QUAD_INDICES_COUNT 6
-#define QUAD_VERTICES_COUNT 4
-#define QUAD_INSTANCES_COUNT 2
+#define CUBE_INDICES_COUNT 36
+#define CUBE_VERTICES_COUNT 8
+#define CUBE_INSTANCES_COUNT 2
 
 /* shader modules global variables */
 const char *default_shader_module_path = "assets/shaders/build/default.spv";
@@ -19,29 +19,52 @@ f32 start_absolute_time = 0.0f;
 uniform_buffer_t *uniform_buffer = NULL;
 uniform_buffer_object_t uniform_buffer_object = {0};
 
-/* quad buffers global variables */
-index_buffer_t *quad_index_buffer = NULL;
-vertex_buffer_t *quad_vertex_buffer = NULL;
+/* cube buffers global variables */
+index_buffer_t *cube_index_buffer = NULL;
+vertex_buffer_t *cube_vertex_buffer = NULL;
 
-instance_buffer_t *quad_instance_buffer = NULL;
-instance_buffer_object_t quad_instance_buffer_objects[QUAD_INSTANCES_COUNT] = {0};
+instance_buffer_t *cube_instance_buffer = NULL;
+instance_buffer_object_t cube_instance_buffer_objects[CUBE_INSTANCES_COUNT] = {0};
 
-u32 quad_indices[QUAD_INDICES_COUNT] = {0, 1, 2, 2, 3, 0};
+u32 cube_indices[CUBE_INDICES_COUNT] = {
+    /* front face */
+    0, 1, 2, 2, 3, 0,
+    /* right face */
+    1, 5, 6, 6, 2, 1,
+    /* bakc face */
+    5, 4, 7, 7, 6, 5,
+    /* left face */
+    4, 0, 3, 3, 7, 4,
+    /* top face */
+    3, 2, 6, 6, 7, 3,
+    /* bottom face */
+    4, 5, 1, 1, 0, 4};
 
-vertex_t quad_vertices[QUAD_VERTICES_COUNT] = {
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.0f}}, .color = {{255, 255, 0, 255}}},
-    (vertex_t){.position = {{0.5f, -0.5f, 0.0f}}, .color = {{255, 255, 0, 255}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.0f}}, .color = {{0, 255, 255, 255}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.0f}}, .color = {{0, 255, 255, 255}}},
+vertex_t cube_vertices[CUBE_VERTICES_COUNT] = {
+    /* front face vertices */
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{255, 255, 0, 255}}},
+    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{255, 255, 0, 255}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{0, 255, 255, 255}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{0, 255, 255, 255}}},
+
+    /* back face vertices */
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 0, 255}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 0, 255}}},
+    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{0, 255, 255, 255}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{0, 255, 255, 255}}},
 };
 
-f32 quad_scale_speed = 2.0f;
-f32 quad_position_speed = 1.0f;
-f32 quad_rotation_angle = 45.0f;
+f32 cube_scale_speed = 2.0f;
+f32 cube_position_speed = 1.0f;
+f32 cube_rotation_angle = 45.0f;
 
-vector3f32_t quad_scale = {{2.0f, 1.0f, 0.0f}};
-vector3f32_t quad_position = {{-0.4f, -0.3f, 0}};
-quaternionf32_t quad_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
+vector3f32_t cube_scale = {{1.0f, 1.0f, 1.0f}};
+vector3f32_t cube_position = {{0.0f, 0.0f, -2.0f}};
+quaternionf32_t cube_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
+
+vector3f32_t cube_instance_scale = {{2.0f, 1.0f, 1.0f}};
+vector3f32_t cube_instance_position = {{1.0f, 0.3f, 0}};
+quaternionf32_t cube_instance_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
 /* camera global variables */
 camera_t *camera = NULL;
@@ -53,7 +76,7 @@ f32 camera_rotation_angle = 45.0f;
 
 vector3f32_t camera_up = {{0.0f, 1.0f, 0.0f}};
 vector3f32_t camera_target = {0};
-vector3f32_t camera_position = {{0.0f, 0.0f, 2.0f}};
+vector3f32_t camera_position = {{-1.0f, -1.0f, 2.0f}};
 
 quaternionf32_t camera_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
@@ -124,19 +147,19 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
   logger_info_format("<renderer:%p> <uniform_buffer:%p> created", (void *)renderer, (void *)uniform_buffer);
 
   /* TODO: proper error handling */
-  quad_index_buffer = index_buffer_create(renderer, quad_indices, QUAD_INDICES_COUNT);
+  cube_index_buffer = index_buffer_create(renderer, cube_indices, CUBE_INDICES_COUNT);
 
-  logger_info_format("<renderer:%p> <index_buffer:%p> created", (void *)renderer, (void *)quad_index_buffer);
-
-  /* TODO: proper error handling */
-  quad_vertex_buffer = vertex_buffer_create(renderer, quad_vertices, QUAD_VERTICES_COUNT);
-
-  logger_info_format("<renderer:%p> <vertex_buffer:%p> created", (void *)renderer, (void *)quad_vertex_buffer);
+  logger_info_format("<renderer:%p> <index_buffer:%p> created", (void *)renderer, (void *)cube_index_buffer);
 
   /* TODO: proper error handling */
-  quad_instance_buffer = instance_buffer_create(renderer, quad_instance_buffer_objects, QUAD_INSTANCES_COUNT);
+  cube_vertex_buffer = vertex_buffer_create(renderer, cube_vertices, CUBE_VERTICES_COUNT);
 
-  logger_info_format("<renderer:%p> <instance_buffer:%p> created", (void *)renderer, (void *)quad_instance_buffer);
+  logger_info_format("<renderer:%p> <vertex_buffer:%p> created", (void *)renderer, (void *)cube_vertex_buffer);
+
+  /* TODO: proper error handling */
+  cube_instance_buffer = instance_buffer_create(renderer, cube_instance_buffer_objects, CUBE_INSTANCES_COUNT);
+
+  logger_info_format("<renderer:%p> <instance_buffer:%p> created", (void *)renderer, (void *)cube_instance_buffer);
 
   /* TODO: proper error handling */
   platform_window_size_t window_size = platform_window_size(window);
@@ -184,17 +207,17 @@ b8 on_destroy(application_t *application, platform_window_t *window, renderer_t 
 
   logger_info_format("<camera:%p> destroyed", (void *)camera);
 
-  instance_buffer_destroy(quad_instance_buffer);
+  instance_buffer_destroy(cube_instance_buffer);
 
-  logger_info_format("<renderer:%p> <instance_buffer:%p> destroyed", (void *)renderer, (void *)quad_instance_buffer);
+  logger_info_format("<renderer:%p> <instance_buffer:%p> destroyed", (void *)renderer, (void *)cube_instance_buffer);
 
-  vertex_buffer_destroy(quad_vertex_buffer);
+  vertex_buffer_destroy(cube_vertex_buffer);
 
-  logger_info_format("<renderer:%p> <vertex_buffer:%p> destroyed", (void *)renderer, (void *)quad_vertex_buffer);
+  logger_info_format("<renderer:%p> <vertex_buffer:%p> destroyed", (void *)renderer, (void *)cube_vertex_buffer);
 
-  index_buffer_destroy(quad_index_buffer);
+  index_buffer_destroy(cube_index_buffer);
 
-  logger_info_format("<renderer:%p> <index_buffer:%p> destroyed", (void *)renderer, (void *)quad_index_buffer);
+  logger_info_format("<renderer:%p> <index_buffer:%p> destroyed", (void *)renderer, (void *)cube_index_buffer);
 
   uniform_buffer_destroy(uniform_buffer);
 
@@ -304,8 +327,8 @@ b8 on_update(f64 timestep) {
     logger_debug_format("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
                         input_mouse_button_string(MOUSE_BUTTON_LEFT));
 
-    quad_rotation =
-        quaternionf32_rotate_euler(quad_rotation, (vector3f32_t){{0.0f, 0.0f, quad_rotation_angle * timestep}});
+    cube_rotation =
+        quaternionf32_rotate_euler(cube_rotation, (vector3f32_t){{0.0f, 0.0f, cube_rotation_angle * timestep}});
   }
 
   if (input_mouse_button_is_released(MOUSE_BUTTON_LEFT)) {
@@ -327,8 +350,8 @@ b8 on_update(f64 timestep) {
     logger_debug_format("<on_update> <timestep:%f> <mouse_button:%s> is pressed", timestep,
                         input_mouse_button_string(MOUSE_BUTTON_RIGHT));
 
-    quad_rotation =
-        quaternionf32_rotate_euler(quad_rotation, (vector3f32_t){{0.0f, 0.0f, -1.0f * quad_rotation_angle * timestep}});
+    cube_rotation =
+        quaternionf32_rotate_euler(cube_rotation, (vector3f32_t){{0.0f, 0.0f, -1.0f * cube_rotation_angle * timestep}});
   }
 
   if (input_mouse_button_is_released(MOUSE_BUTTON_RIGHT)) {
@@ -340,40 +363,42 @@ b8 on_update(f64 timestep) {
     logger_debug_format("<on_update> <timestep:%f> <scroll:%s> is up", timestep,
                         input_mouse_scroll_direction_string(MOUSE_SCROLL_DIRECTION_UP));
 
-    quad_scale.x += quad_scale_speed * timestep;
-    quad_scale.y += quad_scale_speed * timestep;
+    cube_scale.x += cube_scale_speed * timestep;
+    cube_scale.y += cube_scale_speed * timestep;
+    cube_scale.z += cube_scale_speed * timestep;
   }
 
   if (input_mouse_scroll_is_down()) {
     logger_debug_format("<on_update> <timestep:%f> <scroll:%s> is down", timestep,
                         input_mouse_scroll_direction_string(MOUSE_SCROLL_DIRECTION_DOWN));
 
-    quad_scale.x -= quad_scale_speed * timestep;
-    quad_scale.y -= quad_scale_speed * timestep;
+    cube_scale.x -= cube_scale_speed * timestep;
+    cube_scale.y -= cube_scale_speed * timestep;
+    cube_scale.z -= cube_scale_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_RIGHT)) {
-    quad_position.x += quad_position_speed * timestep;
+    cube_position.x += cube_position_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT)) {
-    quad_position.x -= quad_position_speed * timestep;
+    cube_position.x -= cube_position_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_UP)) {
-    quad_position.y -= quad_position_speed * timestep;
+    cube_position.y -= cube_position_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_DOWN)) {
-    quad_position.y += quad_position_speed * timestep;
+    cube_position.y += cube_position_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_SPACE)) {
-    quad_position.z += quad_position_speed * timestep;
+    cube_position.z += cube_position_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_CONTROL)) {
-    quad_position.z -= quad_position_speed * timestep;
+    cube_position.z -= cube_position_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_P)) {
@@ -410,6 +435,9 @@ b8 on_update(f64 timestep) {
         camera->rotation, (vector3f32_t){{0.0f, 0.0f, -1.0f * camera_rotation_angle * timestep}});
   }
 
+  cube_instance_rotation = quaternionf32_rotate_euler(
+      cube_instance_rotation, (vector3f32_t){{-1.0f * cube_rotation_angle * timestep, 0.0f, 0.0f}});
+
   platform_window_size_t size = platform_window_size(window);
 
   camera_update_info_t camera_update_info = (camera_update_info_t){
@@ -443,21 +471,26 @@ b8 on_render(renderer_t *renderer) {
   uniform_buffer_update(uniform_buffer, &uniform_buffer_object);
 
   /* instance buffer object update */
-  matrix4f32_t quad_model_matrix = matrix4f32_identity();
-  quad_model_matrix = matrix4f32_multiply(quad_model_matrix, quaternionf32_to_matrix(quad_rotation));
-  quad_model_matrix = matrix4f32_scale(quad_model_matrix, quad_scale);
-  quad_model_matrix = matrix4f32_translate(quad_model_matrix, quad_position);
+  matrix4f32_t cube_model_matrix = matrix4f32_identity();
+  cube_model_matrix = matrix4f32_multiply(cube_model_matrix, quaternionf32_to_matrix(cube_rotation));
+  cube_model_matrix = matrix4f32_scale(cube_model_matrix, cube_scale);
+  cube_model_matrix = matrix4f32_translate(cube_model_matrix, cube_position);
 
-  quad_instance_buffer_objects[0] = (instance_buffer_object_t){
-      .model = quad_model_matrix,
+  matrix4f32_t cube_instance_model_matrix = matrix4f32_identity();
+  cube_instance_model_matrix =
+      matrix4f32_multiply(cube_instance_model_matrix, quaternionf32_to_matrix(cube_instance_rotation));
+  cube_instance_model_matrix = matrix4f32_scale(cube_instance_model_matrix, cube_instance_scale);
+  cube_instance_model_matrix = matrix4f32_translate(cube_instance_model_matrix, cube_instance_position);
+
+  cube_instance_buffer_objects[0] = (instance_buffer_object_t){
+      .model = cube_model_matrix,
   };
 
-  quad_instance_buffer_objects[1] = (instance_buffer_object_t){
-      .model = matrix4f32_translate(matrix4f32_scale(matrix4f32_identity(), (vector3f32_t){{2.0f, 1.0f, 1.0f}}),
-                                    (vector3f32_t){{0.4f, 0.3f, 0}}),
+  cube_instance_buffer_objects[1] = (instance_buffer_object_t){
+      .model = cube_instance_model_matrix,
   };
 
-  instance_buffer_update(quad_instance_buffer, quad_instance_buffer_objects, QUAD_INSTANCES_COUNT);
+  instance_buffer_update(cube_instance_buffer, cube_instance_buffer_objects, CUBE_INSTANCES_COUNT);
 
   /* graphics pipeline setup */
   if (!graphics_pipeline_bind(default_graphics_pipeline, renderer)) {
@@ -475,31 +508,31 @@ b8 on_render(renderer_t *renderer) {
   }
 
   /* geometry indices setup */
-  if (!index_buffer_bind(quad_index_buffer, renderer)) {
+  if (!index_buffer_bind(cube_index_buffer, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <index_buffer:%p> index buffer binding failed", renderer,
-                           default_graphics_pipeline, quad_index_buffer);
+                           default_graphics_pipeline, cube_index_buffer);
 
     return false;
   }
 
   /* geometry vertices setup */
-  if (!vertex_buffer_bind(quad_vertex_buffer, renderer)) {
+  if (!vertex_buffer_bind(cube_vertex_buffer, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <vertex_buffer:%p> vertex buffer binding failed", renderer,
-                           default_graphics_pipeline, quad_vertex_buffer);
+                           default_graphics_pipeline, cube_vertex_buffer);
 
     return false;
   }
 
   /* geometry instances setup */
-  if (!instance_buffer_bind(quad_instance_buffer, default_graphics_pipeline, renderer)) {
+  if (!instance_buffer_bind(cube_instance_buffer, default_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <instance_buffer:%p> instance buffer binding failed", renderer,
-                           default_graphics_pipeline, quad_instance_buffer);
+                           default_graphics_pipeline, cube_instance_buffer);
 
     return false;
   }
 
   /* geometry draw call */
-  if (!renderer_draw_indexed(renderer, QUAD_INDICES_COUNT, QUAD_INSTANCES_COUNT)) {
+  if (!renderer_draw_indexed(renderer, CUBE_INDICES_COUNT, CUBE_INSTANCES_COUNT)) {
     logger_error_format("<renderer:%p> draw indexed command failed", renderer);
 
     return false;
