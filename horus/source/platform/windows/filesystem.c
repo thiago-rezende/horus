@@ -1,5 +1,6 @@
-/* horus platform layer [ windows ] */
-#include <horus/platform/windows/windows.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
@@ -9,18 +10,17 @@
 #include <horus/platform/filesystem.h>
 
 struct __platform_file {
-  HANDLE handle;
+  FILE *handle;
 };
 
 platform_file_t *platform_file_open(char *path) {
   platform_file_t *file = platform_memory_allocate(sizeof(platform_file_t));
 
-  file->handle = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  file->handle = fopen(path, "rb");
 
-  if (file->handle == INVALID_HANDLE_VALUE) {
-    DWORD error = GetLastError();
-
-    logger_critical_format("<path:%s> <code:%lu> file opening failed", path, error);
+  if (file->handle == NULL) {
+    logger_critical_format("<path:%s> <code:%d> file opening failed", path, errno);
+    logger_critical_format("|- [ error ] %s", strerror(errno));
 
     platform_memory_deallocate(file);
 
@@ -31,7 +31,7 @@ platform_file_t *platform_file_open(char *path) {
 }
 
 b8 platform_file_close(platform_file_t *file) {
-  CloseHandle(file->handle);
+  fclose(file->handle);
 
   platform_memory_deallocate(file);
 
@@ -39,29 +39,38 @@ b8 platform_file_close(platform_file_t *file) {
 }
 
 u64 platform_file_size(platform_file_t *file) {
-  BY_HANDLE_FILE_INFORMATION information;
+  if (fseek(file->handle, 0, SEEK_END) != 0) {
+    logger_critical_format("<file:%p> <handle:%p> <code:%d> file seeking failed", file, file->handle, errno);
+    logger_critical_format("|- [ error ] %s", strerror(errno));
 
-  if (!GetFileInformationByHandle(file->handle, &information)) {
     return 0;
   }
 
-  LARGE_INTEGER size;
+  long size_in_bytes = ftell(file->handle);
 
-  size.HighPart = information.nFileSizeHigh;
-  size.LowPart = information.nFileSizeLow;
+  if (size_in_bytes == -1L && errno != 0) {
+    logger_critical_format("<file:%p> <handle:%p> <code:%d> file size retrieval failed", file, file->handle, errno);
+    logger_critical_format("|- [ error ] %s", strerror(errno));
 
-  ULONGLONG size_in_bytes = size.QuadPart;
+    return 0;
+  }
+
+  if (fseek(file->handle, 0, SEEK_SET) != 0) {
+    logger_critical_format("<file:%p> <handle:%p> <code:%d> file seeking failed", file, file->handle, errno);
+    logger_critical_format("|- [ error ] %s", strerror(errno));
+
+    return 0;
+  }
 
   return (u64)size_in_bytes;
 }
 
 u64 platform_file_read(platform_file_t *file, u8 *buffer, u64 size) {
-  DWORD bytes_read = 0;
+  size_t bytes_read = fread(buffer, sizeof(u8), (size_t)size, file->handle);
 
-  if (!ReadFile(file->handle, buffer, size, &bytes_read, NULL)) {
-    DWORD error = GetLastError();
-
-    logger_critical_format("<file:%p> <handle:%p> <code:%lu> file reading failed", file, file->handle, error);
+  if (bytes_read != size) {
+    logger_critical_format("<file:%p> <handle:%p> <code:%d> file reading failed", file, file->handle, errno);
+    logger_critical_format("|- [ error ] %s", strerror(errno));
 
     return 0;
   }

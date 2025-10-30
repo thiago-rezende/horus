@@ -22,8 +22,6 @@ project_description = 'A simple closs-platform application development framework
 default_c_args = [
   # language standard
   '-std=c11',
-  # optimizations
-  '-O3',
   # warnings
   '-Wall',
   '-Wextra',
