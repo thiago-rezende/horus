@@ -12,6 +12,10 @@
 
 #define platform_debugger_break() raise(SIGTRAP)
 
+#elif defined(HORUS_PLATFORM_WINDOWS)
+
+#define platform_debugger_break() __debugbreak()
+
 #else
 
 #define platform_debugger_break()

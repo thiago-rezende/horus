@@ -24,6 +24,7 @@
 #include <horus/platform/window.h>
 #include <horus/platform/memory.h>
 #include <horus/platform/console.h>
+#include <horus/platform/debugger.h>
 #include <horus/platform/filesystem.h>
 
 #if !defined(HORUS_ENTRYPOINT_DISABLE)

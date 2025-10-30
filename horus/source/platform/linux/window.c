@@ -31,8 +31,6 @@
 #include <horus/platform/linux/input/mouse.h>
 #include <horus/platform/linux/input/keyboard.h>
 
-#include <horus/platform/debugger.h>
-
 #define XCB_ATOM_MAX_LENGTH 255
 
 #define WINDOW_TITLE_MAX_LENGTH 255
