@@ -76,8 +76,14 @@ float4 fragment_entrypoint(vertex_output_t vertex) : SV_Target {
   /* view direction */
   float3 view_direction = normalize(uniform_buffer_object.camera_position - vertex.world_position);
 
+  /* diffuse light factor */
+  float diffuse_factor = max(0.0, dot(normal, view_direction));
+
+  /* amdient light strength */
+  float ambient_strength = 0.25;
+
   /* shading factor */
-  float shading_factor = max(0.0, dot(normal, view_direction));
+  float shading_factor = clamp(ambient_strength + diffuse_factor, 0.0, 1.0);
 
   /* fragment color */
   float4 color = float4(vertex.color.rgb * shading_factor, vertex.color.a);
