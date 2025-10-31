@@ -30,13 +30,13 @@ b8 __camera_update_orthogonal(camera_t *camera, camera_update_info_t info);
 b8 __camera_update_first_person(camera_t *camera, camera_update_info_t info);
 b8 __camera_update_third_person(camera_t *camera, camera_update_info_t info);
 
-b8 __camera_update_perspective(camera_t *camera);
-b8 __camera_update_orthographic(camera_t *camera);
+b8 __camera_update_perspective(camera_t *camera, camera_update_info_t info);
+b8 __camera_update_orthographic(camera_t *camera, camera_update_info_t info);
 
 b8 __camera_update_view_matrix(camera_t *camera);
 
 typedef b8 (*camera_update_fn_t)(camera_t *camera, camera_update_info_t info);
-typedef b8 (*camera_update_projection_fn_t)(camera_t *camera);
+typedef b8 (*camera_update_projection_fn_t)(camera_t *camera, camera_update_info_t info);
 
 static camera_update_fn_t camera_update_functions[CAMERA_TYPE_COUNT] = {
     [CAMERA_TYPE_NONE] = NULL,
@@ -63,6 +63,7 @@ camera_t *camera_create(camera_create_info_t info) {
 
       .speed = info.speed,
 
+      /* TODO: merge view and projection matrices to prevent unnecessary shader overhead */
       .view_matrix = matrix4f32_identity(),
       .projection_matrix = matrix4f32_identity(),
 
@@ -93,9 +94,6 @@ b8 camera_destroy(camera_t *camera) {
 }
 
 b8 camera_update(camera_t *camera, camera_update_info_t info) {
-  (void)info;   /* unused */
-  (void)camera; /* unused */
-
   if (camera->type < CAMERA_TYPE_NONE || camera->type >= CAMERA_TYPE_COUNT) {
     logger_critical_format("<camera:%p> <type:%d> unknown camera type", camera, camera->type);
 
@@ -109,11 +107,6 @@ b8 camera_update(camera_t *camera, camera_update_info_t info) {
     return false;
   }
 
-  camera->target = info.target;
-
-  camera->width = info.width;
-  camera->height = info.height;
-
   camera_update_fn_t camera_update_function = camera_update_functions[camera->type];
   camera_update_projection_fn_t camera_update_projection_function =
       camera_update_projection_functions[camera->projection];
@@ -125,9 +118,7 @@ b8 camera_update(camera_t *camera, camera_update_info_t info) {
     return false;
   }
 
-  __camera_update_view_matrix(camera);
-
-  if (camera_update_projection_function && !camera_update_projection_function(camera)) {
+  if (camera_update_projection_function && !camera_update_projection_function(camera, info)) {
     logger_critical_format("<camera:%p> <type:%s> <projection:%s> camera update projection function failed", camera,
                            camera_type_string(camera->type), camera_projection_string(camera->projection));
 
@@ -154,7 +145,8 @@ const char *camera_projection_string(camera_projection_t projection) {
 }
 
 b8 __camera_update_fixed(camera_t *camera, camera_update_info_t info) {
-  (void)info; /* unused */
+  /* TODO: compare update info target and current camera target to prevent unnecessary recalculation */
+  camera->target = info.target;
 
   vector3f32_t z_axis = vector3f32_subtract(camera->position, camera->target);
   z_axis = vector3f32_normalize(z_axis);
@@ -165,6 +157,8 @@ b8 __camera_update_fixed(camera_t *camera, camera_update_info_t info) {
   vector3f32_t y_axis = vector3f32_cross(z_axis, x_axis);
 
   camera->rotation = quaternionf32_from_axes(x_axis, y_axis, z_axis);
+
+  __camera_update_view_matrix(camera);
 
   return true;
 }
@@ -214,7 +208,11 @@ b8 __camera_update_third_person(camera_t *camera, camera_update_info_t info) {
   return false;
 }
 
-b8 __camera_update_perspective(camera_t *camera) {
+b8 __camera_update_perspective(camera_t *camera, camera_update_info_t info) {
+  /* TODO: compare update info sizes and current camera sizes to prevent unnecessary recalculation */
+  camera->width = info.width;
+  camera->height = info.height;
+
   f32 aspect = (f32)camera->width / (f32)camera->height;
 
   camera->projection_matrix =
@@ -223,7 +221,11 @@ b8 __camera_update_perspective(camera_t *camera) {
   return true;
 }
 
-b8 __camera_update_orthographic(camera_t *camera) {
+b8 __camera_update_orthographic(camera_t *camera, camera_update_info_t info) {
+  /* TODO: compare update info sizes and current camera sizes to prevent unnecessary recalculation */
+  camera->width = info.width;
+  camera->height = info.height;
+
   f32 aspect_ratio = (f32)camera->width / (f32)camera->height;
 
   f32 y_size = camera->zoom;

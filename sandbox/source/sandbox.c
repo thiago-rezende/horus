@@ -493,6 +493,7 @@ b8 on_render(renderer_t *renderer) {
 
   uniform_buffer_object = (uniform_buffer_object_t){
       .time = elapsed_time,
+      /* TODO: merge view and projection matrices to prevent unnecessary shader overhead */
       .view = camera->view_matrix,
       .projection = camera->projection_matrix,
       .camera_position = camera->position,

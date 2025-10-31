@@ -71,6 +71,7 @@ typedef struct __camera {
 
   f32 speed;
 
+  /* TODO: merge view and projection matrices to prevent unnecessary shader overhead */
   matrix4f32_t view_matrix;
   matrix4f32_t projection_matrix;
 
