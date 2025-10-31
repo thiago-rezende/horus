@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+ - [8f9b393] feat(shader): add fixed ambient light strength to default shader (Thiago Rezende)
+ - [cc3796e] docs: update the sandbox screenshot to show vertex normals with basic shading (Thiago Rezende)
+ - [914ee98] feat(vertex): update vertex_t to contain vertex normal and update default shader with simple shading (Thiago Rezende)
+ - [7664201] refactor(filesystem): update implementation to use libc interface on linux and windows since the native implementations will be done after (Thiago Rezende)
+ - [76ef505] feat(debugger|windows): add platform_debugger_break() implementation and update default VK_LAYER_PATH (Thiago Rezende)
+ - [3e80c77] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [55162db] docs: update the sandbox screenshot to show camera support (Thiago Rezende)
  - [9db5b05] feat(sandbox): promote example quad to a cube (Thiago Rezende)
  - [3c3aa0a] feat(camera): add fixed camera update logic (Thiago Rezende)
