@@ -17,6 +17,8 @@ typedef struct __uniform_buffer_object {
 
   matrix4f32_t view;
   matrix4f32_t projection;
+
+  vector3f32_t camera_position;
 } uniform_buffer_object_t;
 
 uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_object_t *object);

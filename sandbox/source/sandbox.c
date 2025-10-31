@@ -3,7 +3,7 @@
 #include <sandbox/sandbox.h>
 
 #define CUBE_INDICES_COUNT 36
-#define CUBE_VERTICES_COUNT 8
+#define CUBE_VERTICES_COUNT 24
 #define CUBE_INSTANCES_COUNT 2
 
 /* shader modules global variables */
@@ -29,29 +29,58 @@ instance_buffer_object_t cube_instance_buffer_objects[CUBE_INSTANCES_COUNT] = {0
 u32 cube_indices[CUBE_INDICES_COUNT] = {
     /* front face */
     0, 1, 2, 2, 3, 0,
+
     /* right face */
-    1, 5, 6, 6, 2, 1,
-    /* bakc face */
-    5, 4, 7, 7, 6, 5,
+    4, 5, 6, 6, 7, 4,
+
+    /* back face */
+    8, 9, 10, 10, 11, 8,
+
     /* left face */
-    4, 0, 3, 3, 7, 4,
+    12, 13, 14, 14, 15, 12,
+
     /* top face */
-    3, 2, 6, 6, 7, 3,
+    16, 17, 18, 18, 19, 16,
+
     /* bottom face */
-    4, 5, 1, 1, 0, 4};
+    20, 21, 22, 22, 23, 20};
 
 vertex_t cube_vertices[CUBE_VERTICES_COUNT] = {
     /* front face vertices */
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{255, 255, 0, 255}}},
-    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{255, 255, 0, 255}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{0, 255, 255, 255}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{0, 255, 255, 255}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
+
+    /* right face vertices */
+    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
 
     /* back face vertices */
-    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 0, 255}}},
-    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 0, 255}}},
-    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{0, 255, 255, 255}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{0, 255, 255, 255}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
+
+    /* left face vertices */
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
+
+    /* top face vertices */
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
+
+    /* bottom face vertices */
+    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
 };
 
 f32 cube_scale_speed = 2.0f;
@@ -466,6 +495,7 @@ b8 on_render(renderer_t *renderer) {
       .time = elapsed_time,
       .view = camera->view_matrix,
       .projection = camera->projection_matrix,
+      .camera_position = camera->position,
   };
 
   uniform_buffer_update(uniform_buffer, &uniform_buffer_object);

@@ -10,4 +10,6 @@ typedef struct __vertex {
   vector3f32_t position;
 
   vector4u8_t color;
+
+  vector3f32_t normal;
 } vertex_t;

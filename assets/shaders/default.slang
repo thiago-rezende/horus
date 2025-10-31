@@ -3,6 +3,8 @@ struct vertex_input_t {
   float3 position; /* vertex position */
 
   float4 color; /* vertex color */
+
+  float3 normal; /* vertex normal */
 };
 
 /* vertex shader output structure */
@@ -10,6 +12,10 @@ struct vertex_output_t {
   float4 position : SV_Position; /* vertex position */
 
   float4 color : COLOR0; /* vertex color */
+
+  float3 normal : NORMAL0; /* vertex normal */
+
+  float3 world_position : TEXCOORD0; /* world position */
 };
 
 /* uniform buffer structure */
@@ -18,6 +24,8 @@ struct uniform_buffer_t {
 
   float4x4 view;
   float4x4 projection;
+
+  float3 camera_position;
 };
 
 /* instance buffer structure */
@@ -50,14 +58,29 @@ vertex_output_t vertex_entrypoint(vertex_input_t input, uint vertex_id: SV_Verte
   /* vertex color */
   output.color = input.color;
 
+  /* vertex normal */
+  output.normal = normalize(mul((float3x3)instance_buffer_object[instance_id].model, input.normal));
+
+  /* world position */
+  output.world_position = world_position.xyz;
+
   return output;
 }
 
 /* vertex shader entrypoint */
 [shader("fragment")]
 float4 fragment_entrypoint(vertex_output_t vertex) : SV_Target {
+  /* interpolated normal */
+  float3 normal = normalize(vertex.normal);
+
+  /* view direction */
+  float3 view_direction = normalize(uniform_buffer_object.camera_position - vertex.world_position);
+
+  /* shading factor */
+  float shading_factor = max(0.0, dot(normal, view_direction));
+
   /* fragment color */
-  float4 color = vertex.color;
+  float4 color = float4(vertex.color.rgb * shading_factor, vertex.color.a);
 
   return color;
 }

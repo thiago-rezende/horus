@@ -60,11 +60,19 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       .offset = offsetof(vertex_t, color),
   };
 
-  const u32 vertex_input_attribute_description_count = 2;
+  VkVertexInputAttributeDescription vertex_input_attribute_description_normal = (VkVertexInputAttributeDescription){
+      .binding = 0,
+      .location = 2,
+      .format = VK_FORMAT_R32G32B32_SFLOAT,
+      .offset = offsetof(vertex_t, normal),
+  };
+
+  const u32 vertex_input_attribute_description_count = 3;
 
   VkVertexInputAttributeDescription vertex_input_attribute_descriptions[] = {
       vertex_input_attribute_description_position,
       vertex_input_attribute_description_color,
+      vertex_input_attribute_description_normal,
   };
 
   VkPipelineVertexInputStateCreateInfo pipeline_vertex_input_state_create_info = (VkPipelineVertexInputStateCreateInfo){
@@ -132,7 +140,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
           .binding = DEFAULT_UNIFORM_BUFFER_BINDING,
           .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
           .descriptorCount = 1,
-          .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+          .stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
           .pImmutableSamplers = NULL,
       },
       (VkDescriptorSetLayoutBinding){
