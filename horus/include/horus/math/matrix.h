@@ -61,7 +61,7 @@ matrix4f32_t matrix4f32_translate(matrix4f32_t matrix, vector3f32_t vector);
 matrix4f32_t matrix4f32_rotate_euler(matrix4f32_t matrix, vector3f32_t degrees);
 
 /* TODO: inline all possible matrix functions */
-matrix4f32_t matrix4f32_perspective(f32 aspect, f32 fov, f32 near, f32 far);
+matrix4f32_t matrix4f32_perspective(f32 aspect_ratio, f32 field_of_view, f32 near_clip, f32 far_clip);
 
 /* TODO: inline all possible matrix functions */
-matrix4f32_t matrix4f32_orthographic(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far);
+matrix4f32_t matrix4f32_orthographic(f32 left, f32 right, f32 bottom, f32 top, f32 near_clip, f32 far_clip);

@@ -236,21 +236,22 @@ static void test_matrix4f32_perspective(void **state) {
   (void)state; /* unused */
 
   /* default attrubutes */
-  f32 aspect = 1.0f;
-  f32 fov = 90.0f;
-  f32 near = 0.1f;
-  f32 far = 100.0f;
+  f32 aspect_ratio = 1.0f;
+  f32 field_of_view = 90.0f;
+  f32 near_clip = 0.1f;
+  f32 far_clip = 100.0f;
 
-  f32 fov_radians = fov * (pi_f32 / 180.0f);
-  f32 tan_half_fov = tan(fov_radians / 2.0f);
-  f32 fov_factor = 1.0f / tan_half_fov;
-  f32 near_minus_far_inverse = 1.0f / (near - far);
+  f32 field_of_view_radians = field_of_view * (pi_f32 / 180.0f);
+  f32 tan_half_field_of_view = tan(field_of_view_radians / 2.0f);
+  f32 field_of_view_factor = 1.0f / tan_half_field_of_view;
+  f32 near_minus_far_inverse = 1.0f / (near_clip - far_clip);
 
   /* expected result */
-  const f32 expected_x_scale = fov_factor / aspect;
-  const f32 expected_y_scale = fov_factor;
-  const f32 expected_z_scale = far * near_minus_far_inverse;
-  const f32 expected_z_offset = far * near * near_minus_far_inverse;
+  const f32 expected_x_scale = field_of_view_factor / aspect_ratio;
+  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility */
+  const f32 expected_y_scale = field_of_view_factor * -1.0f;
+  const f32 expected_z_scale = far_clip * near_minus_far_inverse;
+  const f32 expected_z_offset = far_clip * near_clip * near_minus_far_inverse;
 
   matrix4f32_t expected = (matrix4f32_t){
       .column0 = {expected_x_scale, 0, 0, 0},
@@ -260,7 +261,7 @@ static void test_matrix4f32_perspective(void **state) {
   };
 
   /* function call */
-  matrix4f32_t result = matrix4f32_perspective(aspect, fov, near, far);
+  matrix4f32_t result = matrix4f32_perspective(aspect_ratio, field_of_view, near_clip, far_clip);
 
   /* union assertions */
   assert_float_equal(result.x0, expected.x0, epsilon_f32);
@@ -292,20 +293,21 @@ static void test_matrix4f32_orthographic(void **state) {
   f32 right = 10.0f;
   f32 bottom = -5.0f;
   f32 top = 5.0f;
-  f32 near = 1.0f;
-  f32 far = 10.0f;
+  f32 near_clip = 1.0f;
+  f32 far_clip = 10.0f;
 
   /* expected result */
   f32 inverse_dx = 1.0f / (right - left);
   f32 inverse_dy = 1.0f / (top - bottom);
-  f32 near_minus_far_inverse = 1.0f / (near - far);
+  f32 near_minus_far_inverse = 1.0f / (near_clip - far_clip);
 
   const f32 expected_x_scale = 2.0f * inverse_dx;
-  const f32 expected_y_scale = 2.0f * inverse_dy;
+  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility */
+  const f32 expected_y_scale = 2.0f * inverse_dy * -1.0f;
   const f32 expected_x_translate = -(right + left) * inverse_dx;
   const f32 expected_y_translate = -(top + bottom) * inverse_dy;
   const f32 expected_z_scale = near_minus_far_inverse;
-  const f32 expected_z_translate = near * near_minus_far_inverse;
+  const f32 expected_z_translate = near_clip * near_minus_far_inverse;
 
   matrix4f32_t expected = (matrix4f32_t){
       .column0 = {expected_x_scale, 0, 0, expected_x_translate},
@@ -315,7 +317,7 @@ static void test_matrix4f32_orthographic(void **state) {
   };
 
   /* function call */
-  matrix4f32_t result = matrix4f32_orthographic(left, right, bottom, top, near, far);
+  matrix4f32_t result = matrix4f32_orthographic(left, right, bottom, top, near_clip, far_clip);
 
   /* union assertions */
   assert_float_equal(result.x0, expected.x0, epsilon_f32);

@@ -92,27 +92,24 @@ vector3f32_t cube_position = {{0.0f, 0.0f, -2.0f}};
 quaternionf32_t cube_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
 vector3f32_t cube_instance_scale = {{2.0f, 1.0f, 1.0f}};
-vector3f32_t cube_instance_position = {{1.0f, 0.3f, 0}};
+vector3f32_t cube_instance_position = {{1.0f, -0.3f, 0}};
 quaternionf32_t cube_instance_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
 /* camera global variables */
 camera_t *camera = NULL;
-camera_type_t camera_type = CAMERA_TYPE_FIXED;
-camera_projection_t camera_projection = CAMERA_PROJECTION_PERSPECTIVE;
 
 f32 camera_speed = 1.0f;
 f32 camera_rotation_angle = 45.0f;
 
-vector3f32_t camera_up = {{0.0f, 1.0f, 0.0f}};
 vector3f32_t camera_target = {0};
-vector3f32_t camera_position = {{-1.0f, -1.0f, 2.0f}};
-
+vector3f32_t camera_position = {{-1.0f, 1.0f, 2.0f}};
 quaternionf32_t camera_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
-f32 camera_zoom = 2.0f;
-f32 camera_far_plane = 100.0f;
-f32 camera_near_plane = 0.1f;
-f32 camera_field_of_view = 60.0f;
+matrix4f32_t projection_matrix = {0};
+f32 projection_far_clip = 100.0f;
+f32 projection_near_clip = 0.1f;
+f32 projection_aspect_ratio = 16.0f / 9.0f;
+f32 projection_field_of_view = 60.0f;
 
 application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
@@ -191,39 +188,16 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
   logger_info_format("<renderer:%p> <instance_buffer:%p> created", (void *)renderer, (void *)cube_instance_buffer);
 
   /* TODO: proper error handling */
+  camera = camera_create(camera_position, camera_rotation);
+  camera_look_at(camera, camera_target, camera_up_vector(camera));
+
+  logger_info_format("<camera:%p> created", (void *)camera);
+
   platform_window_size_t window_size = platform_window_size(window);
 
-  camera_create_info_t camera_create_info = (camera_create_info_t){
-      /* general info */
-      .type = camera_type,
-      .projection = camera_projection,
-
-      /* movement info */
-      .speed = camera_speed,
-
-      /* position info */
-      .up = camera_up,
-      .target = camera_target,
-      .position = camera_position,
-
-      /* rotation info */
-      .rotation = camera_rotation,
-
-      /* frustum info */
-      .zoom = camera_zoom,
-      .far_plane = camera_far_plane,
-      .near_plane = camera_near_plane,
-      .field_of_view = camera_field_of_view,
-
-      /* projection info */
-      .width = window_size.width,
-      .height = window_size.height,
-  };
-
-  camera = camera_create(camera_create_info);
-
-  logger_info_format("<camera:%p> <type:%s> <projection:%s> created", (void *)camera, camera_type_string(camera->type),
-                     camera_projection_string(camera->projection));
+  projection_aspect_ratio = (f32)window_size.width / (f32)window_size.height;
+  projection_matrix = matrix4f32_perspective(projection_aspect_ratio, projection_field_of_view, projection_near_clip,
+                                             projection_far_clip);
 
   return true;
 }
@@ -331,6 +305,10 @@ b8 on_update(f64 timestep) {
 
     logger_debug_format("<on_update> <timestep:%f> <width:%u> <height:%u> window resized", timestep, size.width,
                         size.height);
+
+    projection_aspect_ratio = (f32)size.width / (f32)size.height;
+    projection_matrix = matrix4f32_perspective(projection_aspect_ratio, projection_field_of_view, projection_near_clip,
+                                               projection_far_clip);
   }
 
   if (input_mouse_has_moved()) {
@@ -415,73 +393,51 @@ b8 on_update(f64 timestep) {
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_UP)) {
-    cube_position.y -= cube_position_speed * timestep;
-  }
-
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_DOWN)) {
     cube_position.y += cube_position_speed * timestep;
   }
 
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_SPACE)) {
-    cube_position.z += cube_position_speed * timestep;
-  }
-
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_CONTROL)) {
-    cube_position.z -= cube_position_speed * timestep;
-  }
-
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_P)) {
-    camera->projection = CAMERA_PROJECTION_PERSPECTIVE;
-  }
-
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_O)) {
-    camera->projection = CAMERA_PROJECTION_ORTHOGRAPHIC;
-  }
-
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_A)) {
-    camera->position.x -= camera_speed * timestep;
-  }
-
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_D)) {
-    camera->position.x += camera_speed * timestep;
-  }
-
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_S)) {
-    camera->position.y += camera_speed * timestep;
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_DOWN)) {
+    cube_position.y -= cube_position_speed * timestep;
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_W)) {
-    camera->position.y -= camera_speed * timestep;
+    camera_move_forward(camera, camera_speed * timestep);
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_A)) {
+    camera_move_left(camera, camera_speed * timestep);
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_S)) {
+    camera_move_backward(camera, camera_speed * timestep);
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_D)) {
+    camera_move_right(camera, camera_speed * timestep);
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_SPACE)) {
+    camera_move_up(camera, camera_speed * timestep);
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_CONTROL)) {
+    camera_move_down(camera, camera_speed * timestep);
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_SHIFT)) {
+    camera_set_position(camera, (vector3f32_t){{1.0f, 1.0f, 2.0f}});
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_E)) {
-    camera->rotation =
-        quaternionf32_rotate_euler(camera->rotation, (vector3f32_t){{0.0f, 0.0f, camera_rotation_angle * timestep}});
+    camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, 1.0f * camera_rotation_angle * timestep}});
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_Q)) {
-    camera->rotation = quaternionf32_rotate_euler(
-        camera->rotation, (vector3f32_t){{0.0f, 0.0f, -1.0f * camera_rotation_angle * timestep}});
+    camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, -1.0f * camera_rotation_angle * timestep}});
   }
 
   cube_instance_rotation = quaternionf32_rotate_euler(
       cube_instance_rotation, (vector3f32_t){{-1.0f * cube_rotation_angle * timestep, 0.0f, 0.0f}});
-
-  platform_window_size_t size = platform_window_size(window);
-
-  camera_update_info_t camera_update_info = (camera_update_info_t){
-      /* general info */
-      .timestep = timestep,
-
-      /* position info */
-      .target = camera_target,
-
-      /* projection info */
-      .width = size.width,
-      .height = size.height,
-  };
-
-  camera_update(camera, camera_update_info);
 
   return true;
 }
@@ -494,8 +450,8 @@ b8 on_render(renderer_t *renderer) {
   uniform_buffer_object = (uniform_buffer_object_t){
       .time = elapsed_time,
       /* TODO: merge view and projection matrices to prevent unnecessary shader overhead */
-      .view = camera->view_matrix,
-      .projection = camera->projection_matrix,
+      .view = camera_view_matrix(camera),
+      .projection = projection_matrix,
       .camera_position = camera->position,
   };
 
