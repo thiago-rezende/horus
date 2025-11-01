@@ -61,6 +61,12 @@ typedef union __vector4f32 {
 vector4u8_t vector4u8_add(vector4u8_t a, vector4u8_t b);
 
 /* TODO: inline all possible vector functions */
+vector3f32_t vector3f32_up(void);
+
+/* TODO: inline all possible vector functions */
+vector3f32_t vector3f32_down(void);
+
+/* TODO: inline all possible vector functions */
 vector3f32_t vector3f32_add(vector3f32_t a, vector3f32_t b);
 
 /* TODO: inline all possible vector functions */

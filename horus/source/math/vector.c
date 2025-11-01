@@ -14,6 +14,14 @@ vector4u8_t vector4u8_add(vector4u8_t a, vector4u8_t b) {
   return result;
 }
 
+vector3f32_t vector3f32_up(void) {
+  return (vector3f32_t){.x = 0.0f, .y = 1.0f, .z = 0.0f, .__padding = 0.0f};
+}
+
+vector3f32_t vector3f32_down(void) {
+  return (vector3f32_t){.x = 0.0f, .y = -1.0f, .z = 0.0f, .__padding = 0.0f};
+}
+
 vector3f32_t vector3f32_add(vector3f32_t a, vector3f32_t b) {
   vector3f32_t result;
 
