@@ -27,6 +27,36 @@ static void test_vector4u8_add(void **state) {
   assert_int_equal(result.w, expected.a);
 }
 
+static void test_vector3f32_up(void **state) {
+  (void)state; /* unused */
+
+  /* expected result */
+  vector3f32_t expected = (vector3f32_t){.x = 0.0f, .y = 1.0f, .z = 0.0f, .__padding = 0};
+
+  /* function call */
+  vector3f32_t result = vector3f32_up();
+
+  /* union assertions */
+  assert_float_equal(result.x, expected.r, epsilon_f32);
+  assert_float_equal(result.y, expected.g, epsilon_f32);
+  assert_float_equal(result.z, expected.b, epsilon_f32);
+}
+
+static void test_vector3f32_down(void **state) {
+  (void)state; /* unused */
+
+  /* expected result */
+  vector3f32_t expected = (vector3f32_t){.x = 0.0f, .y = -1.0f, .z = 0.0f, .__padding = 0};
+
+  /* function call */
+  vector3f32_t result = vector3f32_down();
+
+  /* union assertions */
+  assert_float_equal(result.x, expected.r, epsilon_f32);
+  assert_float_equal(result.y, expected.g, epsilon_f32);
+  assert_float_equal(result.z, expected.b, epsilon_f32);
+}
+
 static void test_vector3f32_add(void **state) {
   (void)state; /* unused */
 
@@ -198,6 +228,8 @@ int main(void) {
       /* vector4u8_t tests */
       cmocka_unit_test(test_vector4u8_add),
       /* vector3f32 tests */
+      cmocka_unit_test(test_vector3f32_up),
+      cmocka_unit_test(test_vector3f32_down),
       cmocka_unit_test(test_vector3f32_add),
       cmocka_unit_test(test_vector3f32_dot),
       cmocka_unit_test(test_vector3f32_cross),
