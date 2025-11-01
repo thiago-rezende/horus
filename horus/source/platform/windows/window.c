@@ -211,6 +211,7 @@ b8 platform_window_process_events(platform_window_t *window) {
           .type = EVENT_TYPE_KEYBOARD_PRESS,
       };
 
+      /* FIXME: shift control and alt keys not mapped correctly */
       keyboard_keycode_t keycode = __platform_input_keyboard_keycode(event.wParam);
       keyboard_keycode_t scancode = __platform_input_keyboard_scancode(event.lParam);
 
@@ -244,6 +245,7 @@ b8 platform_window_process_events(platform_window_t *window) {
           .type = EVENT_TYPE_KEYBOARD_RELEASE,
       };
 
+      /* FIXME: shift control and alt keys not mapped correctly */
       keyboard_release_event.keycode = __platform_input_keyboard_keycode(event.wParam);
       keyboard_release_event.scancode = __platform_input_keyboard_scancode(event.lParam);
 
