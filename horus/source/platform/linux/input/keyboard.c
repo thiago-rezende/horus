@@ -405,6 +405,9 @@ keyboard_keycode_t __platform_input_keyboard_keycode(xcb_keysym_t keysymbol) {
       return KEYBOARD_KEYCODE_LEFT_META;
     case XK_Alt_R:
       return KEYBOARD_KEYCODE_RIGHT_ALT;
+    /* AltGr */
+    case XK_ISO_Level3_Shift:
+      return KEYBOARD_KEYCODE_RIGHT_ALT;
     case XK_Shift_L:
       return KEYBOARD_KEYCODE_LEFT_SHIFT;
     case XK_Super_L:
