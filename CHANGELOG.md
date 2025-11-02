@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+ - [f9bbb7c] fix(input|windows): update system keys hangling for left modifiers and system keys (Thiago Rezende)
+ - [567b19a] fix(input|linux): update keyboard mapping to handle AltGr keycode since xkb can send different codes for it (Thiago Rezende)
+ - [da511a8] feat(camera): complete overhaul of camera implementation focusing on simplify the code (Thiago Rezende)
+ - [7365f0b] test(math): add vector3f32_t up and down functions unit tests (Thiago Rezende)
+ - [71f43b4] feat(math): add vector3f32_t up and down functions (Thiago Rezende)
+ - [a0050ec] chore(window|windows): add FIXME comment for future solve of a problem with modifier keys mapping (Thiago Rezende)
+ - [31a68ca] chore(camera): add TODOs for future refactor of the view and projection matrices calculation (Thiago Rezende)
+ - [9153e1d] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [8f9b393] feat(shader): add fixed ambient light strength to default shader (Thiago Rezende)
  - [cc3796e] docs: update the sandbox screenshot to show vertex normals with basic shading (Thiago Rezende)
  - [914ee98] feat(vertex): update vertex_t to contain vertex normal and update default shader with simple shading (Thiago Rezende)
