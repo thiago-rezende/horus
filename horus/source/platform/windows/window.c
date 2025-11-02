@@ -199,7 +199,8 @@ b8 platform_window_process_events(platform_window_t *window) {
       }
     }
 
-    if (event.message == WM_KEYDOWN) {
+    /* FIXME: properly handle AltGr key since it generates two separate events */
+    if (event.message == WM_KEYDOWN || event.message == WM_SYSKEYDOWN) {
       keyboard_hold_event_t keyboard_hold_event = {0};
       keyboard_press_event_t keyboard_press_event = {0};
 
@@ -211,8 +212,7 @@ b8 platform_window_process_events(platform_window_t *window) {
           .type = EVENT_TYPE_KEYBOARD_PRESS,
       };
 
-      /* FIXME: shift control and alt keys not mapped correctly */
-      keyboard_keycode_t keycode = __platform_input_keyboard_keycode(event.wParam);
+      keyboard_keycode_t keycode = __platform_input_keyboard_keycode(event.wParam, event.lParam);
       keyboard_keycode_t scancode = __platform_input_keyboard_scancode(event.lParam);
 
       keyboard_hold_event.keycode = keycode;
@@ -238,16 +238,19 @@ b8 platform_window_process_events(platform_window_t *window) {
       }
     }
 
-    if (event.message == WM_KEYUP) {
+    /* FIXME: properly handle AltGr key since it generates two separate events */
+    if (event.message == WM_KEYUP || event.message == WM_SYSKEYUP) {
       keyboard_release_event_t keyboard_release_event = {0};
 
       keyboard_release_event.base = (event_t){
           .type = EVENT_TYPE_KEYBOARD_RELEASE,
       };
 
-      /* FIXME: shift control and alt keys not mapped correctly */
-      keyboard_release_event.keycode = __platform_input_keyboard_keycode(event.wParam);
-      keyboard_release_event.scancode = __platform_input_keyboard_scancode(event.lParam);
+      keyboard_keycode_t keycode = __platform_input_keyboard_keycode(event.wParam, event.lParam);
+      keyboard_keycode_t scancode = __platform_input_keyboard_scancode(event.lParam);
+
+      keyboard_release_event.keycode = keycode;
+      keyboard_release_event.scancode = scancode;
 
       if (!__platform_input_keyboard_keycode_set_state(keyboard_release_event.keycode,
                                                        KEYBOARD_KEYCODE_STATE_RELEASED)) {
@@ -319,6 +322,11 @@ b8 platform_window_process_events(platform_window_t *window) {
                               events_type_string(mouse_scroll_event.base.type));
         }
       }
+    }
+
+    /* prevent event loop to hang on system keys */
+    if (event.message == WM_SYSKEYDOWN || event.message == WM_SYSKEYUP) {
+      continue;
     }
 
     TranslateMessage(&event);

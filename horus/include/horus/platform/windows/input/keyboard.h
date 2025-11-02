@@ -6,7 +6,7 @@
 /* horus platform layer [ windows ]*/
 #include <horus/platform/windows/windows.h>
 
-keyboard_keycode_t __platform_input_keyboard_keycode(WPARAM virtual_key);
+keyboard_keycode_t __platform_input_keyboard_keycode(WPARAM virtual_key, LPARAM parameters);
 
 keyboard_keycode_t __platform_input_keyboard_scancode(LPARAM parameters);
 

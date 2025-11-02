@@ -232,8 +232,43 @@ static keyboard_keycode_state_t __platform_input_keyboard_keycode_states[KEYBOAR
     KEYBOARD_KEYCODE_STATE_NONE,
 };
 
-keyboard_keycode_t __platform_input_keyboard_keycode(WPARAM virtual_key) {
-  return platform_input_keyboard_keycode_mapping[virtual_key];
+keyboard_keycode_t __platform_input_keyboard_keycode(WPARAM virtual_key, LPARAM parameters) {
+  static const UINT extended_key_flag = (1 << 24);
+
+  BOOL is_extended_key = (parameters & extended_key_flag) != 0;
+
+  switch (virtual_key) {
+    case VK_SHIFT: {
+      UINT scan_code = (UINT)((parameters >> 16) & 0xFF);
+
+      if (MapVirtualKey(scan_code, MAPVK_VSC_TO_VK_EX) == VK_RSHIFT) {
+        return KEYBOARD_KEYCODE_RIGHT_SHIFT;
+      }
+
+      return KEYBOARD_KEYCODE_LEFT_SHIFT;
+    }
+
+    case VK_CONTROL: {
+      return is_extended_key ? KEYBOARD_KEYCODE_RIGHT_CONTROL : KEYBOARD_KEYCODE_LEFT_CONTROL;
+    }
+
+    case VK_MENU: {
+      return is_extended_key ? KEYBOARD_KEYCODE_RIGHT_ALT : KEYBOARD_KEYCODE_LEFT_ALT;
+    }
+
+    case VK_RETURN: {
+      /* TODO: update keycodes to hangle keypad keys [ in this case the keypad return ] */
+      return is_extended_key ? KEYBOARD_KEYCODE_NONE : KEYBOARD_KEYCODE_ENTER;
+    }
+
+    default: {
+      if (virtual_key < PLATFORM_INPUT_KEYBOARD_KEYCODE_COUNT) {
+        return platform_input_keyboard_keycode_mapping[virtual_key];
+      }
+
+      return KEYBOARD_KEYCODE_NONE;
+    }
+  }
 }
 
 keyboard_keycode_t __platform_input_keyboard_scancode(LPARAM parameters) {
