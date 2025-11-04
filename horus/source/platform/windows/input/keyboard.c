@@ -257,7 +257,7 @@ keyboard_keycode_t __platform_input_keyboard_keycode(WPARAM virtual_key, LPARAM 
     }
 
     case VK_RETURN: {
-      /* TODO: update keycodes to hangle keypad keys [ in this case the keypad return ] */
+      /* TODO: update keycodes to handle keypad keys [ in this case the keypad return ] */
       return is_extended_key ? KEYBOARD_KEYCODE_NONE : KEYBOARD_KEYCODE_ENTER;
     }
 

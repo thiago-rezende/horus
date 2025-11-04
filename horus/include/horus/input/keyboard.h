@@ -6,6 +6,7 @@
 /* horus events layer */
 #include <horus/events/base.h>
 
+/* TODO: update keycodes to handle keypad keys */
 typedef enum __keyboard_keycode {
   KEYBOARD_KEYCODE_NONE = 0,
 
