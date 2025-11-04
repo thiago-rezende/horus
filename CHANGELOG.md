@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+ - [ff59224] ci: add contitional triggering of workflows based on files and directories updates (Thiago Rezende)
+ - [bcaef3b] chore(input): add TODO comment on keyboard input definition for keypad support implementation (Thiago Rezende)
+ - [7f24e90] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [f9bbb7c] fix(input|windows): update system keys hangling for left modifiers and system keys (Thiago Rezende)
  - [567b19a] fix(input|linux): update keyboard mapping to handle AltGr keycode since xkb can send different codes for it (Thiago Rezende)
  - [da511a8] feat(camera): complete overhaul of camera implementation focusing on simplify the code (Thiago Rezende)
