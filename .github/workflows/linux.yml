@@ -3,8 +3,35 @@ name: Linux
 on:
   push:
     branches: ['main']
+    paths:
+      # files to watch
+      - 'meson.build'
+      - 'meson_options.txt'
+      # directories to watch
+      - 'horus/**'
+      - 'tests/**'
+      - 'sandbox/**'
+      - 'subprojects/**'
+      # directories to ignore
+      - '!horus/source/platform/windows/**'
+      - '!horus/source/renderer/vulkan/windows/**'
+      - '!horus/include/horus/platform/windows/**'
+
   pull_request:
     branches: ['main']
+    paths:
+      # files to watch
+      - 'meson.build'
+      - 'meson_options.txt'
+      # directories to watch
+      - 'horus/**'
+      - 'tests/**'
+      - 'sandbox/**'
+      - 'subprojects/**'
+      # directories to ignore
+      - '!horus/source/platform/windows/**'
+      - '!horus/source/renderer/vulkan/windows/**'
+      - '!horus/include/horus/platform/windows/**'
 
 jobs:
   build:
