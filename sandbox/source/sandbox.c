@@ -384,20 +384,36 @@ b8 on_update(f64 timestep) {
     cube_scale.z -= cube_scale_speed * timestep;
   }
 
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_RIGHT)) {
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_L)) {
     cube_position.x += cube_position_speed * timestep;
   }
 
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT)) {
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_J)) {
     cube_position.x -= cube_position_speed * timestep;
   }
 
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_UP)) {
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_I)) {
     cube_position.y += cube_position_speed * timestep;
   }
 
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_DOWN)) {
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_K)) {
     cube_position.y -= cube_position_speed * timestep;
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_RIGHT)) {
+    camera_rotate_euler(camera, (vector3f32_t){{0.0f, -1.0f * camera_rotation_angle * timestep, 0.0f}});
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT)) {
+    camera_rotate_euler(camera, (vector3f32_t){{0.0f, camera_rotation_angle * timestep, 0.0f}});
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_UP)) {
+    camera_rotate_euler(camera, (vector3f32_t){{camera_rotation_angle * timestep, 0.0f, 0.0f}});
+  }
+
+  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_DOWN)) {
+    camera_rotate_euler(camera, (vector3f32_t){{-1.0f * camera_rotation_angle * timestep, 0.0f, 0.0f}});
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_W)) {
@@ -424,16 +440,12 @@ b8 on_update(f64 timestep) {
     camera_move_down(camera, camera_speed * timestep);
   }
 
-  if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_SHIFT)) {
-    camera_set_position(camera, (vector3f32_t){{1.0f, 1.0f, 2.0f}});
-  }
-
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_E)) {
-    camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, 1.0f * camera_rotation_angle * timestep}});
+    camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, -1.0f * camera_rotation_angle * timestep}});
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_Q)) {
-    camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, -1.0f * camera_rotation_angle * timestep}});
+    camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, camera_rotation_angle * timestep}});
   }
 
   cube_instance_rotation = quaternionf32_rotate_euler(
