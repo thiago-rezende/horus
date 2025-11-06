@@ -30,6 +30,11 @@ default_fragment_shader_entrypoint='fragment_entrypoint'
 default_spir_v_target='spirv'
 default_spir_v_profile='spirv_1_4'
 
+# textures global variables
+default_ktx_format='R8G8B8A8_SRGB'
+default_ktx_assign_tf='srgb'
+default_ktx_generate_mipmap='true'
+
 # ansi colors
 declare -r                               \
         ansi_red='\033[31m'              \
@@ -59,11 +64,15 @@ script__usage() {
   echo -e "  $ansi_green $script_name $ansi_white utility $ansi_yellow command $ansi_magenta < argument > $ansi_cyan [ options ] $ansi_reset"
   echo -e ""
   echo -e "[$ansi_white_bold utilities $ansi_reset]"
-  echo -e "  $ansi_white help $ansi_reset     - show this '$ansi_white_bold help $ansi_reset' message"
-  echo -e "  $ansi_white shaders $ansi_reset  - execute the '$ansi_white_bold shaders $ansi_reset' utility"
+  echo -e "  $ansi_white help $ansi_reset      - show this '$ansi_white_bold help $ansi_reset' message"
+  echo -e "  $ansi_white shaders $ansi_reset   - execute the '$ansi_white_bold shaders $ansi_reset' utility"
+  echo -e "  $ansi_white textures $ansi_reset  - execute the '$ansi_white_bold textures $ansi_reset' utility"
   echo -e ""
   echo -e "[$ansi_white_bold shaders $ansi_reset]"
   echo -e "  $ansi_yellow spir-v $ansi_magenta < slang > < output > $ansi_reset - compile the given slang to spir-v"
+  echo -e ""
+  echo -e "[$ansi_white_bold textures $ansi_reset]"
+  echo -e "  $ansi_yellow ktx $ansi_magenta    < image > < output > $ansi_reset - converts the given image to ktx2"
   echo -e ""
   echo -e "[$ansi_white_bold options $ansi_reset]"
   echo -e "   $ansi_cyan --quiet $ansi_reset  - reduce verbosity"
@@ -166,7 +175,7 @@ shaders__spir_v() {
 
   echo >&3 -e "|- [$ansi_white slangc $ansi_reset] '$ansi_blue $slang $ansi_reset' -> '$ansi_blue $output $ansi_reset'"
 
-  slangc >&${script_logs_directory}/assets__shaders_spir_v__slangc.log \
+  slangc >&${script_logs_directory}/assets__shaders__spir_v__slangc.log \
     $slang \
     -target $default_spir_v_target \
     -profile $default_spir_v_profile \
@@ -177,7 +186,49 @@ shaders__spir_v() {
     -o $output
 
   if [ $? -ne 0 ]; then
-    failure "shaders" "spir-v" "${script_logs_directory}/assets__shaders_spir_v__slangc.log"
+    failure "shaders" "spir-v" "${script_logs_directory}/assets__shaders__spir_v__slangc.log"
+  fi
+}
+
+# textures handler
+textures__handler() {
+  setup__logging
+
+  local command=$1
+
+  case $command in
+    ktx) textures__ktx "${@:2}";;
+    *) if [ -z $command ]; then missing "command" $ansi_yellow; else invalid "command" $command $ansi_yellow; fi;;
+  esac
+}
+
+# textures ktx procedure
+textures__ktx() {
+  local image=$1;
+  local output=$2;
+
+  if [ -z $image ]; then
+    missing "image" $ansi_magenta
+  fi
+
+  if [ -z $output ]; then
+    missing "output" $ansi_magenta
+  fi
+
+  echo >&3 -e "[$ansi_white textures $ansi_reset] conversion started"
+
+  echo >&3 -e "|- [$ansi_white ktx $ansi_reset] '$ansi_blue $image $ansi_reset' -> '$ansi_blue $output $ansi_reset'"
+
+  ktx >&${script_logs_directory}/assets__textures__ktx__ktx.log \
+    create \
+    --assign-tf $default_ktx_assign_tf \
+    $(if [[ "$default_ktx_generate_mipmap" == 'true' ]]; then echo '--generate-mipmap'; else echo ''; fi) \
+    --format $default_ktx_format \
+    $image \
+    $output
+
+  if [ $? -ne 0 ]; then
+    failure "textures" "ktx" "${script_logs_directory}/assets__textures__ktx__ktx.log"
   fi
 }
 
@@ -204,5 +255,6 @@ setup__verbosity
 case $1 in
   help) script__usage;;
   shaders) shaders__handler "${@:2}";;
+  textures) textures__handler "${@:2}";;
   *) invalid "utility" ${1:-""} $ansi_white;;
 esac
