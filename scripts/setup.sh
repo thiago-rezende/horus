@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 
+#
 # ╔═╗╔═╗╔╦╗╦ ╦╔═╗
 # ╚═╗║╣  ║ ║ ║╠═╝
 # ╚═╝╚═╝ ╩ ╚═╝╩
@@ -22,6 +23,21 @@ script_verbose_output=${SCRIPT_VERBOSE_OUTPUT:-1}
 
 # positional arguments
 positional_arguments=()
+
+# project global variables
+project_directory="$(realpath ${script_directory}/../)"
+
+# assets global variables
+assets_script="${script_directory}/assets.sh"
+assets_directory="${project_directory}/assets"
+
+# shaders global variables
+shaders_directory="${assets_directory}/shaders"
+shaders_output_directory="${shaders_directory}/build"
+
+# textures global variables
+textures_directory="${assets_directory}/textures"
+textures_output_directory="${textures_directory}/build"
 
 # ansi colors
 declare -r                               \
@@ -52,11 +68,17 @@ script__usage() {
   echo -e "  $ansi_green $script_name $ansi_white utility $ansi_yellow command $ansi_magenta < argument > $ansi_cyan [ options ] $ansi_reset"
   echo -e ""
   echo -e "[$ansi_white_bold utilities $ansi_reset]"
-  echo -e "  $ansi_white help $ansi_reset   - show this '$ansi_white_bold help $ansi_reset' message"
-  echo -e "  $ansi_white hooks $ansi_reset  - execute the '$ansi_white_bold hooks $ansi_reset' utility"
+  echo -e "  $ansi_white help $ansi_reset    - show this '$ansi_white_bold help $ansi_reset' message"
+  echo -e "  $ansi_white hooks $ansi_reset   - execute the '$ansi_white_bold hooks $ansi_reset' utility"
+  echo -e "  $ansi_white assets $ansi_reset  - execute the '$ansi_white_bold assets $ansi_reset' utility"
   echo -e ""
   echo -e "[$ansi_white_bold hooks $ansi_reset]"
   echo -e "  $ansi_yellow apply $ansi_reset  - apply the available git hooks to the repository"
+  echo -e ""
+  echo -e "[$ansi_white_bold assets $ansi_reset]"
+  echo -e "  $ansi_yellow all $ansi_reset       - execute all the available asset utilities"
+  echo -e "  $ansi_yellow shaders $ansi_reset   - compile all the slang shaders to spir-v"
+  echo -e "  $ansi_yellow textures $ansi_reset  - convert all the textures to ktx2"
   echo -e ""
   echo -e "[$ansi_white_bold options $ansi_reset]"
   echo -e "   $ansi_cyan --quiet $ansi_reset  - reduce verbosity"
@@ -173,6 +195,82 @@ hooks__apply() {
   done
 }
 
+# assets handler
+assets__handler() {
+  setup__logging
+
+  local command=$1
+
+  case $command in
+    all) assets__all "${@:2}";;
+    shaders) assets__shaders "${@:2}";;
+    textures) assets__textures "${@:2}";;
+    *) if [ -z $command ]; then missing "command" $ansi_yellow; else invalid "command" $command $ansi_yellow; fi;;
+  esac
+}
+
+# assets all procedure
+assets__all() {
+  assets__shaders
+  assets__textures
+}
+
+# assets shaders procedure
+assets__shaders() {
+  echo >&3 -e "[$ansi_white shaders $ansi_reset] compiling the available '$ansi_blue slang $ansi_reset' shaders to '$ansi_blue spir-v $ansi_reset'"
+
+  echo >&3 -e "|- [$ansi_white mkdir $ansi_reset] creating the '$ansi_blue $shaders_output_directory $ansi_reset' directory"
+
+  mkdir >&${script_logs_directory}/setup__assets__shaders__mkdir.log -p $shaders_output_directory
+
+  if [ $? -ne 0 ]; then
+    failure "assets" "shaders" "${script_logs_directory}/setup__assets__shaders__mkdir.log"
+  fi
+
+  find $shaders_directory -follow -path $shaders_output_directory -prune -o -type f -print | while read -r file; do
+    case "$file" in
+      *.slang)
+        slang="${file##*/}"
+
+        output="${slang%.*}.spv"
+
+        echo >&3 -e "|- [$ansi_white shader $ansi_reset] compiling '$ansi_blue $file $ansi_reset' to '$ansi_blue ${shaders_output_directory}/${output} $ansi_reset'";
+
+        $assets_script >&3 shaders spir-v "$file" "${shaders_output_directory}/${output}" --quiet
+      ;;
+      *) echo >&3 -e "|- [$ansi_green_bold skip $ansi_reset] ignoring '$ansi_magenta $file $ansi_reset' since it is not a .slang file";;
+    esac
+  done
+}
+
+# assets textures procedure
+assets__textures() {
+  echo >&3 -e "[$ansi_white textures $ansi_reset] compiling the available '$ansi_blue textures $ansi_reset' textures to '$ansi_blue ktx2 $ansi_reset'"
+
+  echo >&3 -e "|- [$ansi_white mkdir $ansi_reset] creating the '$ansi_blue $textures_output_directory $ansi_reset' directory"
+
+  mkdir >&${script_logs_directory}/setup__assets__textures__mkdir.log -p $textures_output_directory
+
+  if [ $? -ne 0 ]; then
+    failure "assets" "textures" "${script_logs_directory}/setup__assets__textures__mkdir.log"
+  fi
+
+  find $textures_directory -follow -path $textures_output_directory -prune -o -type f -print | while read -r file; do
+    case "$file" in
+      *.png)
+        image="${file##*/}"
+
+        output="${image%.*}.ktx2"
+
+        echo >&3 -e "|- [$ansi_white texture $ansi_reset] converting '$ansi_blue $file $ansi_reset' to '$ansi_blue ${textures_output_directory}/${output} $ansi_reset'";
+
+        $assets_script >&3 textures ktx "$file" "${textures_output_directory}/${output}" --quiet
+      ;;
+      *) echo >&3 -e "|- [$ansi_green_bold skip $ansi_reset] ignoring '$ansi_magenta $file $ansi_reset' since it is not a .png file";;
+    esac
+  done
+}
+
 # options handler
 while [ $# -gt 0 ]; do
   case $1 in
@@ -196,5 +294,6 @@ setup__verbosity
 case $1 in
   help) script__usage;;
   hooks) hooks__handler "${@:2}";;
+  assets) assets__handler "${@:2}";;
   *) invalid "utility" ${1:-""} $ansi_white;;
 esac
