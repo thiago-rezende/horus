@@ -5,6 +5,8 @@ struct vertex_input_t {
   float4 color; /* vertex color */
 
   float3 normal; /* vertex normal */
+
+  float2 coordinates; /* vertex texture coordinates */
 };
 
 /* vertex shader output structure */

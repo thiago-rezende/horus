@@ -45,43 +45,45 @@ u32 cube_indices[CUBE_INDICES_COUNT] = {
     /* bottom face */
     20, 21, 22, 22, 23, 20};
 
+/* clang-format off */
 vertex_t cube_vertices[CUBE_VERTICES_COUNT] = {
     /* front face vertices */
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
-    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* right face vertices */
-    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* back face vertices */
-    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* left face vertices */
-    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* top face vertices */
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* bottom face vertices */
-    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
 };
+/* clang-format on */
 
 f32 cube_scale_speed = 2.0f;
 f32 cube_position_speed = 1.0f;

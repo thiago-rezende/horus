@@ -6,6 +6,7 @@
 /* compiler vectorization types [ vector_size should be a power of 2 ] */
 typedef u8 __v4u8 __attribute__((vector_size(sizeof(u8) * 4)));
 
+typedef f32 __v2f32 __attribute__((vector_size(sizeof(f32) * 2)));
 typedef f32 __v3f32 __attribute__((vector_size(sizeof(f32) * 4)));
 typedef f32 __v4f32 __attribute__((vector_size(sizeof(f32) * 4)));
 
@@ -24,6 +25,19 @@ typedef union __vector4u8 {
   /* clang-format on */
 } vector4u8_t;
 
+typedef union __vector2f32 {
+  f32 buffer[2];
+
+  __v2f32 vector;
+
+  /* clang-format off */
+  struct {
+    union { f32 x, u; };
+    union { f32 y, v; };
+  };
+  /* clang-format on */
+} vector2f32_t;
+
 typedef union __vector3f32 {
   f32 buffer[4];
 
@@ -32,9 +46,7 @@ typedef union __vector3f32 {
   /* clang-format off */
   struct {
     union { f32 x, r, u; };
-
     union { f32 y, g, v; };
-
     union { f32 z, b, w; };
 
     f32 __padding;
