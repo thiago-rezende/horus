@@ -115,6 +115,24 @@ static const char *keyboard_keycode_strings[KEYBOARD_KEYCODE_COUNT] = {
     [KEYBOARD_KEYCODE_BACKSLASH] = "backslash",
     [KEYBOARD_KEYCODE_SEMICOLON] = "semicolon",
     [KEYBOARD_KEYCODE_APOSTROPHE] = "apostrophe",
+
+    /* numpad */
+    [KEYBOARD_KEYCODE_NUMPAD_0] = "numpad_0",
+    [KEYBOARD_KEYCODE_NUMPAD_1] = "numpad_1",
+    [KEYBOARD_KEYCODE_NUMPAD_2] = "numpad_2",
+    [KEYBOARD_KEYCODE_NUMPAD_3] = "numpad_3",
+    [KEYBOARD_KEYCODE_NUMPAD_4] = "numpad_4",
+    [KEYBOARD_KEYCODE_NUMPAD_5] = "numpad_5",
+    [KEYBOARD_KEYCODE_NUMPAD_6] = "numpad_6",
+    [KEYBOARD_KEYCODE_NUMPAD_7] = "numpad_7",
+    [KEYBOARD_KEYCODE_NUMPAD_8] = "numpad_8",
+    [KEYBOARD_KEYCODE_NUMPAD_9] = "numpad_9",
+    [KEYBOARD_KEYCODE_NUMPAD_ADD] = "numpad_add",
+    [KEYBOARD_KEYCODE_NUMPAD_ENTER] = "numpad_enter",
+    [KEYBOARD_KEYCODE_NUMPAD_DIVIDE] = "numpad_divide",
+    [KEYBOARD_KEYCODE_NUMPAD_DECIMAL] = "numpad_decimal",
+    [KEYBOARD_KEYCODE_NUMPAD_MULTIPLY] = "numpad_multiply",
+    [KEYBOARD_KEYCODE_NUMPAD_SUBTRACT] = "numpad_subtract",
 };
 
 const char *keyboard_keycode_state_strings[KEYBOARD_KEYCODE_STATE_COUNT] = {
