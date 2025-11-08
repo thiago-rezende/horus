@@ -158,7 +158,7 @@ if host_machine.system() == 'windows'
   vulkan_dep = dependency('vulkan')
 
   # horus renderer textures dependencies [ windows ]
-  ktx_dep = dependency('ktx', required: true)
+  ktx_dep = cc.find_library('ktx', required: true)
 
   horus_dependencies += [
     # horus window dependencies [ windows ]
