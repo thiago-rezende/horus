@@ -265,7 +265,8 @@ vertex_buffer_t *vertex_buffer_create(renderer_t *renderer, vertex_t *vertices, 
   };
 
   if (vkQueueSubmit(renderer->transfer_queue, 1, &transfer_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <buffer:%p> transfer command buffer ending failed", renderer, buffer);
+    logger_critical_format("<renderer:%p> <queue:%p> transfer queue submission failed", renderer,
+                           renderer->transfer_queue);
 
     renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer, renderer->transfer_command_pool);
 
