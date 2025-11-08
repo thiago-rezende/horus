@@ -64,3 +64,6 @@
 #include <horus/renderer/buffers/vertex.h>
 #include <horus/renderer/buffers/uniform.h>
 #include <horus/renderer/buffers/instance.h>
+
+/* horus renderer textures layer */
+#include <horus/renderer/textures/texture.h>

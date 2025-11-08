@@ -54,6 +54,9 @@ horus_renderer_vulkan_sources = [
   'source/renderer/vulkan/buffers/vertex.c',
   'source/renderer/vulkan/buffers/uniform.c',
   'source/renderer/vulkan/buffers/instance.c',
+
+  # horus renderer textures layer [ vulkan ]
+  'source/renderer/vulkan/textures/texture.c',
 ]
 
 # horus source files [ linux ]
@@ -123,6 +126,9 @@ if host_machine.system() == 'linux'
   # horus renderer dependencies [ linux ]
   vulkan_dep = dependency('vulkan')
 
+  # horus renderer textures dependencies [ linux ]
+  ktx_dep = cc.find_library('ktx', required: true)
+
   horus_dependencies += [
     # horus system dependencies [ linux ]
     m_dep,
@@ -134,6 +140,9 @@ if host_machine.system() == 'linux'
 
     # horus renderer dependencies [ linux ]
     vulkan_dep,
+
+    # horus renderer textures dependencies [ linux ]
+    ktx_dep,
   ]
 endif
 
@@ -148,6 +157,9 @@ if host_machine.system() == 'windows'
   # horus renderer dependencies [ windows ]
   vulkan_dep = dependency('vulkan')
 
+  # horus renderer textures dependencies [ windows ]
+  ktx_dep = dependency('ktx', required: true)
+
   horus_dependencies += [
     # horus window dependencies [ windows ]
     dwmapi_dep,
@@ -155,6 +167,9 @@ if host_machine.system() == 'windows'
 
     # horus renderer dependencies [ windows ]
     vulkan_dep,
+
+    # horus renderer textures dependencies [ windows ]
+    ktx_dep,
   ]
 endif
 

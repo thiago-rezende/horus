@@ -11,6 +11,13 @@ const char *default_shader_module_path = "assets/shaders/build/default.spv";
 
 shader_module_t *default_shader_module = NULL;
 
+/* textures global variables */
+const char *checker_dark_texture_path = "assets/textures/build/checker-dark.ktx2";
+const char *checker_light_texture_path = "assets/textures/build/checker-light.ktx2";
+
+texture_t *checker_dark_texture = NULL;
+texture_t *checker_light_texture = NULL;
+
 /* graphics pipelines global variables */
 graphics_pipeline_t *default_graphics_pipeline = NULL;
 
@@ -165,6 +172,18 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
                      default_shader_module_path);
 
   /* TODO: proper error handling */
+  checker_dark_texture = texture_create_from_binary(renderer, (char *)checker_dark_texture_path);
+
+  logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_dark_texture,
+                     checker_dark_texture_path);
+
+  /* TODO: proper error handling */
+  checker_light_texture = texture_create_from_binary(renderer, (char *)checker_light_texture_path);
+
+  logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_light_texture,
+                     checker_light_texture_path);
+
+  /* TODO: proper error handling */
   default_graphics_pipeline = graphics_pipeline_create(renderer, default_shader_module);
 
   logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)default_graphics_pipeline);
@@ -231,6 +250,14 @@ b8 on_destroy(application_t *application, platform_window_t *window, renderer_t 
   graphics_pipeline_destroy(default_graphics_pipeline);
 
   logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)default_graphics_pipeline);
+
+  texture_destroy(checker_dark_texture);
+
+  logger_info_format("<renderer:%p> <texture:%p> destroyed", (void *)renderer, (void *)checker_dark_texture);
+
+  texture_destroy(checker_light_texture);
+
+  logger_info_format("<renderer:%p> <texture:%p> destroyed", (void *)renderer, (void *)checker_light_texture);
 
   shader_module_destroy(default_shader_module);
 
