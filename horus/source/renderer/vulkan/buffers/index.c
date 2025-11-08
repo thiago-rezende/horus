@@ -58,8 +58,6 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
   if (vkCreateBuffer(renderer->device, &buffer_create_info, NULL, &buffer->buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> buffer creation failed", renderer);
 
-    vkDestroyBuffer(buffer->device, buffer->staging, NULL);
-
     platform_memory_deallocate(buffer);
 
     return NULL;
@@ -67,6 +65,8 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
 
   if (vkCreateBuffer(renderer->device, &staging_create_info, NULL, &buffer->staging) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> staging buffer creation failed", renderer);
+
+    vkDestroyBuffer(buffer->device, buffer->staging, NULL);
 
     platform_memory_deallocate(buffer);
 
@@ -219,6 +219,7 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
 
   VkCommandBufferBeginInfo transfer_command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+      .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
   };
 
   if (vkBeginCommandBuffer(transfer_command_buffer, &transfer_command_buffer_begin_info) != VK_SUCCESS) {
