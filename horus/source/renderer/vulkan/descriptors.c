@@ -5,7 +5,7 @@
 #include <horus/logger/logger.h>
 
 b8 renderer_vulkan_descriptor_pool_create(renderer_t *renderer) {
-  VkDescriptorPoolSize descriptor_pool_sizes[2] = {
+  VkDescriptorPoolSize descriptor_pool_sizes[3] = {
       (VkDescriptorPoolSize){
           .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
           .descriptorCount = RENDERER_VULKAN_FRAMES_IN_FLIGHT * 2,
@@ -14,13 +14,17 @@ b8 renderer_vulkan_descriptor_pool_create(renderer_t *renderer) {
           .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
           .descriptorCount = RENDERER_VULKAN_FRAMES_IN_FLIGHT * 2,
       },
+      (VkDescriptorPoolSize){
+          .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+          .descriptorCount = RENDERER_VULKAN_FRAMES_IN_FLIGHT * 2,
+      },
   };
 
   VkDescriptorPoolCreateInfo descriptor_pool_create_info = (VkDescriptorPoolCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
       .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
       .maxSets = RENDERER_VULKAN_FRAMES_IN_FLIGHT,
-      .poolSizeCount = 2,
+      .poolSizeCount = 3,
       .pPoolSizes = descriptor_pool_sizes,
   };
 
@@ -97,12 +101,12 @@ array_t *renderer_vulkan_descriptor_sets_create(VkDevice device,
   return descriptor_sets;
 }
 
-b8 renderer_vulkan_descriptor_set_update(VkDevice device,
-                                         VkDescriptorSet descriptor_set,
-                                         VkDescriptorType descriptor_type,
-                                         u32 binding,
-                                         VkBuffer buffer,
-                                         u64 size) {
+b8 renderer_vulkan_descriptor_set_update_buffer(VkDevice device,
+                                                VkDescriptorSet descriptor_set,
+                                                VkDescriptorType descriptor_type,
+                                                u32 binding,
+                                                VkBuffer buffer,
+                                                u64 size) {
   VkDescriptorBufferInfo descriptor_buffer_info = (VkDescriptorBufferInfo){
       .buffer = buffer,
       .offset = 0,
@@ -117,6 +121,33 @@ b8 renderer_vulkan_descriptor_set_update(VkDevice device,
       .descriptorCount = 1,
       .descriptorType = descriptor_type,
       .pBufferInfo = &descriptor_buffer_info,
+  };
+
+  vkUpdateDescriptorSets(device, 1, &write_descriptor_set, 0, NULL);
+
+  return true;
+}
+
+b8 renderer_vulkan_descriptor_set_update_sampler(VkDevice device,
+                                                 VkDescriptorSet descriptor_set,
+                                                 VkDescriptorType descriptor_type,
+                                                 u32 binding,
+                                                 VkSampler sampler,
+                                                 VkImageView image_view) {
+  VkDescriptorImageInfo descriptor_image_info = (VkDescriptorImageInfo){
+      .sampler = sampler,
+      .imageView = image_view,
+      .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+  };
+
+  VkWriteDescriptorSet write_descriptor_set = (VkWriteDescriptorSet){
+      .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+      .dstSet = descriptor_set,
+      .dstBinding = binding,
+      .dstArrayElement = 0,
+      .descriptorCount = 1,
+      .descriptorType = descriptor_type,
+      .pImageInfo = &descriptor_image_info,
   };
 
   vkUpdateDescriptorSets(device, 1, &write_descriptor_set, 0, NULL);

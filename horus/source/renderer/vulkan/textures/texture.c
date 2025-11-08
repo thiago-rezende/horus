@@ -12,7 +12,9 @@
 
 /* horus renderer layer [ vulkan ]*/
 #include <horus/renderer/vulkan/command.h>
+#include <horus/renderer/vulkan/pipeline.h>
 #include <horus/renderer/vulkan/renderer.h>
+#include <horus/renderer/vulkan/descriptors.h>
 
 /* horus renderer textures layer */
 #include <horus/renderer/textures/texture.h>
@@ -20,10 +22,15 @@
 /* horus renderer textures layer [ vulkan ] */
 #include <horus/renderer/vulkan/textures/texture.h>
 
+#define DEFAULT_DIFFUSE_SAMPLER_BINDING 2
+
 struct __texture {
   VkDevice device;
 
   VkImage image;
+  VkImageView image_view;
+
+  VkSampler sampler;
 
   VkBuffer staging;
 
@@ -42,10 +49,6 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
 
     return NULL;
   }
-
-  logger_debug_format("<ktx_texture:%p> <width:%lu> <height:%lu> <depth:%lu> <levels:%lu> <layers:%lu>", ktx_texture,
-                      ktx_texture->baseWidth, ktx_texture->baseHeight, ktx_texture->baseDepth, ktx_texture->numLevels,
-                      ktx_texture->numLayers);
 
   /* TODO: transcode if needed for better performance and compatibility */
 
@@ -66,7 +69,6 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   VkImageCreateInfo image_create_info = (VkImageCreateInfo){
       .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
       .flags = (VkImageCreateFlags)0,
-      .pNext = NULL,
       .imageType = texture_depth > 1 ? VK_IMAGE_TYPE_3D : VK_IMAGE_TYPE_2D,
       .extent = (VkExtent3D){texture_width, texture_height, texture_depth},
       .format = ktx_texture->vkFormat,
@@ -79,6 +81,7 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
       .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
       .queueFamilyIndexCount = 0,
       .pQueueFamilyIndices = NULL,
+      .pNext = NULL,
   };
 
   VkBufferCreateInfo staging_create_info = (VkBufferCreateInfo){
@@ -292,6 +295,8 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
     vkDestroyImage(texture->device, texture->image, NULL);
     vkDestroyBuffer(texture->device, texture->staging, NULL);
 
+    platform_memory_deallocate(texture);
+
     return NULL;
   }
 
@@ -315,6 +320,8 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
 
     vkDestroyImage(texture->device, texture->image, NULL);
     vkDestroyBuffer(texture->device, texture->staging, NULL);
+
+    platform_memory_deallocate(texture);
 
     return NULL;
   }
@@ -372,6 +379,8 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
 
     array_destroy(regions);
 
+    platform_memory_deallocate(texture);
+
     return NULL;
   }
 
@@ -396,11 +405,15 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
 
     array_destroy(regions);
 
+    platform_memory_deallocate(texture);
+
     return NULL;
   }
 
   vkQueueWaitIdle(renderer->transfer_queue);
 
+  image_transition_info.old_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+  image_transition_info.new_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
   image_transition_info.source_access_mask = VK_ACCESS_TRANSFER_WRITE_BIT;
   image_transition_info.destination_access_mask = VK_ACCESS_SHADER_READ_BIT;
   image_transition_info.source_stage_mask = VK_PIPELINE_STAGE_TRANSFER_BIT;
@@ -417,10 +430,12 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
     vkDestroyImage(texture->device, texture->image, NULL);
     vkDestroyBuffer(texture->device, texture->staging, NULL);
 
+    array_destroy(regions);
+
+    platform_memory_deallocate(texture);
+
     return NULL;
   }
-
-  ktxTexture2_Destroy(ktx_texture);
 
   renderer_vulkan_command_buffer_destroy(texture->device, transfer_command_buffer, renderer->transfer_command_pool);
 
@@ -429,6 +444,69 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   vkDestroyBuffer(texture->device, texture->staging, NULL);
 
   array_destroy(regions);
+
+  VkImageViewCreateInfo image_view_create_info = (VkImageViewCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+      .flags = (VkImageViewCreateFlags)0,
+      .image = texture->image,
+      .viewType = texture_depth > 1 ? VK_IMAGE_VIEW_TYPE_3D : VK_IMAGE_VIEW_TYPE_2D,
+      .format = ktx_texture->vkFormat,
+      .subresourceRange =
+          (VkImageSubresourceRange){
+              .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+              .baseMipLevel = 0,
+              .levelCount = ktx_texture->numLevels,
+              .baseArrayLayer = 0,
+              .layerCount = ktx_texture->numLayers,
+          },
+      .pNext = NULL,
+  };
+
+  if (vkCreateImageView(texture->device, &image_view_create_info, NULL, &texture->image_view) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <texture:%p> image view creation failed", renderer, texture);
+
+    ktxTexture2_Destroy(ktx_texture);
+
+    vkFreeMemory(texture->device, texture->memory, NULL);
+
+    vkDestroyImage(texture->device, texture->image, NULL);
+
+    platform_memory_deallocate(texture);
+
+    return NULL;
+  }
+
+  VkSamplerCreateInfo sampler_create_info = (VkSamplerCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+      .magFilter = VK_FILTER_LINEAR,
+      .minFilter = VK_FILTER_LINEAR,
+      .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+      .mipLodBias = 0.0f,
+      .minLod = 0.0f,
+      .maxLod = ktx_texture->numLevels - 1.0f,
+      .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT, /* TODO: control with user choice */
+      .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT, /* TODO: control with user choice */
+      .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT, /* TODO: control with user choice */
+      .anisotropyEnable = renderer->physical_device_features.samplerAnisotropy,
+      .maxAnisotropy = renderer->physical_device_properties.limits.maxSamplerAnisotropy,
+      .compareEnable = VK_FALSE,
+      .compareOp = VK_COMPARE_OP_ALWAYS,
+      .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+      .unnormalizedCoordinates = VK_FALSE, /* ! always using normalized texture coordinates */
+  };
+
+  if (vkCreateSampler(texture->device, &sampler_create_info, NULL, &texture->sampler) != VK_SUCCESS) {
+    ktxTexture2_Destroy(ktx_texture);
+
+    vkFreeMemory(texture->device, texture->memory, NULL);
+
+    vkDestroyImage(texture->device, texture->image, NULL);
+    vkDestroyImageView(texture->device, texture->image_view, NULL);
+
+    platform_memory_deallocate(texture);
+
+    return NULL;
+  }
 
   return texture;
 }
@@ -477,7 +555,28 @@ texture_t *texture_create_from_binary(renderer_t *renderer, char *path) {
   return texture;
 }
 
+b8 texture_bind(texture_t *texture, graphics_pipeline_t *pipeline, renderer_t *renderer) {
+  VkDescriptorSet descriptor_set;
+  VkCommandBuffer graphics_command_buffer;
+
+  array_retrieve(pipeline->descriptor_sets, renderer->current_frame_in_flight_index, &descriptor_set);
+  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+
+  renderer_vulkan_descriptor_set_update_sampler(renderer->device, descriptor_set,
+                                                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                                                DEFAULT_DIFFUSE_SAMPLER_BINDING, texture->sampler, texture->image_view);
+
+  vkCmdBindDescriptorSets(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->layout, 0, 1,
+                          &descriptor_set, 0, NULL);
+
+  return true;
+}
+
 b8 texture_destroy(texture_t *texture) {
+  vkDestroySampler(texture->device, texture->sampler, NULL);
+
+  vkDestroyImageView(texture->device, texture->image_view, NULL);
+
   vkFreeMemory(texture->device, texture->memory, NULL);
 
   vkDestroyImage(texture->device, texture->image, NULL);

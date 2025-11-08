@@ -17,7 +17,9 @@ struct vertex_output_t {
 
   float3 normal : NORMAL0; /* vertex normal */
 
-  float3 world_position : TEXCOORD0; /* world position */
+  float2 coordinates : TEXCOORD0; /* vertex texture coordinates */
+
+  float3 world_position : TEXCOORD1; /* world position */
 };
 
 /* uniform buffer structure */
@@ -41,6 +43,9 @@ ConstantBuffer<uniform_buffer_t> uniform_buffer_object : register(b0);
 /* instance buffer object */
 StructuredBuffer<instance_buffer_t> instance_buffer_object : register(t1);
 
+/* diffuse texture sampler */
+Sampler2D diffuse_texture_sampler : register(t2) : register(s2);
+
 /* vertex shader entrypoint */
 [shader("vertex")]
 vertex_output_t vertex_entrypoint(vertex_input_t input, uint vertex_id: SV_VertexID, uint instance_id: SV_InstanceID) {
@@ -62,6 +67,9 @@ vertex_output_t vertex_entrypoint(vertex_input_t input, uint vertex_id: SV_Verte
 
   /* vertex normal */
   output.normal = normalize(mul((float3x3)instance_buffer_object[instance_id].model, input.normal));
+
+  /* vertex texture coordinates */
+  output.coordinates = input.coordinates;
 
   /* world position */
   output.world_position = world_position.xyz;
@@ -87,8 +95,11 @@ float4 fragment_entrypoint(vertex_output_t vertex) : SV_Target {
   /* shading factor */
   float shading_factor = clamp(ambient_strength + diffuse_factor, 0.0, 1.0);
 
+  /* diffuse sampled color */
+  float4 diffuse_sampled = diffuse_texture_sampler.Sample(vertex.coordinates);
+
   /* fragment color */
-  float4 color = float4(vertex.color.rgb * shading_factor, vertex.color.a);
+  float4 color = vertex.color * diffuse_sampled * shading_factor;
 
   return color;
 }

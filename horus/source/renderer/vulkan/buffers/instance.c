@@ -153,8 +153,8 @@ b8 instance_buffer_bind(instance_buffer_t *buffer, graphics_pipeline_t *pipeline
   array_retrieve(pipeline->descriptor_sets, renderer->current_frame_in_flight_index, &descriptor_set);
   array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
 
-  renderer_vulkan_descriptor_set_update(renderer->device, descriptor_set, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                                        DEFAULT_INSTANCE_BUFFER_BINDING, current_buffer, buffer->size);
+  renderer_vulkan_descriptor_set_update_buffer(renderer->device, descriptor_set, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                                               DEFAULT_INSTANCE_BUFFER_BINDING, current_buffer, buffer->size);
 
   vkCmdBindDescriptorSets(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->layout, 0, 1,
                           &descriptor_set, 0, NULL);

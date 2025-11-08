@@ -21,12 +21,19 @@ array_t *renderer_vulkan_descriptor_sets_create(VkDevice device,
                                                 VkDescriptorSetLayout layout,
                                                 u8 count);
 
-b8 renderer_vulkan_descriptor_set_update(VkDevice device,
-                                         VkDescriptorSet descriptor_set,
-                                         VkDescriptorType descriptor_type,
-                                         u32 binding,
-                                         VkBuffer buffer,
-                                         u64 size);
+b8 renderer_vulkan_descriptor_set_update_buffer(VkDevice device,
+                                                VkDescriptorSet descriptor_set,
+                                                VkDescriptorType descriptor_type,
+                                                u32 binding,
+                                                VkBuffer buffer,
+                                                u64 size);
+
+b8 renderer_vulkan_descriptor_set_update_sampler(VkDevice device,
+                                                 VkDescriptorSet descriptor_set,
+                                                 VkDescriptorType descriptor_type,
+                                                 u32 binding,
+                                                 VkSampler sampler,
+                                                 VkImageView image_view);
 
 b8 renderer_vulkan_descriptor_set_destroy(VkDevice device,
                                           VkDescriptorPool descriptor_pool,

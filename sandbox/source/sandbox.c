@@ -15,6 +15,7 @@ shader_module_t *default_shader_module = NULL;
 const char *checker_dark_texture_path = "assets/textures/build/checker-dark.ktx2";
 const char *checker_light_texture_path = "assets/textures/build/checker-light.ktx2";
 
+texture_t *current_texture = NULL;
 texture_t *checker_dark_texture = NULL;
 texture_t *checker_light_texture = NULL;
 
@@ -55,40 +56,40 @@ u32 cube_indices[CUBE_INDICES_COUNT] = {
 /* clang-format off */
 vertex_t cube_vertices[CUBE_VERTICES_COUNT] = {
     /* front face vertices */
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 1.0f}}},
+    (vertex_t){.position = {{ 0.5f, -0.5f, 0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{1.0f, 1.0f}}},
+    (vertex_t){.position = {{ 0.5f,  0.5f, 0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{1.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f,  0.5f, 0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, 1.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* right face vertices */
-    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 1.0f}}},
+    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{1.0f, 1.0f}}},
+    (vertex_t){.position = {{0.5f,  0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{1.0f, 0.0f}}},
+    (vertex_t){.position = {{0.5f,  0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* back face vertices */
-    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{ 0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{1.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f,  0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{1.0f, 0.0f}}},
+    (vertex_t){.position = {{ 0.5f,  0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 0.0f, -1.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* left face vertices */
-    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{1.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f,  0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{1.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f,  0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{-1.0f, 0.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* top face vertices */
-    (vertex_t){.position = {{-0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 1.0f}}},
+    (vertex_t){.position = {{ 0.5f, 0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{1.0f, 1.0f}}},
+    (vertex_t){.position = {{ 0.5f, 0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{1.0f, 0.0f}}},
+    (vertex_t){.position = {{-0.5f, 0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, 1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
 
     /* bottom face vertices */
-    (vertex_t){.position = {{0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, 0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
-    (vertex_t){.position = {{0.5f, -0.5f, -0.5f}}, .color = {{242, 89, 18, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{ 0.5f, -0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{1.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f,  0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 1.0f}}},
+    (vertex_t){.position = {{-0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{0.0f, 0.0f}}},
+    (vertex_t){.position = {{ 0.5f, -0.5f, -0.5f}}, .color = {{255, 255, 255, 255}}, .normal = {{0.0f, -1.0f, 0.0f}}, .coordinates = {{1.0f, 0.0f}}},
 };
 /* clang-format on */
 
@@ -176,6 +177,9 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
 
   logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_dark_texture,
                      checker_dark_texture_path);
+
+  /* ! default texture to be bound */
+  current_texture = checker_dark_texture;
 
   /* TODO: proper error handling */
   checker_light_texture = texture_create_from_binary(renderer, (char *)checker_light_texture_path);
@@ -477,6 +481,10 @@ b8 on_update(f64 timestep) {
     camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, camera_rotation_angle * timestep}});
   }
 
+  if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_T)) {
+    current_texture = current_texture == checker_dark_texture ? checker_light_texture : checker_dark_texture;
+  }
+
   cube_instance_rotation = quaternionf32_rotate_euler(
       cube_instance_rotation, (vector3f32_t){{-1.0f * cube_rotation_angle * timestep, 0.0f, 0.0f}});
 
@@ -555,6 +563,14 @@ b8 on_render(renderer_t *renderer) {
   if (!instance_buffer_bind(cube_instance_buffer, default_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <instance_buffer:%p> instance buffer binding failed", renderer,
                            default_graphics_pipeline, cube_instance_buffer);
+
+    return false;
+  }
+
+  /* textures setup */
+  if (!texture_bind(current_texture, default_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> <texture:%p> texture binding failed", renderer,
+                           default_graphics_pipeline, current_texture);
 
     return false;
   }

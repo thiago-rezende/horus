@@ -17,6 +17,8 @@
 #define DEFAULT_UNIFORM_BUFFER_BINDING 0
 #define DEFAULT_INSTANCE_BUFFER_BINDING 1
 
+#define DEFAULT_DIFFUSE_SAMPLER_BINDING 2
+
 static const VkDynamicState renderer_pipeline_dynamic_state_scissor = VK_DYNAMIC_STATE_SCISSOR;
 static const VkDynamicState renderer_pipeline_dynamic_state_viewport = VK_DYNAMIC_STATE_VIEWPORT;
 
@@ -71,7 +73,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       (VkVertexInputAttributeDescription){
           .binding = 0,
           .location = 3,
-          .format = VK_FORMAT_R32G32B32_SFLOAT,
+          .format = VK_FORMAT_R32G32_SFLOAT,
           .offset = offsetof(vertex_t, coordinates),
       };
 
@@ -144,7 +146,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       .pAttachments = &pipeline_color_blend_attachment_state,
   };
 
-  VkDescriptorSetLayoutBinding descriptor_set_layout_bindings[2] = {
+  VkDescriptorSetLayoutBinding descriptor_set_layout_bindings[3] = {
       (VkDescriptorSetLayoutBinding){
           .binding = DEFAULT_UNIFORM_BUFFER_BINDING,
           .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -159,12 +161,19 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
           .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
           .pImmutableSamplers = NULL,
       },
+      (VkDescriptorSetLayoutBinding){
+          .binding = DEFAULT_DIFFUSE_SAMPLER_BINDING,
+          .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+          .descriptorCount = 1,
+          .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+          .pImmutableSamplers = NULL,
+      },
   };
 
   VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info = (VkDescriptorSetLayoutCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
       .flags = (VkDescriptorSetLayoutCreateFlags)0,
-      .bindingCount = 2,
+      .bindingCount = 3,
       .pBindings = descriptor_set_layout_bindings,
       .pNext = NULL,
   };
