@@ -33,6 +33,7 @@ default_spir_v_profile='spirv_1_4'
 
 # textures global variables
 default_ktx_format='R8G8B8A8_SRGB'
+default_ktx_encoding='uastc'
 default_ktx_assign_tf='srgb'
 default_ktx_generate_mipmap='true'
 
@@ -222,6 +223,7 @@ textures__ktx() {
 
   ktx >&${script_logs_directory}/assets__textures__ktx__ktx.log \
     create \
+    --encode $default_ktx_encoding \
     --assign-tf $default_ktx_assign_tf \
     $(if [[ "$default_ktx_generate_mipmap" == 'true' ]]; then echo '--generate-mipmap'; else echo ''; fi) \
     --format $default_ktx_format \

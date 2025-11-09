@@ -5,6 +5,7 @@
 
 /* horus platform layer */
 #include <horus/platform/memory.h>
+#include <horus/platform/detection.h>
 #include <horus/platform/filesystem.h>
 
 /* horus containers layer */
@@ -23,6 +24,8 @@
 #include <horus/renderer/vulkan/textures/texture.h>
 
 #define DEFAULT_DIFFUSE_SAMPLER_BINDING 2
+
+ktx_transcode_fmt_e __select_ktx_transcode_format(renderer_t *renderer);
 
 struct __texture {
   VkDevice device;
@@ -50,7 +53,17 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
     return NULL;
   }
 
-  /* TODO: transcode if needed for better performance and compatibility */
+  if (ktxTexture2_NeedsTranscoding(ktx_texture)) {
+    ktx_transcode_fmt_e transcode_format = __select_ktx_transcode_format(renderer);
+
+    if (ktxTexture2_TranscodeBasis(ktx_texture, transcode_format, 0) != KTX_SUCCESS) {
+      logger_critical_format("<renderer:%p> ktx texture transcoding failed", renderer);
+
+      ktxTexture2_Destroy(ktx_texture);
+
+      return NULL;
+    }
+  }
 
   u32 texture_width = ktx_texture->baseWidth;
   u32 texture_height = ktx_texture->baseHeight;
@@ -662,4 +675,20 @@ b8 __renderer_vulkan_transition_image_layout(renderer_t *renderer, image_transit
   renderer_vulkan_command_buffer_destroy(renderer->device, graphics_command_buffer, renderer->graphics_command_pool);
 
   return true;
+}
+
+ktx_transcode_fmt_e __select_ktx_transcode_format(renderer_t *renderer) {
+  if (renderer->physical_device_features.textureCompressionBC) {
+    return KTX_TTF_BC7_RGBA;
+  }
+
+  if (renderer->physical_device_features.textureCompressionASTC_LDR) {
+    return KTX_TTF_ASTC_4x4_RGBA;
+  }
+
+  if (renderer->physical_device_features.textureCompressionETC2) {
+    return KTX_TTF_ETC2_RGBA;
+  }
+
+  return KTX_TTF_RGBA32;
 }

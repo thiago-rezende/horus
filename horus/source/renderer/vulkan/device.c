@@ -389,6 +389,9 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
               .fillModeNonSolid = renderer->physical_device_features.fillModeNonSolid,
               .samplerAnisotropy = renderer->physical_device_features.samplerAnisotropy,
               .tessellationShader = renderer->physical_device_features.tessellationShader,
+              .textureCompressionBC = renderer->physical_device_features.textureCompressionBC,
+              .textureCompressionETC2 = renderer->physical_device_features.textureCompressionETC2,
+              .textureCompressionASTC_LDR = renderer->physical_device_features.textureCompressionASTC_LDR,
           },
   };
 
