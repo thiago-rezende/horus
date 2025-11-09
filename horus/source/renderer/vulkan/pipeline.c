@@ -135,7 +135,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
   VkPipelineColorBlendAttachmentState pipeline_color_blend_attachment_state = (VkPipelineColorBlendAttachmentState){
       .blendEnable = VK_FALSE,
       .colorWriteMask =
-          VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_B_BIT,
+          VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_A_BIT,
   };
 
   VkPipelineColorBlendStateCreateInfo pipeline_color_blend_state_create_info = (VkPipelineColorBlendStateCreateInfo){

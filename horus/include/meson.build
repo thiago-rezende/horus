@@ -89,6 +89,12 @@ horus_renderer_vulkan_headers = [
   'horus/renderer/vulkan/descriptors.h',
   'horus/renderer/vulkan/synchronization.h',
 
+  # horus renderer buffers layer [ vulkan ]
+  'horus/renderer/vulkan/buffers/index.h',
+  'horus/renderer/vulkan/buffers/vertex.h',
+  'horus/renderer/vulkan/buffers/uniform.h',
+  'horus/renderer/vulkan/buffers/instance.h',
+
   # horus renderer textures layer [ vulkan ]
   'horus/renderer/vulkan/textures/texture.h',
 ]

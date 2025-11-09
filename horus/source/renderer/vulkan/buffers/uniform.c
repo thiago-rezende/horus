@@ -14,21 +14,9 @@
 #include <horus/renderer/vulkan/descriptors.h>
 
 /* horus renderer buffers layer [ vulkan ] */
-#include <horus/renderer/buffers/uniform.h>
+#include <horus/renderer/vulkan/buffers/uniform.h>
 
 #define DEFAULT_UNIFORM_BUFFER_BINDING 0
-
-struct __uniform_buffer {
-  VkDevice device;
-
-  VkDeviceSize size;
-
-  array_t *buffers;
-  array_t *memories;
-  array_t *mappings;
-
-  u8 *current_frame_in_flight_index;
-};
 
 /* TODO: refactor into multipe functions for usage within other types of buffer */
 uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_object_t *object) {

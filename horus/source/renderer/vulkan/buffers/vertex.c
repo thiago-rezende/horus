@@ -12,18 +12,7 @@
 #include <horus/renderer/vulkan/pipeline.h>
 
 /* horus renderer buffers layer [ vulkan ] */
-#include <horus/renderer/buffers/vertex.h>
-
-struct __vertex_buffer {
-  VkDevice device;
-
-  VkBuffer buffer;
-  VkBuffer staging;
-
-  VkDeviceSize size;
-  VkDeviceMemory memory;
-  VkDeviceMemory staging_memory;
-};
+#include <horus/renderer/vulkan/buffers/vertex.h>
 
 /* TODO: refactor into multipe functions for usage within other types of buffer */
 vertex_buffer_t *vertex_buffer_create(renderer_t *renderer, vertex_t *vertices, u64 count) {

@@ -14,22 +14,9 @@
 #include <horus/renderer/vulkan/descriptors.h>
 
 /* horus renderer buffers layer [ vulkan ] */
-#include <horus/renderer/buffers/instance.h>
+#include <horus/renderer/vulkan/buffers/instance.h>
 
 #define DEFAULT_INSTANCE_BUFFER_BINDING 1
-
-/* TODO: update to use staging buffers enabling high speed memory */
-struct __instance_buffer {
-  VkDevice device;
-
-  VkDeviceSize size;
-
-  array_t *buffers;
-  array_t *memories;
-  array_t *mappings;
-
-  u8 *current_frame_in_flight_index;
-};
 
 /* TODO: refactor into multipe functions for usage within other types of buffer */
 instance_buffer_t *instance_buffer_create(renderer_t *renderer, instance_buffer_object_t *objects, u32 count) {

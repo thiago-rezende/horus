@@ -12,18 +12,7 @@
 #include <horus/renderer/vulkan/pipeline.h>
 
 /* horus renderer buffers layer [ vulkan ] */
-#include <horus/renderer/buffers/index.h>
-
-struct __index_buffer {
-  VkDevice device;
-
-  VkBuffer buffer;
-  VkBuffer staging;
-
-  VkDeviceSize size;
-  VkDeviceMemory memory;
-  VkDeviceMemory staging_memory;
-};
+#include <horus/renderer/vulkan/buffers/index.h>
 
 /* TODO: refactor into multipe functions for usage within other types of buffer */
 index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 count) {
