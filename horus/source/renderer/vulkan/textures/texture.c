@@ -296,7 +296,7 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
       .destination_stage_mask = VK_PIPELINE_STAGE_TRANSFER_BIT,
   };
 
-  if (!__renderer_vulkan_transition_image_layout(renderer, image_transition_info)) {
+  if (!renderer_vulkan_image_transition_layout(renderer, image_transition_info)) {
     logger_critical_format("<renderer:%p> <texture:%p> image transition failed", renderer, texture);
 
     ktxTexture2_Destroy(ktx_texture);
@@ -431,7 +431,7 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   image_transition_info.source_stage_mask = VK_PIPELINE_STAGE_TRANSFER_BIT;
   image_transition_info.destination_stage_mask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-  if (!__renderer_vulkan_transition_image_layout(renderer, image_transition_info)) {
+  if (!renderer_vulkan_image_transition_layout(renderer, image_transition_info)) {
     logger_critical_format("<renderer:%p> <texture:%p> image transition failed", renderer, texture);
 
     ktxTexture2_Destroy(ktx_texture);

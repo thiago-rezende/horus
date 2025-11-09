@@ -9,7 +9,7 @@
 #include <horus/renderer/vulkan/command.h>
 #include <horus/renderer/vulkan/renderer.h>
 
-b8 __renderer_vulkan_transition_image_layout(renderer_t *renderer, image_transition_info_t info) {
+b8 renderer_vulkan_image_transition_layout(renderer_t *renderer, image_transition_info_t info) {
   VkCommandBuffer graphics_command_buffer =
       renderer_vulkan_command_buffer_create(renderer->device, renderer->graphics_command_pool);
 
@@ -87,4 +87,33 @@ b8 __renderer_vulkan_transition_image_layout(renderer_t *renderer, image_transit
   renderer_vulkan_command_buffer_destroy(renderer->device, graphics_command_buffer, renderer->graphics_command_pool);
 
   return true;
+}
+
+b8 renderer_vulkan_format_has_stencil_component(VkFormat format) {
+  return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+}
+
+VkFormat renderer_vulkan_image_find_supported_format(renderer_t *renderer,
+                                                     array_t *candidates,
+                                                     VkImageTiling tiling,
+                                                     VkFormatFeatureFlags features) {
+  for (u64 i = 0; i < candidates->count; i++) {
+    VkFormat format;
+
+    array_retrieve(candidates, i, (void *)&format);
+
+    VkFormatProperties format_properties;
+
+    vkGetPhysicalDeviceFormatProperties(renderer->physical_device, format, &format_properties);
+
+    if (tiling == VK_IMAGE_TILING_LINEAR && (format_properties.linearTilingFeatures & features) == features) {
+      return format;
+    }
+
+    if (tiling == VK_IMAGE_TILING_OPTIMAL && (format_properties.optimalTilingFeatures & features) == features) {
+      return format;
+    }
+  }
+
+  return VK_FORMAT_UNDEFINED;
 }

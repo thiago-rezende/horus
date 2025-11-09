@@ -131,7 +131,27 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
           .depthTestEnable = VK_TRUE,
           .depthWriteEnable = VK_TRUE,
           .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
-          .stencilTestEnable = VK_FALSE, /* TODO: check for stencil test availability */
+          .stencilTestEnable = renderer->depth_image_has_stencil_support ? VK_TRUE : VK_FALSE,
+          .front =
+              (VkStencilOpState){
+                  .failOp = VK_STENCIL_OP_KEEP,
+                  .passOp = VK_STENCIL_OP_KEEP,
+                  .depthFailOp = VK_STENCIL_OP_KEEP,
+                  .compareOp = VK_COMPARE_OP_ALWAYS,
+                  .compareMask = 0xFF,
+                  .writeMask = 0xFF,
+                  .reference = 0,
+              },
+          .back =
+              (VkStencilOpState){
+                  .failOp = VK_STENCIL_OP_KEEP,
+                  .passOp = VK_STENCIL_OP_KEEP,
+                  .depthFailOp = VK_STENCIL_OP_KEEP,
+                  .compareOp = VK_COMPARE_OP_ALWAYS,
+                  .compareMask = 0xFF,
+                  .writeMask = 0xFF,
+                  .reference = 0,
+              },
       };
 
   VkPipelineColorBlendAttachmentState pipeline_color_blend_attachment_state = (VkPipelineColorBlendAttachmentState){
@@ -232,8 +252,9 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
       .colorAttachmentCount = 1,
       .pColorAttachmentFormats = &renderer->surface_format.format,
-      .depthAttachmentFormat = VK_FORMAT_D32_SFLOAT,  /* TODO: fetch from depth image creation */
-      .stencilAttachmentFormat = VK_FORMAT_UNDEFINED, /* TODO: check for stencil test availability */
+      .depthAttachmentFormat = renderer->depth_image_format,
+      .stencilAttachmentFormat =
+          (renderer->depth_image_has_stencil_support ? renderer->depth_image_format : VK_FORMAT_UNDEFINED),
   };
 
   if (!pipeline->module->has_vertex_stage_create_info) {

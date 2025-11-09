@@ -50,6 +50,9 @@ struct __renderer {
   VkImageView depth_image_view;
   VkDeviceMemory depth_image_memory;
 
+  b8 depth_image_has_stencil_support;
+  VkFormat depth_image_format;
+
   VkCommandPool compute_command_pool;
   VkCommandPool present_command_pool;
   VkCommandPool graphics_command_pool;

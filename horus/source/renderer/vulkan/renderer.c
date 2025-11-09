@@ -386,7 +386,8 @@ b8 renderer_record_commands(renderer_t *renderer) {
   VkRenderingAttachmentInfo depth_attachment_info = (VkRenderingAttachmentInfo){
       .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
       .imageView = renderer->depth_image_view,
-      .imageLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+      .imageLayout = renderer->depth_image_has_stencil_support ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                                                               : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
       .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
       .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
       .clearValue =
@@ -413,7 +414,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .colorAttachmentCount = 1,
       .pColorAttachments = &rendering_attachment_info,
       .pDepthAttachment = &depth_attachment_info,
-      .pStencilAttachment = NULL,
+      .pStencilAttachment = renderer->depth_image_has_stencil_support ? &depth_attachment_info : NULL,
   };
 
   vkCmdBeginRendering(graphics_command_buffer, &rendering_info);

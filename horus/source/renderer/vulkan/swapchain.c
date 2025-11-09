@@ -83,6 +83,25 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
     return false;
   }
 
+  /* TODO: move the depth format retrieval somewhere else since its needed only one time */
+  array_t *depth_format_candidates = array_create(3, sizeof(VkFormat));
+
+  VkFormat depth_format_candidate_1 = VK_FORMAT_D32_SFLOAT_S8_UINT;
+  VkFormat depth_format_candidate_2 = VK_FORMAT_D24_UNORM_S8_UINT;
+  VkFormat depth_format_candidate_3 = VK_FORMAT_D32_SFLOAT;
+
+  array_insert(depth_format_candidates, &depth_format_candidate_1);
+  array_insert(depth_format_candidates, &depth_format_candidate_2);
+  array_insert(depth_format_candidates, &depth_format_candidate_3);
+
+  renderer->depth_image_format = renderer_vulkan_image_find_supported_format(
+      renderer, depth_format_candidates, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
+  renderer->depth_image_has_stencil_support =
+      renderer_vulkan_format_has_stencil_component(renderer->depth_image_format);
+
+  array_destroy(depth_format_candidates);
+
   VkImageCreateInfo depth_image_create_info = (VkImageCreateInfo){
       .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
       .flags = (VkImageCreateFlags)0,
@@ -93,7 +112,7 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
               .height = renderer->swapchain_extent.height,
               .depth = 1,
           },
-      .format = VK_FORMAT_D32_SFLOAT, /* TODO: select the best available format */
+      .format = renderer->depth_image_format,
       .mipLevels = 1,
       .arrayLayers = 1,
       .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -206,7 +225,8 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
       .format = depth_image_create_info.format,
       .subresourceRange =
           (VkImageSubresourceRange){
-              .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT, /* TODO: check for stencil test availability */
+              .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT |
+                            (renderer->depth_image_has_stencil_support ? VK_IMAGE_ASPECT_STENCIL_BIT : 0),
               .baseMipLevel = 0,
               .levelCount = depth_image_create_info.mipLevels,
               .baseArrayLayer = 0,
@@ -238,8 +258,10 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
       .layers = depth_image_create_info.arrayLayers,
       .image = renderer->depth_image,
       .old_layout = VK_IMAGE_LAYOUT_UNDEFINED,
-      .new_layout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
-      .aspect_mask = VK_IMAGE_ASPECT_DEPTH_BIT, /* TODO: check for stencil test availability */
+      .new_layout = renderer->depth_image_has_stencil_support ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                                                              : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+      .aspect_mask =
+          VK_IMAGE_ASPECT_DEPTH_BIT | (renderer->depth_image_has_stencil_support ? VK_IMAGE_ASPECT_STENCIL_BIT : 0),
       .source_access_mask = (VkAccessFlags2)0,
       .destination_access_mask =
           VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
@@ -247,7 +269,7 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
       .destination_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
   };
 
-  if (!__renderer_vulkan_transition_image_layout(renderer, image_transition_info)) {
+  if (!renderer_vulkan_image_transition_layout(renderer, image_transition_info)) {
     logger_critical_format("<renderer:%p> <image:%p> depth image transition failed", renderer, renderer->depth_image);
 
     vkDestroyImageView(renderer->device, renderer->depth_image_view, NULL);
