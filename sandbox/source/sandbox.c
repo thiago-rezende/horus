@@ -97,7 +97,7 @@ f32 cube_scale_speed = 2.0f;
 f32 cube_position_speed = 1.0f;
 f32 cube_rotation_angle = 45.0f;
 
-vector3f32_t cube_scale = {{1.0f, 1.0f, 1.0f}};
+vector3f32_t cube_scale = {{1.5f, 1.5f, 1.5f}};
 vector3f32_t cube_position = {{0.0f, 0.0f, -2.0f}};
 quaternionf32_t cube_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
