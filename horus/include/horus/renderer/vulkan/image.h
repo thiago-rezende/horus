@@ -1,9 +1,11 @@
 #pragma once
 
-/* horus renderer textures layer */
-#include <horus/renderer/textures/texture.h>
+#include <vulkan/vulkan.h>
 
-/* horus renderer layer [ vulkan ] */
+/* horus core layer */
+#include <horus/core/types.h>
+
+/* horus renderer layery [ vulkan ]*/
 #include <horus/renderer/vulkan/renderer.h>
 
 typedef struct __image_transition_info {
@@ -14,6 +16,7 @@ typedef struct __image_transition_info {
   VkImageLayout new_layout;
   VkAccessFlags2 source_access_mask;
   VkAccessFlags2 destination_access_mask;
+  VkImageAspectFlags aspect_mask;
   VkPipelineStageFlags2 source_stage_mask;
   VkPipelineStageFlags2 destination_stage_mask;
 } image_transition_info_t;

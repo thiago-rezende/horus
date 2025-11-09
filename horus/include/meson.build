@@ -77,6 +77,7 @@ horus_headers = [
 horus_renderer_vulkan_headers = [
   # horus renderer layer [ vulkan ]
   'horus/renderer/vulkan/debug.h',
+  'horus/renderer/vulkan/image.h',
   'horus/renderer/vulkan/device.h',
   'horus/renderer/vulkan/loader.h',
   'horus/renderer/vulkan/shader.h',
@@ -94,9 +95,6 @@ horus_renderer_vulkan_headers = [
   'horus/renderer/vulkan/buffers/vertex.h',
   'horus/renderer/vulkan/buffers/uniform.h',
   'horus/renderer/vulkan/buffers/instance.h',
-
-  # horus renderer textures layer [ vulkan ]
-  'horus/renderer/vulkan/textures/texture.h',
 ]
 
 # horus header files [ linux ]

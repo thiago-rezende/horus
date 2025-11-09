@@ -101,23 +101,6 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
 
   logger_debug_format("<renderer:%p> <device:%p> VkDevice created", (void *)renderer, (void *)renderer->device);
 
-  if (!renderer_vulkan_swapchain_create(renderer, window)) {
-    logger_critical_format("<renderer:%p> VkSwapchainKHR creation failed", (void *)renderer);
-
-    renderer_vulkan_device_destroy(renderer);
-    renderer_vulkan_surface_destroy(renderer);
-    renderer_vulkan_debug_messenger_destroy(renderer);
-    renderer_vulkan_instance_destroy(renderer);
-
-    platform_memory_deallocate(renderer);
-
-    return NULL;
-  }
-
-  logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR created", (void *)renderer,
-                      (void *)renderer->swapchain);
-  logger_debug_format("|- [ image count ] %lu", renderer->swapchain_images->count);
-
   if (!renderer_vulkan_command_pools_create(renderer)) {
     logger_critical_format("<renderer:%p> VkCommandPool creation failed", (void *)renderer);
 
@@ -136,6 +119,23 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
   logger_debug_format("|- [ pools ] <compute:%p> <present:%p> <graphics:%p> <transfer:%p>",
                       (void *)renderer->compute_command_pool, (void *)renderer->present_command_pool,
                       (void *)renderer->graphics_command_pool, (void *)renderer->transfer_command_pool);
+
+  if (!renderer_vulkan_swapchain_create(renderer, window)) {
+    logger_critical_format("<renderer:%p> VkSwapchainKHR creation failed", (void *)renderer);
+
+    renderer_vulkan_device_destroy(renderer);
+    renderer_vulkan_surface_destroy(renderer);
+    renderer_vulkan_debug_messenger_destroy(renderer);
+    renderer_vulkan_instance_destroy(renderer);
+
+    platform_memory_deallocate(renderer);
+
+    return NULL;
+  }
+
+  logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR created", (void *)renderer,
+                      (void *)renderer->swapchain);
+  logger_debug_format("|- [ image count ] %lu", renderer->swapchain_images->count);
 
   if (!renderer_vulkan_synchronization_create(renderer)) {
     logger_critical_format("<renderer:%p> synchronization objects creation failed", (void *)renderer);
@@ -192,6 +192,16 @@ b8 renderer_destroy(renderer_t *renderer) {
 
   logger_debug_format("<renderer:%p> synchronization objects destroyed", (void *)renderer);
 
+  if (!renderer_vulkan_swapchain_destroy(renderer)) {
+    logger_critical_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destruction failed", (void *)renderer,
+                           (void *)renderer->swapchain);
+
+    return false;
+  }
+
+  logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destroyed", (void *)renderer,
+                      (void *)renderer->swapchain);
+
   if (!renderer_vulkan_command_pools_destroy(renderer)) {
     logger_critical_format("<renderer:%p> VkCommandPools destruction failed", (void *)renderer);
 
@@ -202,16 +212,6 @@ b8 renderer_destroy(renderer_t *renderer) {
   logger_debug_format("|- [ pools ] <compute:%p> <present:%p> <graphics:%p> <transfer:%p>",
                       (void *)renderer->compute_command_pool, (void *)renderer->present_command_pool,
                       (void *)renderer->graphics_command_pool, (void *)renderer->transfer_command_pool);
-
-  if (!renderer_vulkan_swapchain_destroy(renderer)) {
-    logger_critical_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destruction failed", (void *)renderer,
-                           (void *)renderer->swapchain);
-
-    return false;
-  }
-
-  logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destroyed", (void *)renderer,
-                      (void *)renderer->swapchain);
 
   if (!renderer_vulkan_device_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <device:%p> VkDevice destruction failed", (void *)renderer,
@@ -383,6 +383,22 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .clearValue = (VkClearValue){clear_color_value},
   };
 
+  VkRenderingAttachmentInfo depth_attachment_info = (VkRenderingAttachmentInfo){
+      .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+      .imageView = renderer->depth_image_view,
+      .imageLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+      .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+      .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+      .clearValue =
+          (VkClearValue){
+              .depthStencil =
+                  {
+                      .depth = 1.0f,
+                      .stencil = 0,
+                  },
+          },
+  };
+
   array_retrieve(renderer->swapchain_image_views, renderer->current_swapchain_image_index,
                  &rendering_attachment_info.imageView);
 
@@ -396,6 +412,8 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .layerCount = 1,
       .colorAttachmentCount = 1,
       .pColorAttachments = &rendering_attachment_info,
+      .pDepthAttachment = &depth_attachment_info,
+      .pStencilAttachment = NULL,
   };
 
   vkCmdBeginRendering(graphics_command_buffer, &rendering_info);

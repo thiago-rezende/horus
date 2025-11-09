@@ -38,6 +38,7 @@ horus_sources = [
 horus_renderer_vulkan_sources = [
   # horus renderer layer [ vulkan ]
   'source/renderer/vulkan/debug.c',
+  'source/renderer/vulkan/image.c',
   'source/renderer/vulkan/device.c',
   'source/renderer/vulkan/loader.c',
   'source/renderer/vulkan/shader.c',

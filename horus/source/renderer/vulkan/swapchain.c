@@ -1,4 +1,5 @@
 /* horus renderer layer [ vulkan ] */
+#include <horus/renderer/vulkan/image.h>
 #include <horus/renderer/vulkan/device.h>
 #include <horus/renderer/vulkan/swapchain.h>
 #include <horus/renderer/vulkan/synchronization.h>
@@ -82,6 +83,188 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
     return false;
   }
 
+  VkImageCreateInfo depth_image_create_info = (VkImageCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+      .flags = (VkImageCreateFlags)0,
+      .imageType = VK_IMAGE_TYPE_2D,
+      .extent =
+          (VkExtent3D){
+              .width = renderer->swapchain_extent.width,
+              .height = renderer->swapchain_extent.height,
+              .depth = 1,
+          },
+      .format = VK_FORMAT_D32_SFLOAT, /* TODO: select the best available format */
+      .mipLevels = 1,
+      .arrayLayers = 1,
+      .samples = VK_SAMPLE_COUNT_1_BIT,
+      .tiling = VK_IMAGE_TILING_OPTIMAL, /* better performance for shader access */
+      .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+      .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+      .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+      .queueFamilyIndexCount = 0,
+      .pQueueFamilyIndices = NULL,
+      .pNext = NULL,
+  };
+
+  if (vkCreateImage(renderer->device, &depth_image_create_info, NULL, &renderer->depth_image) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> image creation failed", renderer);
+
+    renderer_vulkan_swapchain_image_views_destroy(renderer);
+
+    array_destroy(renderer->swapchain_images);
+
+    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+    return false;
+  }
+
+  VkMemoryRequirements depth_image_memory_requirements;
+
+  VkPhysicalDeviceMemoryProperties physical_device_memory_properties;
+
+  VkMemoryPropertyFlags depth_image_memory_properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+  vkGetImageMemoryRequirements(renderer->device, renderer->depth_image, &depth_image_memory_requirements);
+
+  vkGetPhysicalDeviceMemoryProperties(renderer->physical_device, &physical_device_memory_properties);
+
+  u32 depth_image_memory_type_index = 0;
+
+  b8 has_required_depth_image_memory_type = false;
+
+  for (u32 i = 0; i < physical_device_memory_properties.memoryTypeCount; i++) {
+    if ((depth_image_memory_requirements.memoryTypeBits & (1 << i)) &&
+        (physical_device_memory_properties.memoryTypes[i].propertyFlags & depth_image_memory_properties) ==
+            depth_image_memory_properties) {
+      depth_image_memory_type_index = i;
+
+      has_required_depth_image_memory_type = true;
+
+      break;
+    }
+  }
+
+  if (!has_required_depth_image_memory_type) {
+    logger_critical_format("<renderer:%p> desired memory type for depth image creation not found", renderer);
+
+    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+
+    renderer_vulkan_swapchain_image_views_destroy(renderer);
+
+    array_destroy(renderer->swapchain_images);
+
+    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+    return false;
+  }
+
+  VkMemoryAllocateInfo depth_image_memory_allocate_info = (VkMemoryAllocateInfo){
+      .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+      .allocationSize = depth_image_memory_requirements.size,
+      .memoryTypeIndex = depth_image_memory_type_index,
+  };
+
+  /* TODO: implement a memory allocator to allow more than 4096 allocations */
+  if (vkAllocateMemory(renderer->device, &depth_image_memory_allocate_info, NULL, &renderer->depth_image_memory) !=
+      VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <image:%p> depth image memory allocation failed", renderer,
+                           renderer->depth_image);
+
+    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+
+    renderer_vulkan_swapchain_image_views_destroy(renderer);
+
+    array_destroy(renderer->swapchain_images);
+
+    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+    return false;
+  }
+
+  if (vkBindImageMemory(renderer->device, renderer->depth_image, renderer->depth_image_memory, 0) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <image:%p> depth image memory binding failed", renderer,
+                           renderer->depth_image);
+
+    vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+
+    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+
+    renderer_vulkan_swapchain_image_views_destroy(renderer);
+
+    array_destroy(renderer->swapchain_images);
+
+    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+    return false;
+  }
+
+  VkImageViewCreateInfo depth_image_view_create_info = (VkImageViewCreateInfo){
+      .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+      .flags = (VkImageViewCreateFlags)0,
+      .image = renderer->depth_image,
+      .viewType = VK_IMAGE_VIEW_TYPE_2D,
+      .format = depth_image_create_info.format,
+      .subresourceRange =
+          (VkImageSubresourceRange){
+              .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT, /* TODO: check for stencil test availability */
+              .baseMipLevel = 0,
+              .levelCount = depth_image_create_info.mipLevels,
+              .baseArrayLayer = 0,
+              .layerCount = depth_image_create_info.arrayLayers,
+          },
+      .pNext = NULL,
+  };
+
+  if (vkCreateImageView(renderer->device, &depth_image_view_create_info, NULL, &renderer->depth_image_view) !=
+      VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <image:%p> depth image view creation failed", renderer,
+                           renderer->depth_image);
+
+    vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+
+    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+
+    renderer_vulkan_swapchain_image_views_destroy(renderer);
+
+    array_destroy(renderer->swapchain_images);
+
+    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+    return false;
+  }
+
+  image_transition_info_t image_transition_info = (image_transition_info_t){
+      .levels = depth_image_create_info.mipLevels,
+      .layers = depth_image_create_info.arrayLayers,
+      .image = renderer->depth_image,
+      .old_layout = VK_IMAGE_LAYOUT_UNDEFINED,
+      .new_layout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+      .aspect_mask = VK_IMAGE_ASPECT_DEPTH_BIT, /* TODO: check for stencil test availability */
+      .source_access_mask = (VkAccessFlags2)0,
+      .destination_access_mask =
+          VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+      .source_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+      .destination_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+  };
+
+  if (!__renderer_vulkan_transition_image_layout(renderer, image_transition_info)) {
+    logger_critical_format("<renderer:%p> <image:%p> depth image transition failed", renderer, renderer->depth_image);
+
+    vkDestroyImageView(renderer->device, renderer->depth_image_view, NULL);
+
+    vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+
+    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+
+    renderer_vulkan_swapchain_image_views_destroy(renderer);
+
+    array_destroy(renderer->swapchain_images);
+
+    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+
+    return false;
+  }
+
   return true;
 }
 
@@ -103,6 +286,12 @@ b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *win
 
 b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {
   vkDeviceWaitIdle(renderer->device);
+
+  vkDestroyImageView(renderer->device, renderer->depth_image_view, NULL);
+
+  vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+
+  vkDestroyImage(renderer->device, renderer->depth_image, NULL);
 
   if (!renderer_vulkan_swapchain_image_views_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image views destruction failed", renderer,

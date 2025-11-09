@@ -128,8 +128,10 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
   VkPipelineDepthStencilStateCreateInfo pipeline_depth_stencil_state_create_info =
       (VkPipelineDepthStencilStateCreateInfo){
           .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-          .depthTestEnable = VK_FALSE,
-          .stencilTestEnable = VK_FALSE,
+          .depthTestEnable = VK_TRUE,
+          .depthWriteEnable = VK_TRUE,
+          .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
+          .stencilTestEnable = VK_FALSE, /* TODO: check for stencil test availability */
       };
 
   VkPipelineColorBlendAttachmentState pipeline_color_blend_attachment_state = (VkPipelineColorBlendAttachmentState){
@@ -230,6 +232,8 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
       .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
       .colorAttachmentCount = 1,
       .pColorAttachmentFormats = &renderer->surface_format.format,
+      .depthAttachmentFormat = VK_FORMAT_D32_SFLOAT,  /* TODO: fetch from depth image creation */
+      .stencilAttachmentFormat = VK_FORMAT_UNDEFINED, /* TODO: check for stencil test availability */
   };
 
   if (!pipeline->module->has_vertex_stage_create_info) {

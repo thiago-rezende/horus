@@ -46,6 +46,10 @@ struct __renderer {
   array_t *swapchain_images;
   array_t *swapchain_image_views;
 
+  VkImage depth_image;
+  VkImageView depth_image_view;
+  VkDeviceMemory depth_image_memory;
+
   VkCommandPool compute_command_pool;
   VkCommandPool present_command_pool;
   VkCommandPool graphics_command_pool;
