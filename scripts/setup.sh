@@ -230,7 +230,7 @@ assets__shaders() {
   find $shaders_directory -follow -path $shaders_output_directory -prune -o -type f -print | while read -r file; do
     case "$file" in
       *.slang)
-        slang="${file##*/}"
+        slang="${file#$shaders_directory/}"
 
         output="${slang%.*}.spv"
 
@@ -258,7 +258,7 @@ assets__textures() {
   find $textures_directory -follow -path $textures_output_directory -prune -o -type f -print | while read -r file; do
     case "$file" in
       *.png)
-        image="${file##*/}"
+        image="${file#$textures_directory/}"
 
         output="${image%.*}.ktx2"
 
