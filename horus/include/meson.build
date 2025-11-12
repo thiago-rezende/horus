@@ -81,6 +81,7 @@ horus_renderer_vulkan_headers = [
   'horus/renderer/vulkan/loader.h',
   'horus/renderer/vulkan/shader.h',
   'horus/renderer/vulkan/command.h',
+  'horus/renderer/vulkan/texture.h',
   'horus/renderer/vulkan/instance.h',
   'horus/renderer/vulkan/renderer.h',
   'horus/renderer/vulkan/pipeline.h',

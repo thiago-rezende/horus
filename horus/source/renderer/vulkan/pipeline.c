@@ -1,7 +1,5 @@
-/* horus renderer layer [ vulkan ] */
-#include <horus/renderer/vulkan/shader.h>
-#include <horus/renderer/vulkan/pipeline.h>
-#include <horus/renderer/vulkan/descriptors.h>
+/* horus types layer */
+#include <horus/types/vertex.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
@@ -9,15 +7,16 @@
 /* horus platform layer */
 #include <horus/platform/memory.h>
 
-/* horus types layer */
-#include <horus/types/vertex.h>
+/* horus renderer layer [ vulkan ] */
+#include <horus/renderer/vulkan/shader.h>
+#include <horus/renderer/vulkan/texture.h>
+#include <horus/renderer/vulkan/pipeline.h>
+#include <horus/renderer/vulkan/descriptors.h>
 
 #define RENDERER_PIPELINE_DYNAMIC_STATES_COUNT 2
 
 #define DEFAULT_UNIFORM_BUFFER_BINDING 0
 #define DEFAULT_INSTANCE_BUFFER_BINDING 1
-
-#define DEFAULT_DIFFUSE_SAMPLER_BINDING 2
 
 static const VkDynamicState renderer_pipeline_dynamic_state_scissor = VK_DYNAMIC_STATE_SCISSOR;
 static const VkDynamicState renderer_pipeline_dynamic_state_viewport = VK_DYNAMIC_STATE_VIEWPORT;
@@ -184,7 +183,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
           .pImmutableSamplers = NULL,
       },
       (VkDescriptorSetLayoutBinding){
-          .binding = DEFAULT_DIFFUSE_SAMPLER_BINDING,
+          .binding = renderer_vulkan_texture_binding(TEXTURE_ROLE_DIFFUSE),
           .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
           .descriptorCount = 1,
           .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,

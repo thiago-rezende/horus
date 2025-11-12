@@ -33,6 +33,7 @@ horus_sources = [
 
   # horus renderer layer
   'source/renderer/general.c',
+  'source/renderer/texture.c',
 ]
 
 horus_renderer_vulkan_sources = [

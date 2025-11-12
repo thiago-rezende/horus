@@ -11,42 +11,32 @@
 /* horus containers layer */
 #include <horus/containers/array.h>
 
+/* horus renderer layer */
+#include <horus/renderer/texture.h>
+
 /* horus renderer layer [ vulkan ]*/
 #include <horus/renderer/vulkan/image.h>
 #include <horus/renderer/vulkan/command.h>
+#include <horus/renderer/vulkan/texture.h>
 #include <horus/renderer/vulkan/pipeline.h>
 #include <horus/renderer/vulkan/renderer.h>
 #include <horus/renderer/vulkan/descriptors.h>
 
-/* horus renderer layer */
-#include <horus/renderer/texture.h>
-
 #define DEFAULT_DIFFUSE_SAMPLER_BINDING 2
+
+static const u32 texture_context_bindings[TEXTURE_ROLE_COUNT] = {
+    [TEXTURE_ROLE_DIFFUSE] = DEFAULT_DIFFUSE_SAMPLER_BINDING,
+};
 
 ktx_transcode_fmt_e __select_ktx_transcode_format(renderer_t *renderer);
 
-struct __texture {
-  VkDevice device;
-
-  VkImage image;
-  VkImageView image_view;
-
-  VkSampler sampler;
-
-  VkBuffer staging;
-
-  VkDeviceSize size;
-  VkDeviceMemory memory;
-  VkDeviceMemory staging_memory;
-};
-
-/* TODO: refactor into multipe functions for usage within other types texture */
-texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
+/* TODO: refactor into multipe functions for usage within other types texture_context */
+texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t role, u8 *binary, u64 size) {
   ktxTexture2 *ktx_texture = NULL;
 
   if (ktxTexture2_CreateFromMemory((ktx_uint8_t *)binary, (ktx_size_t)size, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
                                    &ktx_texture) != KTX_SUCCESS) {
-    logger_critical_format("<renderer:%p> ktx texture creation failed", renderer);
+    logger_critical_format("<renderer:%p> ktx texture_context creation failed", renderer);
 
     return NULL;
   }
@@ -55,7 +45,7 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
     ktx_transcode_fmt_e transcode_format = __select_ktx_transcode_format(renderer);
 
     if (ktxTexture2_TranscodeBasis(ktx_texture, transcode_format, 0) != KTX_SUCCESS) {
-      logger_critical_format("<renderer:%p> ktx texture transcoding failed", renderer);
+      logger_critical_format("<renderer:%p> ktx texture_context transcoding failed", renderer);
 
       ktxTexture2_Destroy(ktx_texture);
 
@@ -70,11 +60,12 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   ktx_size_t texture_size = ktxTexture_GetDataSize((ktxTexture *)ktx_texture);
   ktx_uint8_t *texture_data = ktxTexture_GetData((ktxTexture *)ktx_texture);
 
-  texture_t *texture = platform_memory_allocate(sizeof(texture_t));
+  texture_context_t *texture_context = platform_memory_allocate(sizeof(texture_context_t));
 
-  *texture = (texture_t){
+  *texture_context = (texture_context_t){
       .size = (u64)texture_size,
       .device = renderer->device,
+      .binding = renderer_vulkan_texture_binding(role),
   };
 
   VkImageCreateInfo image_create_info = (VkImageCreateInfo){
@@ -98,7 +89,7 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   VkBufferCreateInfo staging_create_info = (VkBufferCreateInfo){
       .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
       .flags = (VkBufferCreateFlags)0,
-      .size = texture->size,
+      .size = texture_context->size,
       .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
       .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
   };
@@ -107,24 +98,24 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
     staging_create_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
   }
 
-  if (vkCreateImage(texture->device, &image_create_info, NULL, &texture->image) != VK_SUCCESS) {
+  if (vkCreateImage(texture_context->device, &image_create_info, NULL, &texture_context->image) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> image creation failed", renderer);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
-  if (vkCreateBuffer(texture->device, &staging_create_info, NULL, &texture->staging) != VK_SUCCESS) {
+  if (vkCreateBuffer(texture_context->device, &staging_create_info, NULL, &texture_context->staging) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> buffer creation failed", renderer);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
@@ -137,8 +128,8 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   VkMemoryPropertyFlags staging_memory_properties =
       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
-  vkGetImageMemoryRequirements(texture->device, texture->image, &image_memory_requirements);
-  vkGetBufferMemoryRequirements(texture->device, texture->staging, &staging_memory_requirements);
+  vkGetImageMemoryRequirements(texture_context->device, texture_context->image, &image_memory_requirements);
+  vkGetBufferMemoryRequirements(texture_context->device, texture_context->staging, &staging_memory_requirements);
 
   vkGetPhysicalDeviceMemoryProperties(renderer->physical_device, &physical_device_memory_properties);
 
@@ -174,15 +165,15 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
 
   if (!has_required_image_memory_type || !has_required_staging_memory_type) {
     logger_critical_format(
-        "<renderer:%p> <texture:%p> desired memory type for image and staging buffer creation not found", renderer,
-        texture);
+        "<renderer:%p> <texture_context:%p> desired memory type for image and staging buffer creation not found",
+        renderer, texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
@@ -200,93 +191,101 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   };
 
   /* TODO: implement a memory allocator to allow more than 4096 allocations */
-  if (vkAllocateMemory(texture->device, &image_memory_allocate_info, NULL, &texture->memory) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> image memory allocation failed", renderer, texture);
+  if (vkAllocateMemory(texture_context->device, &image_memory_allocate_info, NULL, &texture_context->memory) !=
+      VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <texture_context:%p> image memory allocation failed", renderer,
+                           texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
   /* TODO: implement a memory allocator to allow more than 4096 allocations */
-  if (vkAllocateMemory(texture->device, &staging_memory_allocate_info, NULL, &texture->staging_memory) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> staging buffer memory allocation failed", renderer, texture);
+  if (vkAllocateMemory(texture_context->device, &staging_memory_allocate_info, NULL,
+                       &texture_context->staging_memory) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <texture_context:%p> staging buffer memory allocation failed", renderer,
+                           texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
-  if (vkBindImageMemory(texture->device, texture->image, texture->memory, 0) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> image memory binding failed", renderer, texture);
+  if (vkBindImageMemory(texture_context->device, texture_context->image, texture_context->memory, 0) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <texture_context:%p> image memory binding failed", renderer, texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
-  if (vkBindBufferMemory(texture->device, texture->staging, texture->staging_memory, 0) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> staging buffer memory binding failed", renderer, texture);
+  if (vkBindBufferMemory(texture_context->device, texture_context->staging, texture_context->staging_memory, 0) !=
+      VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <texture_context:%p> staging buffer memory binding failed", renderer,
+                           texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
   void *mapped = NULL;
 
-  if (vkMapMemory(texture->device, texture->staging_memory, 0, staging_create_info.size, 0, &mapped) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> buffer memory mapping failed", renderer, texture);
+  if (vkMapMemory(texture_context->device, texture_context->staging_memory, 0, staging_create_info.size, 0, &mapped) !=
+      VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <texture_context:%p> buffer memory mapping failed", renderer,
+                           texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
   platform_memory_copy(mapped, texture_data, (u64)texture_size);
 
-  vkUnmapMemory(texture->device, texture->staging_memory);
+  vkUnmapMemory(texture_context->device, texture_context->staging_memory);
 
   image_transition_info_t image_transition_info = (image_transition_info_t){
       .levels = (u32)ktx_texture->numLevels,
       .layers = (u32)ktx_texture->numLayers,
-      .image = texture->image,
+      .image = texture_context->image,
       .old_layout = VK_IMAGE_LAYOUT_UNDEFINED,
       .new_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
       .aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -297,23 +296,23 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   };
 
   if (!renderer_vulkan_image_transition_layout(renderer, image_transition_info)) {
-    logger_critical_format("<renderer:%p> <texture:%p> image transition failed", renderer, texture);
+    logger_critical_format("<renderer:%p> <texture_context:%p> image transition failed", renderer, texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
   VkCommandBuffer transfer_command_buffer =
-      renderer_vulkan_command_buffer_create(texture->device, renderer->transfer_command_pool);
+      renderer_vulkan_command_buffer_create(texture_context->device, renderer->transfer_command_pool);
 
   VkCommandBufferBeginInfo transfer_command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -321,19 +320,21 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   };
 
   if (vkBeginCommandBuffer(transfer_command_buffer, &transfer_command_buffer_begin_info) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> transfer command buffer beginning failed", renderer, texture);
+    logger_critical_format("<renderer:%p> <texture_context:%p> transfer command buffer beginning failed", renderer,
+                           texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    renderer_vulkan_command_buffer_destroy(texture->device, transfer_command_buffer, renderer->transfer_command_pool);
+    renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
+                                           renderer->transfer_command_pool);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
@@ -373,25 +374,27 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
     array_insert(regions, &buffer_image_copy);
   }
 
-  vkCmdCopyBufferToImage(transfer_command_buffer, texture->staging, texture->image,
+  vkCmdCopyBufferToImage(transfer_command_buffer, texture_context->staging, texture_context->image,
                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, regions->count, regions->buffer);
 
   if (vkEndCommandBuffer(transfer_command_buffer) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> transfer command buffer ending failed", renderer, texture);
+    logger_critical_format("<renderer:%p> <texture_context:%p> transfer command buffer ending failed", renderer,
+                           texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    renderer_vulkan_command_buffer_destroy(texture->device, transfer_command_buffer, renderer->transfer_command_pool);
+    renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
+                                           renderer->transfer_command_pool);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
     array_destroy(regions);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
@@ -403,21 +406,23 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   };
 
   if (vkQueueSubmit(renderer->transfer_queue, 1, &transfer_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> transfer queue submission failed", renderer, texture);
+    logger_critical_format("<renderer:%p> <texture_context:%p> transfer queue submission failed", renderer,
+                           texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    renderer_vulkan_command_buffer_destroy(texture->device, transfer_command_buffer, renderer->transfer_command_pool);
+    renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
+                                           renderer->transfer_command_pool);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
     array_destroy(regions);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
@@ -432,35 +437,36 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
   image_transition_info.destination_stage_mask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
   if (!renderer_vulkan_image_transition_layout(renderer, image_transition_info)) {
-    logger_critical_format("<renderer:%p> <texture:%p> image transition failed", renderer, texture);
+    logger_critical_format("<renderer:%p> <texture_context:%p> image transition failed", renderer, texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
-    vkFreeMemory(texture->device, texture->staging_memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyBuffer(texture->device, texture->staging, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
     array_destroy(regions);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
-  renderer_vulkan_command_buffer_destroy(texture->device, transfer_command_buffer, renderer->transfer_command_pool);
+  renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
+                                         renderer->transfer_command_pool);
 
-  vkFreeMemory(texture->device, texture->staging_memory, NULL);
+  vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
-  vkDestroyBuffer(texture->device, texture->staging, NULL);
+  vkDestroyBuffer(texture_context->device, texture_context->staging, NULL);
 
   array_destroy(regions);
 
   VkImageViewCreateInfo image_view_create_info = (VkImageViewCreateInfo){
       .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
       .flags = (VkImageViewCreateFlags)0,
-      .image = texture->image,
+      .image = texture_context->image,
       .viewType = texture_depth > 1 ? VK_IMAGE_VIEW_TYPE_3D : VK_IMAGE_VIEW_TYPE_2D,
       .format = ktx_texture->vkFormat,
       .subresourceRange =
@@ -474,16 +480,17 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
       .pNext = NULL,
   };
 
-  if (vkCreateImageView(texture->device, &image_view_create_info, NULL, &texture->image_view) != VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <texture:%p> image view creation failed", renderer, texture);
+  if (vkCreateImageView(texture_context->device, &image_view_create_info, NULL, &texture_context->image_view) !=
+      VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <texture_context:%p> image view creation failed", renderer, texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
@@ -504,70 +511,26 @@ texture_t *texture_create(renderer_t *renderer, u8 *binary, u64 size) {
       .compareEnable = VK_FALSE,
       .compareOp = VK_COMPARE_OP_ALWAYS,
       .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
-      .unnormalizedCoordinates = VK_FALSE, /* ! always using normalized texture coordinates */
+      .unnormalizedCoordinates = VK_FALSE, /* ! always using normalized texture_context coordinates */
   };
 
-  if (vkCreateSampler(texture->device, &sampler_create_info, NULL, &texture->sampler) != VK_SUCCESS) {
+  if (vkCreateSampler(texture_context->device, &sampler_create_info, NULL, &texture_context->sampler) != VK_SUCCESS) {
     ktxTexture2_Destroy(ktx_texture);
 
-    vkFreeMemory(texture->device, texture->memory, NULL);
+    vkFreeMemory(texture_context->device, texture_context->memory, NULL);
 
-    vkDestroyImage(texture->device, texture->image, NULL);
-    vkDestroyImageView(texture->device, texture->image_view, NULL);
+    vkDestroyImage(texture_context->device, texture_context->image, NULL);
+    vkDestroyImageView(texture_context->device, texture_context->image_view, NULL);
 
-    platform_memory_deallocate(texture);
+    platform_memory_deallocate(texture_context);
 
     return NULL;
   }
 
-  return texture;
+  return texture_context;
 }
 
-texture_t *texture_create_from_binary(renderer_t *renderer, char *path) {
-  platform_file_t *binary = platform_file_open(path);
-
-  if (binary == NULL) {
-    logger_critical_format("<renderer:%p> <path:%s> texture binary opening failed", renderer, path);
-
-    return NULL;
-  }
-
-  u64 size = platform_file_size(binary);
-
-  u8 *buffer = platform_memory_allocate(sizeof(u8) * size);
-
-  platform_memory_clear((void *)buffer, size);
-
-  u64 bytes_read = platform_file_read(binary, buffer, size);
-
-  if (bytes_read == 0) {
-    logger_critical_format("<renderer:%p> <path:%s> texture binary reading failed", renderer, path);
-
-    platform_memory_deallocate(buffer);
-
-    platform_file_close(binary);
-
-    return NULL;
-  }
-
-  platform_file_close(binary);
-
-  texture_t *texture = texture_create(renderer, buffer, size);
-
-  if (texture == NULL) {
-    logger_critical_format("<renderer:%p> <path:%s> texture creation failed", renderer, path);
-
-    platform_memory_deallocate(buffer);
-
-    return NULL;
-  }
-
-  platform_memory_deallocate(buffer);
-
-  return texture;
-}
-
-b8 texture_bind(texture_t *texture, graphics_pipeline_t *pipeline, renderer_t *renderer) {
+b8 texture_context_bind(texture_context_t *context, graphics_pipeline_t *pipeline, renderer_t *renderer) {
   VkDescriptorSet descriptor_set;
   VkCommandBuffer graphics_command_buffer;
 
@@ -575,8 +538,8 @@ b8 texture_bind(texture_t *texture, graphics_pipeline_t *pipeline, renderer_t *r
   array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
 
   renderer_vulkan_descriptor_set_update_sampler(renderer->device, descriptor_set,
-                                                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                DEFAULT_DIFFUSE_SAMPLER_BINDING, texture->sampler, texture->image_view);
+                                                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, context->binding,
+                                                context->sampler, context->image_view);
 
   vkCmdBindDescriptorSets(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->layout, 0, 1,
                           &descriptor_set, 0, NULL);
@@ -584,16 +547,26 @@ b8 texture_bind(texture_t *texture, graphics_pipeline_t *pipeline, renderer_t *r
   return true;
 }
 
-b8 texture_destroy(texture_t *texture) {
-  vkDestroySampler(texture->device, texture->sampler, NULL);
+b8 texture_context_destroy(texture_context_t *context) {
+  vkDestroySampler(context->device, context->sampler, NULL);
 
-  vkDestroyImageView(texture->device, texture->image_view, NULL);
+  vkDestroyImageView(context->device, context->image_view, NULL);
 
-  vkFreeMemory(texture->device, texture->memory, NULL);
+  vkFreeMemory(context->device, context->memory, NULL);
 
-  vkDestroyImage(texture->device, texture->image, NULL);
+  vkDestroyImage(context->device, context->image, NULL);
+
+  platform_memory_deallocate(context);
 
   return true;
+}
+
+u32 renderer_vulkan_texture_binding(texture_role_t role) {
+  if (role < TEXTURE_ROLE_COUNT && role >= TEXTURE_ROLE_DIFFUSE) {
+    return texture_context_bindings[role];
+  }
+
+  return max_u32;
 }
 
 ktx_transcode_fmt_e __select_ktx_transcode_format(renderer_t *renderer) {
