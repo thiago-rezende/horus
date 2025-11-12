@@ -56,6 +56,7 @@
 
 /* horus renderer layer */
 #include <horus/renderer/shader.h>
+#include <horus/renderer/texture.h>
 #include <horus/renderer/pipeline.h>
 #include <horus/renderer/renderer.h>
 
@@ -64,6 +65,3 @@
 #include <horus/renderer/buffers/vertex.h>
 #include <horus/renderer/buffers/uniform.h>
 #include <horus/renderer/buffers/instance.h>
-
-/* horus renderer textures layer */
-#include <horus/renderer/textures/texture.h>

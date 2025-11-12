@@ -61,6 +61,7 @@ horus_headers = [
   # horus renderer layer
   'horus/renderer/shader.h',
   'horus/renderer/general.h',
+  'horus/renderer/texture.h',
   'horus/renderer/renderer.h',
   'horus/renderer/pipeline.h',
 
@@ -70,8 +71,6 @@ horus_headers = [
   'horus/renderer/buffers/uniform.h',
   'horus/renderer/buffers/instance.h',
 
-  # horus renderer textures layer
-  'horus/renderer/textures/texture.h',
 ]
 
 horus_renderer_vulkan_headers = [

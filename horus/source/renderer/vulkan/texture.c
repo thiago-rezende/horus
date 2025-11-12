@@ -18,8 +18,8 @@
 #include <horus/renderer/vulkan/renderer.h>
 #include <horus/renderer/vulkan/descriptors.h>
 
-/* horus renderer textures layer */
-#include <horus/renderer/textures/texture.h>
+/* horus renderer layer */
+#include <horus/renderer/texture.h>
 
 #define DEFAULT_DIFFUSE_SAMPLER_BINDING 2
 

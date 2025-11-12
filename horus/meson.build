@@ -43,6 +43,7 @@ horus_renderer_vulkan_sources = [
   'source/renderer/vulkan/loader.c',
   'source/renderer/vulkan/shader.c',
   'source/renderer/vulkan/command.c',
+  'source/renderer/vulkan/texture.c',
   'source/renderer/vulkan/instance.c',
   'source/renderer/vulkan/renderer.c',
   'source/renderer/vulkan/pipeline.c',
@@ -55,9 +56,6 @@ horus_renderer_vulkan_sources = [
   'source/renderer/vulkan/buffers/vertex.c',
   'source/renderer/vulkan/buffers/uniform.c',
   'source/renderer/vulkan/buffers/instance.c',
-
-  # horus renderer textures layer [ vulkan ]
-  'source/renderer/vulkan/textures/texture.c',
 ]
 
 # horus source files [ linux ]
