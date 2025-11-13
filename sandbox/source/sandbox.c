@@ -178,14 +178,14 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
   logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_dark_texture,
                      checker_dark_texture_path);
 
-  /* ! default texture to be bound */
-  current_texture = checker_dark_texture;
-
   /* TODO: proper error handling */
   checker_light_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)checker_light_texture_path);
 
   logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_light_texture,
                      checker_light_texture_path);
+
+  /* ! default texture to be bound */
+  current_texture = checker_light_texture;
 
   /* TODO: proper error handling */
   default_graphics_pipeline = graphics_pipeline_create(renderer, default_shader_module);
