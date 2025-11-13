@@ -183,7 +183,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
           .pImmutableSamplers = NULL,
       },
       (VkDescriptorSetLayoutBinding){
-          .binding = renderer_vulkan_texture_binding(TEXTURE_ROLE_DIFFUSE),
+          .binding = renderer_vulkan_texture_binding(TEXTURE_ROLE_ALBEDO),
           .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
           .descriptorCount = 1,
           .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,

@@ -14,7 +14,7 @@
 #include <horus/renderer/texture.h>
 
 static const char *texture_role_strings[TEXTURE_ROLE_COUNT] = {
-    [TEXTURE_ROLE_DIFFUSE] = "diffuse",
+    [TEXTURE_ROLE_ALBEDO] = "albedo",
 };
 
 texture_t *texture_create(renderer_t *renderer, texture_role_t role, u8 *binary, u64 size) {
@@ -99,7 +99,7 @@ b8 texture_destroy(texture_t *texture) {
 }
 
 const char *texture_role_string(texture_role_t role) {
-  if (role < TEXTURE_ROLE_COUNT && role >= TEXTURE_ROLE_DIFFUSE) {
+  if (role < TEXTURE_ROLE_COUNT && role >= TEXTURE_ROLE_ALBEDO) {
     return texture_role_strings[role];
   }
 

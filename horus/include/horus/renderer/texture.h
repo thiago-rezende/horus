@@ -10,7 +10,7 @@
 /* TODO: implement texture types */
 
 typedef enum __texture_role {
-  TEXTURE_ROLE_DIFFUSE = 0,
+  TEXTURE_ROLE_ALBEDO = 0,
   TEXTURE_ROLE_COUNT,
 } texture_role_t;
 

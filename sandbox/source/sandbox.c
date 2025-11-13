@@ -173,7 +173,7 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
                      default_shader_module_path);
 
   /* TODO: proper error handling */
-  checker_dark_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_DIFFUSE, (char *)checker_dark_texture_path);
+  checker_dark_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)checker_dark_texture_path);
 
   logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_dark_texture,
                      checker_dark_texture_path);
@@ -182,8 +182,7 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
   current_texture = checker_dark_texture;
 
   /* TODO: proper error handling */
-  checker_light_texture =
-      texture_create_from_binary(renderer, TEXTURE_ROLE_DIFFUSE, (char *)checker_light_texture_path);
+  checker_light_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)checker_light_texture_path);
 
   logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_light_texture,
                      checker_light_texture_path);

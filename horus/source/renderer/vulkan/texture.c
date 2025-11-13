@@ -22,10 +22,10 @@
 #include <horus/renderer/vulkan/renderer.h>
 #include <horus/renderer/vulkan/descriptors.h>
 
-#define DEFAULT_DIFFUSE_SAMPLER_BINDING 2
+#define DEFAULT_ALBEDO_SAMPLER_BINDING 2
 
 static const u32 texture_context_bindings[TEXTURE_ROLE_COUNT] = {
-    [TEXTURE_ROLE_DIFFUSE] = DEFAULT_DIFFUSE_SAMPLER_BINDING,
+    [TEXTURE_ROLE_ALBEDO] = DEFAULT_ALBEDO_SAMPLER_BINDING,
 };
 
 ktx_transcode_fmt_e __select_ktx_transcode_format(renderer_t *renderer);
@@ -562,7 +562,7 @@ b8 texture_context_destroy(texture_context_t *context) {
 }
 
 u32 renderer_vulkan_texture_binding(texture_role_t role) {
-  if (role < TEXTURE_ROLE_COUNT && role >= TEXTURE_ROLE_DIFFUSE) {
+  if (role < TEXTURE_ROLE_COUNT && role >= TEXTURE_ROLE_ALBEDO) {
     return texture_context_bindings[role];
   }
 
