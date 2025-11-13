@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+ - [65a299a] chore(sandbox): update default cube texture to checkers-light and update the screenshot to show the change (Thiago Rezende)
+ - [ea96fde] chore(assets): add default 1x1 gray texture to be used on the default graphics pipeline and default shader (Thiago Rezende)
+ - [3b38fc7] chore(assets): add default 1x1 blue texture to be used on the default graphics pipeline and default shader (Thiago Rezende)
+ - [ee386c1] refactor(renderer): update the currently named diffuse texture role to albedo for consistency (Thiago Rezende)
+ - [bb9ca3a] refactor(renderer): update texture_t to be a generic handle and created texture_context_t to the renderer implementation (Thiago Rezende)
+ - [f7feb90] refactor(renderer): remove unnecessary textures layer and move texture_t to renderer layer (Thiago Rezende)
+ - [ca25873] chore(assets): add default 1x1 magenta texture to be used on the default graphics pipeline and default shader (Thiago Rezende)
+ - [0f4795c] chore(assets): add default 1x1 black texture to be used on the default graphics pipeline and default shader (Thiago Rezende)
+ - [e80f5be] chore(assets): add default 1x1 white texture to be used on the default graphics pipeline and default shader (Thiago Rezende)
+ - [de5f7f7] chore(setup): update textures and shaders procedures to replicate subpaths on the output directory (Thiago Rezende)
+ - [14c2e8d] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [59da77f] feat(renderer|vulkan): update depth buffering to choose the best format available with stencil capabilities (Thiago Rezende)
  - [5910400] feat(renderer|vulkan): add simple depth buffering to the rendering pipeline (Thiago Rezende)
  - [02c28ab] refactor(renderer|vulkan): move vulkan buffer definitions to its own internal headers to be shared amongst other renderer pipelines (Thiago Rezende)
