@@ -22,6 +22,7 @@
         "MSYSTEM": "CLANG64",
         "CHERE_INVOKING": "1",
         "MSYS2_PATH_TYPE": "inherit",
+        "VK_LAYER_PATH": "C:/msys64/clang64/bin"
       },
       "overrideName": true,
     }
@@ -31,5 +32,6 @@
     "MSYSTEM": "CLANG64",
     "CHERE_INVOKING": "1",
     "MSYS2_PATH_TYPE": "inherit",
+    "VK_LAYER_PATH": "C:/msys64/clang64/bin"
   }
 }
