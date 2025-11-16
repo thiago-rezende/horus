@@ -7,6 +7,7 @@ horus_headers = [
   'horus/definitions.h',
 
   # horus core layer
+  'horus/core/hash.h',
   'horus/core/types.h',
   'horus/core/assert.h',
   'horus/core/macros.h',

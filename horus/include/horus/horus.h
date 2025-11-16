@@ -7,6 +7,7 @@
 #include <horus/platform/detection.h>
 
 /* horus core layer */
+#include <horus/core/hash.h>
 #include <horus/core/types.h>
 #include <horus/core/assert.h>
 #include <horus/core/macros.h>

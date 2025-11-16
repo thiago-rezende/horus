@@ -4,6 +4,7 @@ horus_sources = [
   'source/definitions.c',
 
   # horus core layer
+  'source/core/hash.c',
   'source/core/strings.c',
   'source/core/numeric.c',
 
