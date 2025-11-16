@@ -1,5 +1,6 @@
 # core layer test sources
 core_sources = [
+  'hash.c',
   'strings.c',
 ]
 
