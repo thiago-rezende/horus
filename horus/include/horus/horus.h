@@ -14,6 +14,7 @@
 #include <horus/core/strings.h>
 
 /* horus containers layer */
+#include <horus/containers/list.h>
 #include <horus/containers/array.h>
 
 /* horus application layer */

@@ -9,6 +9,7 @@ horus_sources = [
   'source/core/numeric.c',
 
   # horus containers layer
+  'source/containers/list.c',
   'source/containers/array.c',
 
   # horus logger layer
