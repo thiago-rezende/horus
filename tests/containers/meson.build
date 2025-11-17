@@ -1,5 +1,6 @@
 # containers layer test sources
 containers_sources = [
+  'list.c',
   'array.c',
 ]
 
