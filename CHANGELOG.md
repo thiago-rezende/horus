@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+ - [d085cde] test(containers): add linked list unit tests (Thiago Rezende)
+ - [d28ee29] feat(containers): add simple linked list implementation (Thiago Rezende)
+ - [4c71e0f] test(core): add FNV-1a hash function unit test (Thiago Rezende)
+ - [a5db9d1] feat(core): add FNV-1a hash function implementation (Thiago Rezende)
+ - [4c88281] chore(editor): update default terminal environment variables for Msys2 on windows to have VK_LAYER_PATH (Thiago Rezende)
+ - [b3714d5] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [65a299a] chore(sandbox): update default cube texture to checkers-light and update the screenshot to show the change (Thiago Rezende)
  - [ea96fde] chore(assets): add default 1x1 gray texture to be used on the default graphics pipeline and default shader (Thiago Rezende)
  - [3b38fc7] chore(assets): add default 1x1 blue texture to be used on the default graphics pipeline and default shader (Thiago Rezende)
