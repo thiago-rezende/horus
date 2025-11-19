@@ -7,7 +7,7 @@
 #define HORUS_ENTRYPOINT_DISABLE
 #include <horus/horus.h>
 
-static void test_list_create_and_destroy(void **state) {
+static void test_linked_list_create_and_destroy(void **state) {
   (void)state; /* unused */
 
   /* default attributes */
@@ -17,7 +17,7 @@ static void test_list_create_and_destroy(void **state) {
   const u64 count = 0;
 
   /* list creation */
-  list_t *list = list_create(stride);
+  linked_list_t *list = linked_list_create(stride);
 
   /* creation result assertion */
   assert_non_null(list);
@@ -27,7 +27,7 @@ static void test_list_create_and_destroy(void **state) {
   assert_int_equal(list->stride, stride);
 
   /* list destruction */
-  b8 result = list_destroy(list);
+  b8 result = linked_list_destroy(list);
 
   /* destruction result assertion */
   assert_true(result);
@@ -51,12 +51,12 @@ static void test_list_insert_and_remove(void **state) {
   const u64 count = 2;
 
   /* list creation */
-  list_t *list = list_create(stride);
+  linked_list_t *list = linked_list_create(stride);
 
   /* list insertion */
-  b8 insert_result_0 = list_insert(list, 0, (void *)&item_to_insert_0);
-  b8 insert_result_1 = list_insert(list, 1, (void *)&item_to_insert_1);
-  b8 insert_result_2 = list_insert(list, 1, (void *)&item_to_insert_2);
+  b8 insert_result_0 = linked_list_insert(list, 0, (void *)&item_to_insert_0);
+  b8 insert_result_1 = linked_list_insert(list, 1, (void *)&item_to_insert_1);
+  b8 insert_result_2 = linked_list_insert(list, 1, (void *)&item_to_insert_2);
 
   /* insertion result assertion */
   assert_true(insert_result_0);
@@ -64,7 +64,7 @@ static void test_list_insert_and_remove(void **state) {
   assert_true(insert_result_2);
 
   /* list retrieval */
-  b8 remove_result = list_remove(list, 1, (void *)&item_removed);
+  b8 remove_result = linked_list_remove(list, 1, (void *)&item_removed);
 
   /* retrieval result assertion */
   assert_true(remove_result);
@@ -90,10 +90,10 @@ static void test_list_insert_and_remove(void **state) {
   assert_int_equal(*(u64 *)list->tail->data, item_to_insert_1);
 
   /* list destruction */
-  list_destroy(list);
+  linked_list_destroy(list);
 }
 
-static void test_list_insert_and_retrieve(void **state) {
+static void test_linked_list_insert_and_retrieve(void **state) {
   (void)state; /* unused */
 
   /* default attributes */
@@ -111,12 +111,12 @@ static void test_list_insert_and_retrieve(void **state) {
   const u64 count = 3;
 
   /* list creation */
-  list_t *list = list_create(stride);
+  linked_list_t *list = linked_list_create(stride);
 
   /* list insertion */
-  b8 insert_result_0 = list_insert(list, 0, (void *)&item_to_insert_0);
-  b8 insert_result_1 = list_insert(list, 1, (void *)&item_to_insert_1);
-  b8 insert_result_2 = list_insert(list, 1, (void *)&item_to_insert_2);
+  b8 insert_result_0 = linked_list_insert(list, 0, (void *)&item_to_insert_0);
+  b8 insert_result_1 = linked_list_insert(list, 1, (void *)&item_to_insert_1);
+  b8 insert_result_2 = linked_list_insert(list, 1, (void *)&item_to_insert_2);
 
   /* insertion result assertion */
   assert_true(insert_result_0);
@@ -124,7 +124,7 @@ static void test_list_insert_and_retrieve(void **state) {
   assert_true(insert_result_2);
 
   /* list retrieval */
-  b8 retrieve_result = list_retrieve(list, 2, (void *)&item_to_retrieve);
+  b8 retrieve_result = linked_list_retrieve(list, 2, (void *)&item_to_retrieve);
 
   /* retrieval result assertion */
   assert_true(retrieve_result);
@@ -149,10 +149,10 @@ static void test_list_insert_and_retrieve(void **state) {
   assert_int_equal(*(u64 *)list->tail->data, item_to_insert_1);
 
   /* list destruction */
-  list_destroy(list);
+  linked_list_destroy(list);
 }
 
-static void test_list_clear(void **state) {
+static void test_linked_list_clear(void **state) {
   (void)state; /* unused */
 
   /* default attributes */
@@ -165,22 +165,22 @@ static void test_list_clear(void **state) {
   const u64 count = 6;
 
   /* list creation */
-  list_t *list = list_create(stride);
+  linked_list_t *list = linked_list_create(stride);
 
   /* list insertion */
-  list_insert(list, 0, (void *)&item_to_insert);
-  list_insert(list, 0, (void *)&item_to_insert);
-  list_insert(list, 0, (void *)&item_to_insert);
-  list_insert(list, 0, (void *)&item_to_insert);
-  list_insert(list, 0, (void *)&item_to_insert);
-  list_insert(list, 0, (void *)&item_to_insert);
+  linked_list_insert(list, 0, (void *)&item_to_insert);
+  linked_list_insert(list, 0, (void *)&item_to_insert);
+  linked_list_insert(list, 0, (void *)&item_to_insert);
+  linked_list_insert(list, 0, (void *)&item_to_insert);
+  linked_list_insert(list, 0, (void *)&item_to_insert);
+  linked_list_insert(list, 0, (void *)&item_to_insert);
 
   /* list attribute assertions */
   assert_int_equal(list->count, count);
   assert_int_equal(list->stride, stride);
 
   /* list clear */
-  b8 clear_result = list_clear(list);
+  b8 clear_result = linked_list_clear(list);
 
   /* clear result assertion */
   assert_true(clear_result);
@@ -193,15 +193,15 @@ static void test_list_clear(void **state) {
   assert_null(list->tail);
 
   /* list destruction */
-  list_destroy(list);
+  linked_list_destroy(list);
 }
 
 int main(void) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_list_clear),
+      cmocka_unit_test(test_linked_list_clear),
       cmocka_unit_test(test_list_insert_and_remove),
-      cmocka_unit_test(test_list_create_and_destroy),
-      cmocka_unit_test(test_list_insert_and_retrieve),
+      cmocka_unit_test(test_linked_list_create_and_destroy),
+      cmocka_unit_test(test_linked_list_insert_and_retrieve),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);

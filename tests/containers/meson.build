@@ -1,7 +1,7 @@
 # containers layer test sources
 containers_sources = [
-  'list.c',
   'array.c',
+  'linked_list.c',
 ]
 
 # containers layer tests executables

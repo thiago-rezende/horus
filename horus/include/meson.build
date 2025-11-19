@@ -15,8 +15,8 @@ horus_headers = [
   'horus/core/strings.h',
 
   # horus containers layer
-  'horus/containers/list.h',
   'horus/containers/array.h',
+  'horus/containers/linked_list.h',
 
   # horus application layer
   'horus/application/application.h',
