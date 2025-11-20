@@ -1,6 +1,7 @@
 # containers layer test sources
 containers_sources = [
   'array.c',
+  'hash_map.c',
   'linked_list.c',
 ]
 
