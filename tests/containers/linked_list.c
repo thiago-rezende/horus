@@ -7,6 +7,13 @@
 #define HORUS_ENTRYPOINT_DISABLE
 #include <horus/horus.h>
 
+static b8 predicate_u64(void *data, void *item) {
+  u64 value = *(u64 *)data;
+  u64 item_value = *(u64 *)item;
+
+  return value == item_value;
+}
+
 static void test_linked_list_create_and_destroy(void **state) {
   (void)state; /* unused */
 
@@ -196,8 +203,57 @@ static void test_linked_list_clear(void **state) {
   linked_list_destroy(list);
 }
 
+static void test_linked_list_find(void **state) {
+  (void)state; /* unused */
+
+  /* default attributes */
+  const u64 stride = sizeof(u64);
+  const linked_list_predicate_t predicate = predicate_u64;
+
+  /* default values */
+  const u64 item_to_insert_0 = 100;
+  const u64 item_to_insert_1 = 101;
+  const u64 item_to_insert_2 = 102;
+
+  const u64 index_to_insert_0 = 0;
+  const u64 index_to_insert_1 = 1;
+  const u64 index_to_insert_2 = 2;
+
+  /* default output variables */
+  u64 item_to_find = 0;
+  u64 index_to_find = 0;
+
+  /* list creation */
+  linked_list_t *list = linked_list_create(stride);
+
+  /* list insertion */
+  b8 insert_result_0 = linked_list_insert(list, index_to_insert_0, (void *)&item_to_insert_0);
+  b8 insert_result_1 = linked_list_insert(list, index_to_insert_1, (void *)&item_to_insert_1);
+  b8 insert_result_2 = linked_list_insert(list, index_to_insert_2, (void *)&item_to_insert_2);
+
+  /* insertion result assertion */
+  assert_true(insert_result_0);
+  assert_true(insert_result_1);
+  assert_true(insert_result_2);
+
+  /* list find */
+  b8 find_result =
+      linked_list_find(list, predicate, (void *)&item_to_insert_1, (void *)&index_to_find, (void *)&item_to_find);
+
+  /* find result assertion */
+  assert_true(find_result);
+
+  /* item comparison assertion */
+  assert_int_equal(item_to_insert_1, item_to_find);
+  assert_int_equal(index_to_insert_1, index_to_find);
+
+  /* list destruction */
+  linked_list_destroy(list);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
+      cmocka_unit_test(test_linked_list_find),
       cmocka_unit_test(test_linked_list_clear),
       cmocka_unit_test(test_list_insert_and_remove),
       cmocka_unit_test(test_linked_list_create_and_destroy),
