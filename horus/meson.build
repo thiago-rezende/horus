@@ -10,6 +10,7 @@ horus_sources = [
 
   # horus containers layer
   'source/containers/array.c',
+  'source/containers/hash_map.c',
   'source/containers/linked_list.c',
 
   # horus logger layer
