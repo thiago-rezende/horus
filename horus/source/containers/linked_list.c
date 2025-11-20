@@ -207,3 +207,36 @@ b8 linked_list_retrieve(linked_list_t *list, u64 index, void *item) {
 
   return true;
 }
+
+b8 linked_list_find(linked_list_t *list, linked_list_predicate_t predicate, void *data, u64 *index, void *item) {
+  if (list == NULL || predicate == NULL) {
+    return false;
+  }
+
+  if (list->count == 0) {
+    return false;
+  }
+
+  u64 current_index = 0;
+  linked_list_node_t *current = list->head;
+
+  while (current != NULL) {
+    if (predicate(data, current->data)) {
+      if (index != NULL) {
+        platform_memory_copy(index, &current_index, sizeof(u64));
+      }
+
+      if (item != NULL) {
+        platform_memory_copy(item, current->data, list->stride);
+      }
+
+      return true;
+    }
+
+    current = current->next;
+
+    current_index++;
+  }
+
+  return false;
+}

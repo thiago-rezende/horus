@@ -3,8 +3,9 @@
 /* horus core layer */
 #include <horus/core/types.h>
 
-typedef struct __linked_list_node linked_list_node_t;
+typedef b8 (*linked_list_predicate_t)(void *data, void *item);
 
+typedef struct __linked_list_node linked_list_node_t;
 struct __linked_list_node {
   void *data;
 
@@ -30,3 +31,5 @@ b8 linked_list_clear(linked_list_t *list);
 b8 linked_list_insert(linked_list_t *list, u64 index, void *item);
 b8 linked_list_remove(linked_list_t *list, u64 index, void *item);
 b8 linked_list_retrieve(linked_list_t *list, u64 index, void *item);
+
+b8 linked_list_find(linked_list_t *list, linked_list_predicate_t predicate, void *data, u64 *index, void *item);
