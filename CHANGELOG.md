@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+ - [a35cda5] test(containers): add hash map implementation unit tests (Thiago Rezende)
+ - [c640e42] feat(containers): add simple hash map implementation (Thiago Rezende)
+ - [e650f19] test(containers): add linked_list_find menthod unit test (Thiago Rezende)
+ - [c8eb96f] feat(containers): add linked_list_find menthod (Thiago Rezende)
+ - [4619710] refactor(containers): update list_t to linked_list_t form clarity (Thiago Rezende)
+ - [aaea109] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [d085cde] test(containers): add linked list unit tests (Thiago Rezende)
  - [d28ee29] feat(containers): add simple linked list implementation (Thiago Rezende)
  - [4c71e0f] test(core): add FNV-1a hash function unit test (Thiago Rezende)
