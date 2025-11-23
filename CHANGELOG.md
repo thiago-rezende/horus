@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+ - [8986769] chore(shaders): remove currently unused triangle slang shader (Thiago Rezende)
+ - [79b0938] chore(shaders): add initial unlit slang shader (Thiago Rezende)
+ - [b03a0a5] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [a35cda5] test(containers): add hash map implementation unit tests (Thiago Rezende)
  - [c640e42] feat(containers): add simple hash map implementation (Thiago Rezende)
  - [e650f19] test(containers): add linked_list_find menthod unit test (Thiago Rezende)
