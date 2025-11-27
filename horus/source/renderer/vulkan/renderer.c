@@ -21,12 +21,11 @@
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
-renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *window) {
-  renderer_t *renderer = platform_memory_allocate(sizeof(renderer_t));
+b8 renderer_context_create(renderer_t *renderer, renderer_context_create_info_t info, platform_window_t *window) {
+  renderer->context = platform_memory_allocate(sizeof(renderer_context_t));
 
-  *renderer = (renderer_t){
+  *renderer->context = (renderer_context_t){
       .implementation = RENDERER_IMPLEMENTATION_VULKAN,
-      .implementation_string = __renderer_implementation_string(RENDERER_IMPLEMENTATION_VULKAN),
       .current_semaphore_index = 0,
       .current_frame_in_flight_index = 0,
   };
@@ -34,25 +33,26 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
   if (!renderer_vulkan_instance_create(renderer, info)) {
     logger_critical_format("<renderer:%p> VkInstance creation failed", (void *)renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
-  logger_debug_format("<renderer:%p> <instance:%p> VkInstance created", (void *)renderer, (void *)renderer->instance);
+  logger_debug_format("<renderer:%p> <instance:%p> VkInstance created", (void *)renderer,
+                      (void *)renderer->context->instance);
 
   if (!renderer_vulkan_debug_messenger_create(renderer)) {
     logger_critical_format("<renderer:%p> VkDebugUtilsMessengerEXT creation failed", (void *)renderer);
 
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
   logger_debug_format("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT created", (void *)renderer,
-                      (void *)renderer->messenger);
+                      (void *)renderer->context->messenger);
 
   if (!renderer_vulkan_surface_create(renderer, window)) {
     logger_critical_format("<renderer:%p> VkSurfaceKHR creation failed", (void *)renderer);
@@ -60,12 +60,13 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
-  logger_debug_format("<renderer:%p> <surface:%p> VkSurfaceKHR created", (void *)renderer, (void *)renderer->surface);
+  logger_debug_format("<renderer:%p> <surface:%p> VkSurfaceKHR created", (void *)renderer,
+                      (void *)renderer->context->surface);
 
   if (!renderer_vulkan_physical_device_select(renderer)) {
     logger_critical_format("<renderer:%p> VkPhysicalDevice selection failed", (void *)renderer);
@@ -74,18 +75,18 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
   logger_debug_format("<renderer:%p> <physical_device:%p> VkPhysicalDevice selected", (void *)renderer,
-                      (void *)renderer->physical_device);
-  logger_debug_format("|- [ %u ] %s", renderer->physical_device_properties.deviceID,
-                      renderer->physical_device_properties.deviceName);
+                      (void *)renderer->context->physical_device);
+  logger_debug_format("|- [ %u ] %s", renderer->context->physical_device_properties.deviceID,
+                      renderer->context->physical_device_properties.deviceName);
   logger_debug_format("|- |- [ queues family indices ] <compute:%u> <present:%u> <graphics:%u> <transfer:%u>",
-                      renderer->compute_queue_family_index, renderer->present_queue_family_index,
-                      renderer->graphics_queue_family_index, renderer->transfer_queue_family_index);
+                      renderer->context->compute_queue_family_index, renderer->context->present_queue_family_index,
+                      renderer->context->graphics_queue_family_index, renderer->context->transfer_queue_family_index);
 
   if (!renderer_vulkan_device_create(renderer)) {
     logger_critical_format("<renderer:%p> VkDevice creation failed", (void *)renderer);
@@ -94,12 +95,13 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
-  logger_debug_format("<renderer:%p> <device:%p> VkDevice created", (void *)renderer, (void *)renderer->device);
+  logger_debug_format("<renderer:%p> <device:%p> VkDevice created", (void *)renderer,
+                      (void *)renderer->context->device);
 
   if (!renderer_vulkan_command_pools_create(renderer)) {
     logger_critical_format("<renderer:%p> VkCommandPool creation failed", (void *)renderer);
@@ -110,15 +112,16 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
   logger_debug_format("<renderer:%p> VkCommandPools created", (void *)renderer);
   logger_debug_format("|- [ pools ] <compute:%p> <present:%p> <graphics:%p> <transfer:%p>",
-                      (void *)renderer->compute_command_pool, (void *)renderer->present_command_pool,
-                      (void *)renderer->graphics_command_pool, (void *)renderer->transfer_command_pool);
+                      (void *)renderer->context->compute_command_pool, (void *)renderer->context->present_command_pool,
+                      (void *)renderer->context->graphics_command_pool,
+                      (void *)renderer->context->transfer_command_pool);
 
   if (!renderer_vulkan_swapchain_create(renderer, window)) {
     logger_critical_format("<renderer:%p> VkSwapchainKHR creation failed", (void *)renderer);
@@ -128,14 +131,14 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
   logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR created", (void *)renderer,
-                      (void *)renderer->swapchain);
-  logger_debug_format("|- [ image count ] %lu", renderer->swapchain_images->count);
+                      (void *)renderer->context->swapchain);
+  logger_debug_format("|- [ image count ] %lu", renderer->context->swapchain_images->count);
 
   if (!renderer_vulkan_synchronization_create(renderer)) {
     logger_critical_format("<renderer:%p> synchronization objects creation failed", (void *)renderer);
@@ -147,9 +150,9 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
   logger_debug_format("<renderer:%p> synchronization objects created", (void *)renderer);
@@ -163,18 +166,18 @@ renderer_t *renderer_create(renderer_create_info_t info, platform_window_t *wind
     renderer_vulkan_debug_messenger_destroy(renderer);
     renderer_vulkan_instance_destroy(renderer);
 
-    platform_memory_deallocate(renderer);
+    platform_memory_deallocate(renderer->context);
 
-    return NULL;
+    return false;
   }
 
   logger_debug_format("<renderer:%p> <descriptor_pool:%p> VkDescriptorPool created", (void *)renderer,
-                      (void *)renderer->descriptor_pool);
+                      (void *)renderer->context->descriptor_pool);
 
-  return renderer;
+  return true;
 }
 
-b8 renderer_destroy(renderer_t *renderer) {
+b8 renderer_context_destroy(renderer_t *renderer) {
   if (!renderer_vulkan_descriptor_pool_destroy(renderer)) {
     logger_critical_format("<renderer:%p> VkDescriptorPool destruction failed", (void *)renderer);
 
@@ -182,7 +185,7 @@ b8 renderer_destroy(renderer_t *renderer) {
   }
 
   logger_debug_format("<renderer:%p> <descriptor_pool:%p> VkDescriptorPool destroyed", (void *)renderer,
-                      (void *)renderer->descriptor_pool);
+                      (void *)renderer->context->descriptor_pool);
 
   if (!renderer_vulkan_synchronization_destroy(renderer)) {
     logger_critical_format("<renderer:%p> synchronization objects destruction failed", (void *)renderer);
@@ -194,13 +197,13 @@ b8 renderer_destroy(renderer_t *renderer) {
 
   if (!renderer_vulkan_swapchain_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destruction failed", (void *)renderer,
-                           (void *)renderer->swapchain);
+                           (void *)renderer->context->swapchain);
 
     return false;
   }
 
   logger_debug_format("<renderer:%p> <swapchain:%p> VkSwapchainKHR destroyed", (void *)renderer,
-                      (void *)renderer->swapchain);
+                      (void *)renderer->context->swapchain);
 
   if (!renderer_vulkan_command_pools_destroy(renderer)) {
     logger_critical_format("<renderer:%p> VkCommandPools destruction failed", (void *)renderer);
@@ -210,53 +213,57 @@ b8 renderer_destroy(renderer_t *renderer) {
 
   logger_debug_format("<renderer:%p> VkCommandPools destroyed", (void *)renderer);
   logger_debug_format("|- [ pools ] <compute:%p> <present:%p> <graphics:%p> <transfer:%p>",
-                      (void *)renderer->compute_command_pool, (void *)renderer->present_command_pool,
-                      (void *)renderer->graphics_command_pool, (void *)renderer->transfer_command_pool);
+                      (void *)renderer->context->compute_command_pool, (void *)renderer->context->present_command_pool,
+                      (void *)renderer->context->graphics_command_pool,
+                      (void *)renderer->context->transfer_command_pool);
 
   if (!renderer_vulkan_device_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <device:%p> VkDevice destruction failed", (void *)renderer,
-                           (void *)renderer->device);
+                           (void *)renderer->context->device);
 
     return false;
   }
 
-  logger_debug_format("<renderer:%p> <device:%p> VkDevice destroyed", (void *)renderer, (void *)renderer->device);
+  logger_debug_format("<renderer:%p> <device:%p> VkDevice destroyed", (void *)renderer,
+                      (void *)renderer->context->device);
 
   if (!renderer_vulkan_surface_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <surface:%p> VkSurfaceKHR destruction failed", (void *)renderer,
-                           (void *)renderer->surface);
+                           (void *)renderer->context->surface);
 
     return false;
   }
 
-  logger_debug_format("<renderer:%p> <surface:%p> VkSurfaceKHR destroyed", (void *)renderer, (void *)renderer->surface);
+  logger_debug_format("<renderer:%p> <surface:%p> VkSurfaceKHR destroyed", (void *)renderer,
+                      (void *)renderer->context->surface);
 
   if (!renderer_vulkan_debug_messenger_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT destruction failed", (void *)renderer,
-                           (void *)renderer->messenger);
+                           (void *)renderer->context->messenger);
 
     return false;
   }
 
   logger_debug_format("<renderer:%p> <messenger:%p> VkDebugUtilsMessengerEXT destroyed", (void *)renderer,
-                      (void *)renderer->messenger);
+                      (void *)renderer->context->messenger);
 
   if (!renderer_vulkan_instance_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <instance:%p> VkInstance destruction failed", (void *)renderer,
-                           (void *)renderer->instance);
+                           (void *)renderer->context->instance);
 
     return false;
   }
 
-  logger_debug_format("<renderer:%p> <instance:%p> VkInstance destroyed", (void *)renderer, (void *)renderer->instance);
+  logger_debug_format("<renderer:%p> <instance:%p> VkInstance destroyed", (void *)renderer,
+                      (void *)renderer->context->instance);
 
-  platform_memory_deallocate(renderer);
+  platform_memory_deallocate(renderer->context);
 
   return true;
 }
 
 /* TODO: improve for multiple windows support */
-b8 renderer_record_commands(renderer_t *renderer) {
+b8 renderer_context_record_commands(renderer_t *renderer) {
   /* TODO: improve window retrieval for multiple windows support */
   platform_window_t *window = platform_window();
   platform_window_size_t window_size = platform_window_size(platform_window());
@@ -273,23 +280,30 @@ b8 renderer_record_commands(renderer_t *renderer) {
   VkCommandBuffer graphics_command_buffer;
   VkCommandBuffer transfer_command_buffer;
 
-  array_retrieve(renderer->render_complete_fences, renderer->current_frame_in_flight_index, &render_complete_fence);
-  array_retrieve(renderer->present_complete_semaphores, renderer->current_semaphore_index, &present_complete_semaphore);
+  array_retrieve(renderer->context->render_complete_fences, renderer->context->current_frame_in_flight_index,
+                 &render_complete_fence);
+  array_retrieve(renderer->context->present_complete_semaphores, renderer->context->current_semaphore_index,
+                 &present_complete_semaphore);
 
-  array_retrieve(renderer->compute_command_buffers, renderer->current_frame_in_flight_index, &compute_command_buffer);
-  array_retrieve(renderer->present_command_buffers, renderer->current_frame_in_flight_index, &present_command_buffer);
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
-  array_retrieve(renderer->transfer_command_buffers, renderer->current_frame_in_flight_index, &transfer_command_buffer);
+  array_retrieve(renderer->context->compute_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &compute_command_buffer);
+  array_retrieve(renderer->context->present_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &present_command_buffer);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
+  array_retrieve(renderer->context->transfer_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &transfer_command_buffer);
 
-  while (vkWaitForFences(renderer->device, 1, &render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
+  while (vkWaitForFences(renderer->context->device, 1, &render_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
     ;
 
-  VkResult acquire_next_image_result =
-      vkAcquireNextImageKHR(renderer->device, renderer->swapchain, max_u64, present_complete_semaphore, VK_NULL_HANDLE,
-                            &renderer->current_swapchain_image_index);
+  VkResult acquire_next_image_result = vkAcquireNextImageKHR(renderer->context->device, renderer->context->swapchain,
+                                                             max_u64, present_complete_semaphore, VK_NULL_HANDLE,
+                                                             &renderer->context->current_swapchain_image_index);
 
   if (acquire_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
-    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
+    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer,
+                          renderer->context->swapchain);
 
     renderer_vulkan_swapchain_update(renderer, window);
 
@@ -298,12 +312,12 @@ b8 renderer_record_commands(renderer_t *renderer) {
 
   if (acquire_next_image_result != VK_SUCCESS && acquire_next_image_result != VK_SUBOPTIMAL_KHR) {
     logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image retrieval failed", renderer,
-                           renderer->swapchain);
+                           renderer->context->swapchain);
 
     return false;
   }
 
-  if (vkResetFences(renderer->device, 1, &render_complete_fence) != VK_SUCCESS) {
+  if (vkResetFences(renderer->context->device, 1, &render_complete_fence) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> fences reset failed", renderer);
 
     return false;
@@ -358,7 +372,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .command_buffer = graphics_command_buffer,
   };
 
-  array_retrieve(renderer->swapchain_images, renderer->current_swapchain_image_index,
+  array_retrieve(renderer->context->swapchain_images, renderer->context->current_swapchain_image_index,
                  &swapchain_image_transition_info.image);
 
   if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
@@ -385,9 +399,10 @@ b8 renderer_record_commands(renderer_t *renderer) {
 
   VkRenderingAttachmentInfo depth_attachment_info = (VkRenderingAttachmentInfo){
       .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-      .imageView = renderer->depth_image_view,
-      .imageLayout = renderer->depth_image_has_stencil_support ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-                                                               : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+      .imageView = renderer->context->depth_image_view,
+      .imageLayout = renderer->context->depth_image_has_stencil_support
+                         ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                         : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
       .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
       .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
       .clearValue =
@@ -400,7 +415,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
           },
   };
 
-  array_retrieve(renderer->swapchain_image_views, renderer->current_swapchain_image_index,
+  array_retrieve(renderer->context->swapchain_image_views, renderer->context->current_swapchain_image_index,
                  &rendering_attachment_info.imageView);
 
   VkRenderingInfo rendering_info = (VkRenderingInfo){
@@ -408,13 +423,13 @@ b8 renderer_record_commands(renderer_t *renderer) {
       .renderArea =
           (VkRect2D){
               .offset = (VkOffset2D){.x = 0, .y = 0},
-              .extent = renderer->swapchain_extent,
+              .extent = renderer->context->swapchain_extent,
           },
       .layerCount = 1,
       .colorAttachmentCount = 1,
       .pColorAttachments = &rendering_attachment_info,
       .pDepthAttachment = &depth_attachment_info,
-      .pStencilAttachment = renderer->depth_image_has_stencil_support ? &depth_attachment_info : NULL,
+      .pStencilAttachment = renderer->context->depth_image_has_stencil_support ? &depth_attachment_info : NULL,
   };
 
   vkCmdBeginRendering(graphics_command_buffer, &rendering_info);
@@ -422,15 +437,15 @@ b8 renderer_record_commands(renderer_t *renderer) {
   VkViewport viewport = (VkViewport){
       .x = 0,
       .y = 0,
-      .width = renderer->swapchain_extent.width,
-      .height = renderer->swapchain_extent.height,
+      .width = renderer->context->swapchain_extent.width,
+      .height = renderer->context->swapchain_extent.height,
       .minDepth = 0.0f,
       .maxDepth = 1.0f,
   };
 
   VkRect2D scissor = (VkRect2D){
       .offset = (VkOffset2D){.x = 0, .y = 0},
-      .extent = renderer->swapchain_extent,
+      .extent = renderer->context->swapchain_extent,
   };
 
   vkCmdSetViewport(graphics_command_buffer, 0, 1, &viewport);
@@ -440,7 +455,7 @@ b8 renderer_record_commands(renderer_t *renderer) {
 }
 
 /* TODO: improve for multiple windows support */
-b8 renderer_submit_commands(renderer_t *renderer) {
+b8 renderer_context_submit_commands(renderer_t *renderer) {
   VkFence render_complete_fence;
   VkFence transfer_complete_fence;
   VkSemaphore render_complete_semaphore;
@@ -451,16 +466,23 @@ b8 renderer_submit_commands(renderer_t *renderer) {
   VkCommandBuffer graphics_command_buffer;
   VkCommandBuffer transfer_command_buffer;
 
-  array_retrieve(renderer->render_complete_fences, renderer->current_frame_in_flight_index, &render_complete_fence);
-  array_retrieve(renderer->transfer_complete_fences, renderer->current_frame_in_flight_index, &transfer_complete_fence);
-  array_retrieve(renderer->present_complete_semaphores, renderer->current_semaphore_index, &present_complete_semaphore);
-  array_retrieve(renderer->render_complete_semaphores, renderer->current_swapchain_image_index,
+  array_retrieve(renderer->context->render_complete_fences, renderer->context->current_frame_in_flight_index,
+                 &render_complete_fence);
+  array_retrieve(renderer->context->transfer_complete_fences, renderer->context->current_frame_in_flight_index,
+                 &transfer_complete_fence);
+  array_retrieve(renderer->context->present_complete_semaphores, renderer->context->current_semaphore_index,
+                 &present_complete_semaphore);
+  array_retrieve(renderer->context->render_complete_semaphores, renderer->context->current_swapchain_image_index,
                  &render_complete_semaphore);
 
-  array_retrieve(renderer->compute_command_buffers, renderer->current_frame_in_flight_index, &compute_command_buffer);
-  array_retrieve(renderer->present_command_buffers, renderer->current_frame_in_flight_index, &present_command_buffer);
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
-  array_retrieve(renderer->transfer_command_buffers, renderer->current_frame_in_flight_index, &transfer_command_buffer);
+  array_retrieve(renderer->context->compute_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &compute_command_buffer);
+  array_retrieve(renderer->context->present_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &present_command_buffer);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
+  array_retrieve(renderer->context->transfer_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &transfer_command_buffer);
 
   vkCmdEndRendering(graphics_command_buffer);
 
@@ -474,7 +496,7 @@ b8 renderer_submit_commands(renderer_t *renderer) {
       .command_buffer = graphics_command_buffer,
   };
 
-  array_retrieve(renderer->swapchain_images, renderer->current_swapchain_image_index,
+  array_retrieve(renderer->context->swapchain_images, renderer->context->current_swapchain_image_index,
                  &swapchain_image_transition_info.image);
 
   if (!renderer_vulkan_swapchain_image_transition(swapchain_image_transition_info)) {
@@ -520,19 +542,21 @@ b8 renderer_submit_commands(renderer_t *renderer) {
       .pCommandBuffers = &transfer_command_buffer,
   };
 
-  if (vkResetFences(renderer->device, 1, &transfer_complete_fence) != VK_SUCCESS) {
+  if (vkResetFences(renderer->context->device, 1, &transfer_complete_fence) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> fences reset failed", renderer);
 
     return false;
   }
 
-  if (vkQueueSubmit(renderer->transfer_queue, 1, &transfer_queue_submit_info, transfer_complete_fence) != VK_SUCCESS) {
-    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
+  if (vkQueueSubmit(renderer->context->transfer_queue, 1, &transfer_queue_submit_info, transfer_complete_fence) !=
+      VK_SUCCESS) {
+    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer,
+                          renderer->context->swapchain);
 
     return false;
   }
 
-  while (vkWaitForFences(renderer->device, 1, &transfer_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
+  while (vkWaitForFences(renderer->context->device, 1, &transfer_complete_fence, VK_TRUE, max_u64) == VK_TIMEOUT)
     ;
 
   VkPipelineStageFlags graphics_pipeline_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -548,8 +572,10 @@ b8 renderer_submit_commands(renderer_t *renderer) {
       .pSignalSemaphores = &render_complete_semaphore,
   };
 
-  if (vkQueueSubmit(renderer->graphics_queue, 1, &graphics_queue_submit_info, render_complete_fence) != VK_SUCCESS) {
-    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer, renderer->swapchain);
+  if (vkQueueSubmit(renderer->context->graphics_queue, 1, &graphics_queue_submit_info, render_complete_fence) !=
+      VK_SUCCESS) {
+    logger_warning_format("<renderer:%p> <swapchain:%p> swapchain images are outdated", renderer,
+                          renderer->context->swapchain);
 
     return false;
   }
@@ -559,12 +585,12 @@ b8 renderer_submit_commands(renderer_t *renderer) {
       .waitSemaphoreCount = 1,
       .pWaitSemaphores = &render_complete_semaphore,
       .swapchainCount = 1,
-      .pSwapchains = &renderer->swapchain,
-      .pImageIndices = &renderer->current_swapchain_image_index,
+      .pSwapchains = &renderer->context->swapchain,
+      .pImageIndices = &renderer->context->current_swapchain_image_index,
       .pResults = NULL,
   };
 
-  VkResult queue_present_result = vkQueuePresentKHR(renderer->present_queue, &present_info);
+  VkResult queue_present_result = vkQueuePresentKHR(renderer->context->present_queue, &present_info);
 
   /* TODO: improve window retrieval for multiple windows support */
   platform_window_t *window = platform_window();
@@ -580,20 +606,21 @@ b8 renderer_submit_commands(renderer_t *renderer) {
     return false;
   }
 
-  renderer->current_semaphore_index =
-      (renderer->current_semaphore_index + 1) % renderer->present_complete_semaphores->count;
+  renderer->context->current_semaphore_index =
+      (renderer->context->current_semaphore_index + 1) % renderer->context->present_complete_semaphores->count;
 
-  renderer->current_frame_in_flight_index =
-      (renderer->current_frame_in_flight_index + 1) % RENDERER_VULKAN_FRAMES_IN_FLIGHT;
+  renderer->context->current_frame_in_flight_index =
+      (renderer->context->current_frame_in_flight_index + 1) % RENDERER_VULKAN_FRAMES_IN_FLIGHT;
 
   return true;
 }
 
 /* TODO: improve for multiple window support */
-b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances) {
+b8 renderer_context_draw(renderer_t *renderer, u32 vertices, u32 instances) {
   VkCommandBuffer graphics_command_buffer;
 
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
 
   vkCmdDraw(graphics_command_buffer, vertices, instances, 0, 0);
 
@@ -601,20 +628,17 @@ b8 renderer_draw(renderer_t *renderer, u32 vertices, u32 instances) {
 }
 
 /* TODO: improve for multiple window support */
-b8 renderer_draw_indexed(renderer_t *renderer, u32 indices, u32 instances) {
+b8 renderer_context_draw_indexed(renderer_t *renderer, u32 indices, u32 instances) {
   VkCommandBuffer graphics_command_buffer;
 
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
 
   vkCmdDrawIndexed(graphics_command_buffer, indices, instances, 0, 0, 0);
 
   return true;
 }
 
-renderer_implementation_t renderer_implementation(renderer_t *renderer) {
-  return renderer->implementation;
-}
-
-const char *renderer_implementation_string(renderer_t *renderer) {
-  return renderer->implementation_string;
+renderer_implementation_t renderer_context_implementation(renderer_t *renderer) {
+  return renderer->context->implementation;
 }

@@ -64,7 +64,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
 
   *texture_context = (texture_context_t){
       .size = (u64)texture_size,
-      .device = renderer->device,
+      .device = renderer->context->device,
       .binding = renderer_vulkan_texture_binding(role),
   };
 
@@ -94,7 +94,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
       .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
   };
 
-  if (renderer->graphics_queue_family_index != renderer->transfer_queue_family_index) {
+  if (renderer->context->graphics_queue_family_index != renderer->context->transfer_queue_family_index) {
     staging_create_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
   }
 
@@ -131,7 +131,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
   vkGetImageMemoryRequirements(texture_context->device, texture_context->image, &image_memory_requirements);
   vkGetBufferMemoryRequirements(texture_context->device, texture_context->staging, &staging_memory_requirements);
 
-  vkGetPhysicalDeviceMemoryProperties(renderer->physical_device, &physical_device_memory_properties);
+  vkGetPhysicalDeviceMemoryProperties(renderer->context->physical_device, &physical_device_memory_properties);
 
   u32 image_memory_type_index = 0;
   u32 staging_memory_type_index = 0;
@@ -312,7 +312,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
   }
 
   VkCommandBuffer transfer_command_buffer =
-      renderer_vulkan_command_buffer_create(texture_context->device, renderer->transfer_command_pool);
+      renderer_vulkan_command_buffer_create(texture_context->device, renderer->context->transfer_command_pool);
 
   VkCommandBufferBeginInfo transfer_command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -326,7 +326,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
     ktxTexture2_Destroy(ktx_texture);
 
     renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
-                                           renderer->transfer_command_pool);
+                                           renderer->context->transfer_command_pool);
 
     vkFreeMemory(texture_context->device, texture_context->memory, NULL);
     vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
@@ -384,7 +384,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
     ktxTexture2_Destroy(ktx_texture);
 
     renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
-                                           renderer->transfer_command_pool);
+                                           renderer->context->transfer_command_pool);
 
     vkFreeMemory(texture_context->device, texture_context->memory, NULL);
     vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
@@ -405,14 +405,14 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
       .pCommandBuffers = &transfer_command_buffer,
   };
 
-  if (vkQueueSubmit(renderer->transfer_queue, 1, &transfer_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
+  if (vkQueueSubmit(renderer->context->transfer_queue, 1, &transfer_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <texture_context:%p> transfer queue submission failed", renderer,
                            texture_context);
 
     ktxTexture2_Destroy(ktx_texture);
 
     renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
-                                           renderer->transfer_command_pool);
+                                           renderer->context->transfer_command_pool);
 
     vkFreeMemory(texture_context->device, texture_context->memory, NULL);
     vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
@@ -427,7 +427,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
     return NULL;
   }
 
-  vkQueueWaitIdle(renderer->transfer_queue);
+  vkQueueWaitIdle(renderer->context->transfer_queue);
 
   image_transition_info.old_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
   image_transition_info.new_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -455,7 +455,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
   }
 
   renderer_vulkan_command_buffer_destroy(texture_context->device, transfer_command_buffer,
-                                         renderer->transfer_command_pool);
+                                         renderer->context->transfer_command_pool);
 
   vkFreeMemory(texture_context->device, texture_context->staging_memory, NULL);
 
@@ -506,8 +506,8 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
       .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT, /* TODO: control with user choice */
       .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT, /* TODO: control with user choice */
       .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT, /* TODO: control with user choice */
-      .anisotropyEnable = renderer->physical_device_features.samplerAnisotropy,
-      .maxAnisotropy = renderer->physical_device_properties.limits.maxSamplerAnisotropy,
+      .anisotropyEnable = renderer->context->physical_device_features.samplerAnisotropy,
+      .maxAnisotropy = renderer->context->physical_device_properties.limits.maxSamplerAnisotropy,
       .compareEnable = VK_FALSE,
       .compareOp = VK_COMPARE_OP_ALWAYS,
       .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
@@ -534,10 +534,11 @@ b8 texture_context_bind(texture_context_t *context, graphics_pipeline_t *pipelin
   VkDescriptorSet descriptor_set;
   VkCommandBuffer graphics_command_buffer;
 
-  array_retrieve(pipeline->descriptor_sets, renderer->current_frame_in_flight_index, &descriptor_set);
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(pipeline->descriptor_sets, renderer->context->current_frame_in_flight_index, &descriptor_set);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
 
-  renderer_vulkan_descriptor_set_update_sampler(renderer->device, descriptor_set,
+  renderer_vulkan_descriptor_set_update_sampler(renderer->context->device, descriptor_set,
                                                 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, context->binding,
                                                 context->sampler, context->image_view);
 
@@ -570,15 +571,15 @@ u32 renderer_vulkan_texture_binding(texture_role_t role) {
 }
 
 ktx_transcode_fmt_e __select_ktx_transcode_format(renderer_t *renderer) {
-  if (renderer->physical_device_features.textureCompressionBC) {
+  if (renderer->context->physical_device_features.textureCompressionBC) {
     return KTX_TTF_BC7_RGBA;
   }
 
-  if (renderer->physical_device_features.textureCompressionASTC_LDR) {
+  if (renderer->context->physical_device_features.textureCompressionASTC_LDR) {
     return KTX_TTF_ASTC_4x4_RGBA;
   }
 
-  if (renderer->physical_device_features.textureCompressionETC2) {
+  if (renderer->context->physical_device_features.textureCompressionETC2) {
     return KTX_TTF_ETC2_RGBA;
   }
 

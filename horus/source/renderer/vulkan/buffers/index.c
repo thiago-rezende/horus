@@ -20,7 +20,7 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
 
   *buffer = (index_buffer_t){
       .size = sizeof(u32) * count,
-      .device = renderer->device,
+      .device = renderer->context->device,
   };
 
   VkBufferCreateInfo buffer_create_info = (VkBufferCreateInfo){
@@ -39,12 +39,12 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
       .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
   };
 
-  if (renderer->graphics_queue_family_index != renderer->transfer_queue_family_index) {
+  if (renderer->context->graphics_queue_family_index != renderer->context->transfer_queue_family_index) {
     buffer_create_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
     staging_create_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
   }
 
-  if (vkCreateBuffer(renderer->device, &buffer_create_info, NULL, &buffer->buffer) != VK_SUCCESS) {
+  if (vkCreateBuffer(renderer->context->device, &buffer_create_info, NULL, &buffer->buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> buffer creation failed", renderer);
 
     platform_memory_deallocate(buffer);
@@ -52,7 +52,7 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
     return NULL;
   }
 
-  if (vkCreateBuffer(renderer->device, &staging_create_info, NULL, &buffer->staging) != VK_SUCCESS) {
+  if (vkCreateBuffer(renderer->context->device, &staging_create_info, NULL, &buffer->staging) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> staging buffer creation failed", renderer);
 
     vkDestroyBuffer(buffer->device, buffer->staging, NULL);
@@ -73,7 +73,7 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
   vkGetBufferMemoryRequirements(buffer->device, buffer->buffer, &buffer_memory_requirements);
   vkGetBufferMemoryRequirements(buffer->device, buffer->staging, &staging_memory_requirements);
 
-  vkGetPhysicalDeviceMemoryProperties(renderer->physical_device, &physical_device_memory_properties);
+  vkGetPhysicalDeviceMemoryProperties(renderer->context->physical_device, &physical_device_memory_properties);
 
   u32 buffer_memory_type_index = 0;
   u32 staging_memory_type_index = 0;
@@ -204,7 +204,7 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
   vkUnmapMemory(buffer->device, buffer->staging_memory);
 
   VkCommandBuffer transfer_command_buffer =
-      renderer_vulkan_command_buffer_create(buffer->device, renderer->transfer_command_pool);
+      renderer_vulkan_command_buffer_create(buffer->device, renderer->context->transfer_command_pool);
 
   VkCommandBufferBeginInfo transfer_command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -214,7 +214,8 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
   if (vkBeginCommandBuffer(transfer_command_buffer, &transfer_command_buffer_begin_info) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <buffer:%p> transfer command buffer beginning failed", renderer, buffer);
 
-    renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer, renderer->transfer_command_pool);
+    renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer,
+                                           renderer->context->transfer_command_pool);
 
     vkFreeMemory(buffer->device, buffer->memory, NULL);
     vkFreeMemory(buffer->device, buffer->staging_memory, NULL);
@@ -236,7 +237,8 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
   if (vkEndCommandBuffer(transfer_command_buffer) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <buffer:%p> transfer command buffer ending failed", renderer, buffer);
 
-    renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer, renderer->transfer_command_pool);
+    renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer,
+                                           renderer->context->transfer_command_pool);
 
     vkFreeMemory(buffer->device, buffer->memory, NULL);
     vkFreeMemory(buffer->device, buffer->staging_memory, NULL);
@@ -253,11 +255,12 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
       .pCommandBuffers = &transfer_command_buffer,
   };
 
-  if (vkQueueSubmit(renderer->transfer_queue, 1, &transfer_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
+  if (vkQueueSubmit(renderer->context->transfer_queue, 1, &transfer_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <queue:%p> transfer queue submission failed", renderer,
-                           renderer->transfer_queue);
+                           renderer->context->transfer_queue);
 
-    renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer, renderer->transfer_command_pool);
+    renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer,
+                                           renderer->context->transfer_command_pool);
 
     vkFreeMemory(buffer->device, buffer->memory, NULL);
     vkFreeMemory(buffer->device, buffer->staging_memory, NULL);
@@ -268,9 +271,10 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
     return NULL;
   }
 
-  vkQueueWaitIdle(renderer->transfer_queue);
+  vkQueueWaitIdle(renderer->context->transfer_queue);
 
-  renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer, renderer->transfer_command_pool);
+  renderer_vulkan_command_buffer_destroy(buffer->device, transfer_command_buffer,
+                                         renderer->context->transfer_command_pool);
 
   vkFreeMemory(buffer->device, buffer->staging_memory, NULL);
 
@@ -282,7 +286,8 @@ index_buffer_t *index_buffer_create(renderer_t *renderer, u32 *indices, u64 coun
 b8 index_buffer_bind(index_buffer_t *buffer, renderer_t *renderer) {
   VkCommandBuffer graphics_command_buffer;
 
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
 
   VkDeviceSize offset = {0};
 

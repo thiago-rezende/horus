@@ -35,8 +35,9 @@ horus_sources = [
   'source/camera/camera.c',
 
   # horus renderer layer
-  'source/renderer/general.c',
   'source/renderer/texture.c',
+  'source/renderer/material.c',
+  'source/renderer/renderer.c',
 ]
 
 horus_renderer_vulkan_sources = [
@@ -49,8 +50,8 @@ horus_renderer_vulkan_sources = [
   'source/renderer/vulkan/command.c',
   'source/renderer/vulkan/texture.c',
   'source/renderer/vulkan/instance.c',
-  'source/renderer/vulkan/renderer.c',
   'source/renderer/vulkan/pipeline.c',
+  'source/renderer/vulkan/renderer.c',
   'source/renderer/vulkan/swapchain.c',
   'source/renderer/vulkan/descriptors.c',
   'source/renderer/vulkan/synchronization.c',

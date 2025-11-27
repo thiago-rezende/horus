@@ -25,9 +25,9 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
   graphics_pipeline_t *pipeline = platform_memory_allocate(sizeof(graphics_pipeline_t));
 
   *pipeline = (graphics_pipeline_t){
-      .device = renderer->device,
+      .device = renderer->context->device,
       .module = module,
-      .descriptor_pool = renderer->descriptor_pool,
+      .descriptor_pool = renderer->context->descriptor_pool,
   };
 
   pipeline->dynamic_states = array_create(RENDERER_PIPELINE_DYNAMIC_STATES_COUNT, sizeof(VkDynamicState));
@@ -130,7 +130,7 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
           .depthTestEnable = VK_TRUE,
           .depthWriteEnable = VK_TRUE,
           .depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
-          .stencilTestEnable = renderer->depth_image_has_stencil_support ? VK_TRUE : VK_FALSE,
+          .stencilTestEnable = renderer->context->depth_image_has_stencil_support ? VK_TRUE : VK_FALSE,
           .front =
               (VkStencilOpState){
                   .failOp = VK_STENCIL_OP_KEEP,
@@ -250,10 +250,11 @@ graphics_pipeline_t *graphics_pipeline_create(renderer_t *renderer, shader_modul
   VkPipelineRenderingCreateInfo pipeline_rendering_create_info = (VkPipelineRenderingCreateInfo){
       .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
       .colorAttachmentCount = 1,
-      .pColorAttachmentFormats = &renderer->surface_format.format,
-      .depthAttachmentFormat = renderer->depth_image_format,
+      .pColorAttachmentFormats = &renderer->context->surface_format.format,
+      .depthAttachmentFormat = renderer->context->depth_image_format,
       .stencilAttachmentFormat =
-          (renderer->depth_image_has_stencil_support ? renderer->depth_image_format : VK_FORMAT_UNDEFINED),
+          (renderer->context->depth_image_has_stencil_support ? renderer->context->depth_image_format
+                                                              : VK_FORMAT_UNDEFINED),
   };
 
   if (!pipeline->module->has_vertex_stage_create_info) {
@@ -373,7 +374,8 @@ b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline) {
 b8 graphics_pipeline_bind(graphics_pipeline_t *pipeline, renderer_t *renderer) {
   VkCommandBuffer graphics_command_buffer;
 
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
 
   vkCmdBindPipeline(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
 

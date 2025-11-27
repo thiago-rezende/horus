@@ -11,7 +11,7 @@
 
 b8 renderer_vulkan_image_transition_layout(renderer_t *renderer, image_transition_info_t info) {
   VkCommandBuffer graphics_command_buffer =
-      renderer_vulkan_command_buffer_create(renderer->device, renderer->graphics_command_pool);
+      renderer_vulkan_command_buffer_create(renderer->context->device, renderer->context->graphics_command_pool);
 
   VkCommandBufferBeginInfo graphics_command_buffer_begin_info = (VkCommandBufferBeginInfo){
       .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -22,7 +22,8 @@ b8 renderer_vulkan_image_transition_layout(renderer_t *renderer, image_transitio
     logger_critical_format("<renderer:%p> <command_buffer:%p> graphics command buffer beginning failed", renderer,
                            graphics_command_buffer);
 
-    renderer_vulkan_command_buffer_destroy(renderer->device, graphics_command_buffer, renderer->graphics_command_pool);
+    renderer_vulkan_command_buffer_destroy(renderer->context->device, graphics_command_buffer,
+                                           renderer->context->graphics_command_pool);
 
     return false;
   }
@@ -62,7 +63,8 @@ b8 renderer_vulkan_image_transition_layout(renderer_t *renderer, image_transitio
     logger_critical_format("<renderer:%p> <command_buffer:%p> graphics command buffer ending failed", renderer,
                            graphics_command_buffer);
 
-    renderer_vulkan_command_buffer_destroy(renderer->device, graphics_command_buffer, renderer->graphics_command_pool);
+    renderer_vulkan_command_buffer_destroy(renderer->context->device, graphics_command_buffer,
+                                           renderer->context->graphics_command_pool);
 
     return false;
   }
@@ -73,18 +75,20 @@ b8 renderer_vulkan_image_transition_layout(renderer_t *renderer, image_transitio
       .pCommandBuffers = &graphics_command_buffer,
   };
 
-  if (vkQueueSubmit(renderer->graphics_queue, 1, &graphics_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
+  if (vkQueueSubmit(renderer->context->graphics_queue, 1, &graphics_submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <queue:%p> graphics queue submission failed", renderer,
-                           renderer->graphics_queue);
+                           renderer->context->graphics_queue);
 
-    renderer_vulkan_command_buffer_destroy(renderer->device, graphics_command_buffer, renderer->graphics_command_pool);
+    renderer_vulkan_command_buffer_destroy(renderer->context->device, graphics_command_buffer,
+                                           renderer->context->graphics_command_pool);
 
     return false;
   }
 
-  vkQueueWaitIdle(renderer->graphics_queue);
+  vkQueueWaitIdle(renderer->context->graphics_queue);
 
-  renderer_vulkan_command_buffer_destroy(renderer->device, graphics_command_buffer, renderer->graphics_command_pool);
+  renderer_vulkan_command_buffer_destroy(renderer->context->device, graphics_command_buffer,
+                                         renderer->context->graphics_command_pool);
 
   return true;
 }
@@ -104,7 +108,7 @@ VkFormat renderer_vulkan_image_find_supported_format(renderer_t *renderer,
 
     VkFormatProperties format_properties;
 
-    vkGetPhysicalDeviceFormatProperties(renderer->physical_device, format, &format_properties);
+    vkGetPhysicalDeviceFormatProperties(renderer->context->physical_device, format, &format_properties);
 
     if (tiling == VK_IMAGE_TILING_LINEAR && (format_properties.linearTilingFeatures & features) == features) {
       return format;

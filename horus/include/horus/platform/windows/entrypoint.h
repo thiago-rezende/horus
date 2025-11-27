@@ -63,15 +63,15 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
   logger_info_format("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", (void *)window,
                      application->name, resolution->width, resolution->height, configuration->fullscreen);
 
-  renderer_create_info_t renderer_create_info = (renderer_create_info_t){
+  renderer_context_create_info_t renderer_context_create_info = (renderer_context_create_info_t){
       .name = application->name,
       .version = application->version,
   };
 
-  renderer_t *renderer = renderer_create(renderer_create_info, window);
+  renderer_t *renderer = renderer_create(renderer_context_create_info, window);
 
   logger_info_format("<renderer:%p> <implementation:%s> created", (void *)renderer,
-                     renderer_implementation_string(renderer));
+                     renderer_implementation_string(renderer->implementation));
 
   if (application->on_event) {
     if (!platform_window_set_event_callback(window, application->on_event)) {

@@ -18,11 +18,11 @@ array_t *__build_queue_create_infos(renderer_t *renderer);
 b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
   u32 physical_device_count = 0;
 
-  vkEnumeratePhysicalDevices(renderer->instance, &physical_device_count, NULL);
+  vkEnumeratePhysicalDevices(renderer->context->instance, &physical_device_count, NULL);
 
   if (physical_device_count == 0) {
     logger_critical_format("<renderer:%p> <instance:%p> no physical devices found", (void *)renderer,
-                           (void *)renderer->instance);
+                           (void *)renderer->context->instance);
 
     return false;
   }
@@ -43,7 +43,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
   devices->count = physical_device_count;
 
-  vkEnumeratePhysicalDevices(renderer->instance, &physical_device_count, devices->buffer);
+  vkEnumeratePhysicalDevices(renderer->context->instance, &physical_device_count, devices->buffer);
 
   logger_debug_format("<renderer:%p> <count:%lu> physical devices", (void *)renderer, devices->count);
 
@@ -58,7 +58,7 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
     array_retrieve(devices, i, (void *)&device);
 
     physical_device_score_t device_score =
-        renderer_vulkan_physical_device_get_score(device, renderer->surface, extensions);
+        renderer_vulkan_physical_device_get_score(device, renderer->context->surface, extensions);
 
     if (device_score.score > current_physical_device_score.score) {
       current_physical_device_score = device_score;
@@ -70,23 +70,23 @@ b8 renderer_vulkan_physical_device_select(renderer_t *renderer) {
 
   if (current_physical_device_score.device == VK_NULL_HANDLE) {
     logger_critical_format("<renderer:%p> <instance:%p> no suitable physical devices found", (void *)renderer,
-                           (void *)renderer->instance);
+                           (void *)renderer->context->instance);
 
     return false;
   }
 
-  renderer->physical_device = current_physical_device_score.device;
-  renderer->physical_device_features = current_physical_device_score.features;
-  renderer->physical_device_properties = current_physical_device_score.properties;
+  renderer->context->physical_device = current_physical_device_score.device;
+  renderer->context->physical_device_features = current_physical_device_score.features;
+  renderer->context->physical_device_properties = current_physical_device_score.properties;
 
-  renderer->compute_queue_family_index = current_physical_device_score.queues.compute_family_index;
-  renderer->present_queue_family_index = current_physical_device_score.queues.present_family_index;
-  renderer->graphics_queue_family_index = current_physical_device_score.queues.graphics_family_index;
-  renderer->transfer_queue_family_index = current_physical_device_score.queues.transfer_family_index;
+  renderer->context->compute_queue_family_index = current_physical_device_score.queues.compute_family_index;
+  renderer->context->present_queue_family_index = current_physical_device_score.queues.present_family_index;
+  renderer->context->graphics_queue_family_index = current_physical_device_score.queues.graphics_family_index;
+  renderer->context->transfer_queue_family_index = current_physical_device_score.queues.transfer_family_index;
 
-  renderer->surface_format = current_physical_device_score.surface_information.format;
-  renderer->surface_capabilities = current_physical_device_score.surface_information.capabilities;
-  renderer->surface_present_mode = current_physical_device_score.surface_information.present_mode;
+  renderer->context->surface_format = current_physical_device_score.surface_information.format;
+  renderer->context->surface_capabilities = current_physical_device_score.surface_information.capabilities;
+  renderer->context->surface_present_mode = current_physical_device_score.surface_information.present_mode;
 
   return true;
 }
@@ -364,12 +364,12 @@ surface_information_t renderer_vulkan_physical_device_get_surface_information(Vk
 }
 
 b8 renderer_vulkan_physical_device_update_surface_information(renderer_t *renderer) {
-  surface_information_t info =
-      renderer_vulkan_physical_device_get_surface_information(renderer->physical_device, renderer->surface);
+  surface_information_t info = renderer_vulkan_physical_device_get_surface_information(
+      renderer->context->physical_device, renderer->context->surface);
 
-  renderer->surface_format = info.format;
-  renderer->surface_capabilities = info.capabilities;
-  renderer->surface_present_mode = info.present_mode;
+  renderer->context->surface_format = info.format;
+  renderer->context->surface_capabilities = info.capabilities;
+  renderer->context->surface_present_mode = info.present_mode;
 
   return true;
 }
@@ -383,15 +383,15 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
       .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
       .features =
           (VkPhysicalDeviceFeatures){
-              .wideLines = renderer->physical_device_features.wideLines,
-              .depthBounds = renderer->physical_device_features.depthBounds,
-              .multiViewport = renderer->physical_device_features.multiViewport,
-              .fillModeNonSolid = renderer->physical_device_features.fillModeNonSolid,
-              .samplerAnisotropy = renderer->physical_device_features.samplerAnisotropy,
-              .tessellationShader = renderer->physical_device_features.tessellationShader,
-              .textureCompressionBC = renderer->physical_device_features.textureCompressionBC,
-              .textureCompressionETC2 = renderer->physical_device_features.textureCompressionETC2,
-              .textureCompressionASTC_LDR = renderer->physical_device_features.textureCompressionASTC_LDR,
+              .wideLines = renderer->context->physical_device_features.wideLines,
+              .depthBounds = renderer->context->physical_device_features.depthBounds,
+              .multiViewport = renderer->context->physical_device_features.multiViewport,
+              .fillModeNonSolid = renderer->context->physical_device_features.fillModeNonSolid,
+              .samplerAnisotropy = renderer->context->physical_device_features.samplerAnisotropy,
+              .tessellationShader = renderer->context->physical_device_features.tessellationShader,
+              .textureCompressionBC = renderer->context->physical_device_features.textureCompressionBC,
+              .textureCompressionETC2 = renderer->context->physical_device_features.textureCompressionETC2,
+              .textureCompressionASTC_LDR = renderer->context->physical_device_features.textureCompressionASTC_LDR,
           },
   };
 
@@ -424,8 +424,10 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
       .pNext = &device_features_2,
   };
 
-  if (vkCreateDevice(renderer->physical_device, &device_create_info, NULL, &renderer->device) != VK_SUCCESS) {
-    logger_critical_format("<physical_device:%p> logical device creation failed", (void *)renderer->physical_device);
+  if (vkCreateDevice(renderer->context->physical_device, &device_create_info, NULL, &renderer->context->device) !=
+      VK_SUCCESS) {
+    logger_critical_format("<physical_device:%p> logical device creation failed",
+                           (void *)renderer->context->physical_device);
 
     array_destroy(extensions);
     array_destroy(queue_create_infos);
@@ -433,10 +435,14 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
     return false;
   }
 
-  vkGetDeviceQueue(renderer->device, renderer->compute_queue_family_index, 0, &renderer->compute_queue);
-  vkGetDeviceQueue(renderer->device, renderer->present_queue_family_index, 0, &renderer->present_queue);
-  vkGetDeviceQueue(renderer->device, renderer->graphics_queue_family_index, 0, &renderer->graphics_queue);
-  vkGetDeviceQueue(renderer->device, renderer->transfer_queue_family_index, 0, &renderer->transfer_queue);
+  vkGetDeviceQueue(renderer->context->device, renderer->context->compute_queue_family_index, 0,
+                   &renderer->context->compute_queue);
+  vkGetDeviceQueue(renderer->context->device, renderer->context->present_queue_family_index, 0,
+                   &renderer->context->present_queue);
+  vkGetDeviceQueue(renderer->context->device, renderer->context->graphics_queue_family_index, 0,
+                   &renderer->context->graphics_queue);
+  vkGetDeviceQueue(renderer->context->device, renderer->context->transfer_queue_family_index, 0,
+                   &renderer->context->transfer_queue);
 
   array_destroy(extensions);
   array_destroy(queue_create_infos);
@@ -445,7 +451,7 @@ b8 renderer_vulkan_device_create(renderer_t *renderer) {
 }
 
 b8 renderer_vulkan_device_destroy(renderer_t *renderer) {
-  vkDestroyDevice(renderer->device, NULL);
+  vkDestroyDevice(renderer->context->device, NULL);
 
   return true;
 }
@@ -507,28 +513,28 @@ array_t *__build_queue_create_infos(renderer_t *renderer) {
   VkDeviceQueueCreateInfo compute_queue_create_info = (VkDeviceQueueCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
       .queueCount = 1,
-      .queueFamilyIndex = renderer->compute_queue_family_index,
+      .queueFamilyIndex = renderer->context->compute_queue_family_index,
       .pQueuePriorities = &queue_priority,
   };
 
   VkDeviceQueueCreateInfo present_queue_create_info = (VkDeviceQueueCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
       .queueCount = 1,
-      .queueFamilyIndex = renderer->present_queue_family_index,
+      .queueFamilyIndex = renderer->context->present_queue_family_index,
       .pQueuePriorities = &queue_priority,
   };
 
   VkDeviceQueueCreateInfo graphics_queue_create_info = (VkDeviceQueueCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
       .queueCount = 1,
-      .queueFamilyIndex = renderer->graphics_queue_family_index,
+      .queueFamilyIndex = renderer->context->graphics_queue_family_index,
       .pQueuePriorities = &queue_priority,
   };
 
   VkDeviceQueueCreateInfo transfer_queue_create_info = (VkDeviceQueueCreateInfo){
       .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
       .queueCount = 1,
-      .queueFamilyIndex = renderer->transfer_queue_family_index,
+      .queueFamilyIndex = renderer->context->transfer_queue_family_index,
       .pQueuePriorities = &queue_priority,
   };
 
@@ -536,23 +542,26 @@ array_t *__build_queue_create_infos(renderer_t *renderer) {
 
   u8 queue_others_count = 2;
 
-  u32 present_queue_others[] = {renderer->compute_queue_family_index, renderer->graphics_queue_family_index,
-                                renderer->transfer_queue_family_index};
-  u32 graphics_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
-                                 renderer->transfer_queue_family_index};
-  u32 transfer_queue_others[] = {renderer->compute_queue_family_index, renderer->present_queue_family_index,
-                                 renderer->graphics_queue_family_index};
+  u32 present_queue_others[] = {renderer->context->compute_queue_family_index,
+                                renderer->context->graphics_queue_family_index,
+                                renderer->context->transfer_queue_family_index};
+  u32 graphics_queue_others[] = {renderer->context->compute_queue_family_index,
+                                 renderer->context->present_queue_family_index,
+                                 renderer->context->transfer_queue_family_index};
+  u32 transfer_queue_others[] = {renderer->context->compute_queue_family_index,
+                                 renderer->context->present_queue_family_index,
+                                 renderer->context->graphics_queue_family_index};
 
   b8 should_include_compute_queue = true;
 
-  b8 should_include_present_queue =
-      __queue_family_index_is_unique(renderer->present_queue_family_index, present_queue_others, queue_others_count);
+  b8 should_include_present_queue = __queue_family_index_is_unique(renderer->context->present_queue_family_index,
+                                                                   present_queue_others, queue_others_count);
 
-  b8 should_include_graphics_queue =
-      __queue_family_index_is_unique(renderer->graphics_queue_family_index, graphics_queue_others, queue_others_count);
+  b8 should_include_graphics_queue = __queue_family_index_is_unique(renderer->context->graphics_queue_family_index,
+                                                                    graphics_queue_others, queue_others_count);
 
-  b8 should_include_transfer_queue =
-      __queue_family_index_is_unique(renderer->transfer_queue_family_index, transfer_queue_others, queue_others_count);
+  b8 should_include_transfer_queue = __queue_family_index_is_unique(renderer->context->transfer_queue_family_index,
+                                                                    transfer_queue_others, queue_others_count);
 
   if (should_include_compute_queue) {
     array_insert(queue_create_infos, &compute_queue_create_info);

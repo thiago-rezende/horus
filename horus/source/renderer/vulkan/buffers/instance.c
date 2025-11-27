@@ -24,8 +24,8 @@ instance_buffer_t *instance_buffer_create(renderer_t *renderer, instance_buffer_
 
   *buffer = (instance_buffer_t){
       .size = sizeof(instance_buffer_object_t) * count,
-      .device = renderer->device,
-      .current_frame_in_flight_index = &renderer->current_frame_in_flight_index,
+      .device = renderer->context->device,
+      .current_frame_in_flight_index = &renderer->context->current_frame_in_flight_index,
   };
 
   buffer->buffers = array_create(RENDERER_VULKAN_FRAMES_IN_FLIGHT, sizeof(VkBuffer));
@@ -63,7 +63,7 @@ instance_buffer_t *instance_buffer_create(renderer_t *renderer, instance_buffer_
 
     vkGetBufferMemoryRequirements(buffer->device, current_buffer, &buffer_memory_requirements);
 
-    vkGetPhysicalDeviceMemoryProperties(renderer->physical_device, &physical_device_memory_properties);
+    vkGetPhysicalDeviceMemoryProperties(renderer->context->physical_device, &physical_device_memory_properties);
 
     u32 buffer_memory_type_index = 0;
 
@@ -136,12 +136,14 @@ b8 instance_buffer_bind(instance_buffer_t *buffer, graphics_pipeline_t *pipeline
   VkDescriptorSet descriptor_set;
   VkCommandBuffer graphics_command_buffer;
 
-  array_retrieve(buffer->buffers, renderer->current_frame_in_flight_index, &current_buffer);
-  array_retrieve(pipeline->descriptor_sets, renderer->current_frame_in_flight_index, &descriptor_set);
-  array_retrieve(renderer->graphics_command_buffers, renderer->current_frame_in_flight_index, &graphics_command_buffer);
+  array_retrieve(buffer->buffers, renderer->context->current_frame_in_flight_index, &current_buffer);
+  array_retrieve(pipeline->descriptor_sets, renderer->context->current_frame_in_flight_index, &descriptor_set);
+  array_retrieve(renderer->context->graphics_command_buffers, renderer->context->current_frame_in_flight_index,
+                 &graphics_command_buffer);
 
-  renderer_vulkan_descriptor_set_update_buffer(renderer->device, descriptor_set, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                                               DEFAULT_INSTANCE_BUFFER_BINDING, current_buffer, buffer->size);
+  renderer_vulkan_descriptor_set_update_buffer(renderer->context->device, descriptor_set,
+                                               VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, DEFAULT_INSTANCE_BUFFER_BINDING,
+                                               current_buffer, buffer->size);
 
   vkCmdBindDescriptorSets(graphics_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->layout, 0, 1,
                           &descriptor_set, 0, NULL);

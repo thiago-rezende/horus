@@ -11,9 +11,8 @@
 /* TODO: improve the buffering control and allow the application to choose */
 #define RENDERER_VULKAN_FRAMES_IN_FLIGHT 3
 
-struct __renderer {
+struct __renderer_context {
   renderer_implementation_t implementation;
-  const char *implementation_string;
 
   VkInstance instance;
 

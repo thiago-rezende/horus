@@ -12,7 +12,7 @@ shader_module_t *shader_module_create(renderer_t *renderer, shader_stage_flags_t
   shader_module_t *module = platform_memory_allocate(sizeof(shader_module_t));
 
   *module = (shader_module_t){
-      .device = renderer->device,
+      .device = renderer->context->device,
       .module = VK_NULL_HANDLE,
 
       .vertex_stage_create_info = (VkPipelineShaderStageCreateInfo){0},

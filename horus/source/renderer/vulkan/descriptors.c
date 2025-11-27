@@ -28,9 +28,10 @@ b8 renderer_vulkan_descriptor_pool_create(renderer_t *renderer) {
       .pPoolSizes = descriptor_pool_sizes,
   };
 
-  if (vkCreateDescriptorPool(renderer->device, &descriptor_pool_create_info, NULL, &renderer->descriptor_pool) !=
-      VK_SUCCESS) {
-    logger_critical_format("<renderer:%p> <device:%p> descriptor pool creation failed", renderer, renderer->device);
+  if (vkCreateDescriptorPool(renderer->context->device, &descriptor_pool_create_info, NULL,
+                             &renderer->context->descriptor_pool) != VK_SUCCESS) {
+    logger_critical_format("<renderer:%p> <device:%p> descriptor pool creation failed", renderer,
+                           renderer->context->device);
 
     return false;
   }
@@ -39,9 +40,9 @@ b8 renderer_vulkan_descriptor_pool_create(renderer_t *renderer) {
 }
 
 b8 renderer_vulkan_descriptor_pool_destroy(renderer_t *renderer) {
-  vkDeviceWaitIdle(renderer->device);
+  vkDeviceWaitIdle(renderer->context->device);
 
-  vkDestroyDescriptorPool(renderer->device, renderer->descriptor_pool, NULL);
+  vkDestroyDescriptorPool(renderer->context->device, renderer->context->descriptor_pool, NULL);
 
   return true;
 }

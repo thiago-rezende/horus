@@ -11,7 +11,7 @@
 /* horus containers layer */
 #include <horus/containers/array.h>
 
-b8 renderer_vulkan_instance_create(renderer_t *renderer, renderer_create_info_t info) {
+b8 renderer_vulkan_instance_create(renderer_t *renderer, renderer_context_create_info_t info) {
   unsigned int engine_version_major = horus_project_version_major();
   unsigned int engine_version_minor = horus_project_version_minor();
   unsigned int engine_version_patch = horus_project_version_patch();
@@ -57,7 +57,7 @@ b8 renderer_vulkan_instance_create(renderer_t *renderer, renderer_create_info_t 
       .ppEnabledExtensionNames = extensions->buffer,
   };
 
-  VkResult result = vkCreateInstance(&instance_create_info, NULL, &renderer->instance);
+  VkResult result = vkCreateInstance(&instance_create_info, NULL, &renderer->context->instance);
 
   array_destroy(layers);
   array_destroy(extensions);
@@ -70,7 +70,7 @@ b8 renderer_vulkan_instance_create(renderer_t *renderer, renderer_create_info_t 
 }
 
 b8 renderer_vulkan_instance_destroy(renderer_t *renderer) {
-  vkDestroyInstance(renderer->instance, NULL);
+  vkDestroyInstance(renderer->context->instance, NULL);
 
   return true;
 }

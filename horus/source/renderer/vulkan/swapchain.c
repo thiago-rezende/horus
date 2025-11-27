@@ -11,13 +11,13 @@
 #include <horus/logger/logger.h>
 
 b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *window) {
-  vkDeviceWaitIdle(renderer->device);
+  vkDeviceWaitIdle(renderer->context->device);
 
-  u32 minimum_image_count = renderer->surface_capabilities.minImageCount + 1;
+  u32 minimum_image_count = renderer->context->surface_capabilities.minImageCount + 1;
 
-  if (renderer->surface_capabilities.maxImageCount > 0 &&
-      minimum_image_count > renderer->surface_capabilities.maxImageCount) {
-    minimum_image_count = renderer->surface_capabilities.maxImageCount;
+  if (renderer->context->surface_capabilities.maxImageCount > 0 &&
+      minimum_image_count > renderer->context->surface_capabilities.maxImageCount) {
+    minimum_image_count = renderer->context->surface_capabilities.maxImageCount;
   }
 
   if (!renderer_vulkan_swapchain_build_extent(renderer, window)) {
@@ -30,17 +30,17 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   VkSwapchainCreateInfoKHR swapchain_create_info = (VkSwapchainCreateInfoKHR){
       .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
       .flags = (VkSwapchainCreateFlagsKHR){0},
-      .surface = renderer->surface,
+      .surface = renderer->context->surface,
       .minImageCount = minimum_image_count,
-      .imageFormat = renderer->surface_format.format,
-      .imageColorSpace = renderer->surface_format.colorSpace,
-      .imageExtent = renderer->surface_capabilities.currentExtent, /* TODO: build extent from window state */
+      .imageFormat = renderer->context->surface_format.format,
+      .imageColorSpace = renderer->context->surface_format.colorSpace,
+      .imageExtent = renderer->context->surface_capabilities.currentExtent, /* TODO: build extent from window state */
       .imageArrayLayers = 1,
       .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, /* TODO: change to VK_IMAGE_USAGE_TRANSFER_DST_BIT */
       .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-      .preTransform = renderer->surface_capabilities.currentTransform,
+      .preTransform = renderer->context->surface_capabilities.currentTransform,
       .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-      .presentMode = renderer->surface_present_mode,
+      .presentMode = renderer->context->surface_present_mode,
       .clipped = VK_TRUE,
       .oldSwapchain = NULL,
       .queueFamilyIndexCount = 0,
@@ -48,37 +48,39 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   };
 
   u32 queue_family_index_count = 2;
-  u32 queue_family_indices[] = {renderer->graphics_queue_family_index, renderer->present_queue_family_index};
+  u32 queue_family_indices[] = {renderer->context->graphics_queue_family_index,
+                                renderer->context->present_queue_family_index};
 
-  if (renderer->graphics_queue_family_index != renderer->present_queue_family_index) {
+  if (renderer->context->graphics_queue_family_index != renderer->context->present_queue_family_index) {
     swapchain_create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     swapchain_create_info.queueFamilyIndexCount = queue_family_index_count;
     swapchain_create_info.pQueueFamilyIndices = queue_family_indices;
   }
 
-  if (vkCreateSwapchainKHR(renderer->device, &swapchain_create_info, NULL, &renderer->swapchain) != VK_SUCCESS) {
-    logger_critical_format("<device:%p> swapchain creation failed", (void *)renderer->device);
+  if (vkCreateSwapchainKHR(renderer->context->device, &swapchain_create_info, NULL, &renderer->context->swapchain) !=
+      VK_SUCCESS) {
+    logger_critical_format("<device:%p> swapchain creation failed", (void *)renderer->context->device);
 
     return false;
   }
 
   u32 swapchain_image_count = 0;
 
-  vkGetSwapchainImagesKHR(renderer->device, renderer->swapchain, &swapchain_image_count, NULL);
+  vkGetSwapchainImagesKHR(renderer->context->device, renderer->context->swapchain, &swapchain_image_count, NULL);
 
-  renderer->swapchain_images = array_create(swapchain_image_count, sizeof(VkImage));
-  renderer->swapchain_images->count = swapchain_image_count;
+  renderer->context->swapchain_images = array_create(swapchain_image_count, sizeof(VkImage));
+  renderer->context->swapchain_images->count = swapchain_image_count;
 
-  vkGetSwapchainImagesKHR(renderer->device, renderer->swapchain, &swapchain_image_count,
-                          renderer->swapchain_images->buffer);
+  vkGetSwapchainImagesKHR(renderer->context->device, renderer->context->swapchain, &swapchain_image_count,
+                          renderer->context->swapchain_images->buffer);
 
   if (!renderer_vulkan_swapchain_image_views_create(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image views creation failed", renderer,
-                           renderer->swapchain);
+                           renderer->context->swapchain);
 
-    array_destroy(renderer->swapchain_images);
+    array_destroy(renderer->context->swapchain_images);
 
-    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+    vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
     return false;
   }
@@ -94,11 +96,11 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   array_insert(depth_format_candidates, &depth_format_candidate_2);
   array_insert(depth_format_candidates, &depth_format_candidate_3);
 
-  renderer->depth_image_format = renderer_vulkan_image_find_supported_format(
+  renderer->context->depth_image_format = renderer_vulkan_image_find_supported_format(
       renderer, depth_format_candidates, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
-  renderer->depth_image_has_stencil_support =
-      renderer_vulkan_format_has_stencil_component(renderer->depth_image_format);
+  renderer->context->depth_image_has_stencil_support =
+      renderer_vulkan_format_has_stencil_component(renderer->context->depth_image_format);
 
   array_destroy(depth_format_candidates);
 
@@ -108,11 +110,11 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
       .imageType = VK_IMAGE_TYPE_2D,
       .extent =
           (VkExtent3D){
-              .width = renderer->swapchain_extent.width,
-              .height = renderer->swapchain_extent.height,
+              .width = renderer->context->swapchain_extent.width,
+              .height = renderer->context->swapchain_extent.height,
               .depth = 1,
           },
-      .format = renderer->depth_image_format,
+      .format = renderer->context->depth_image_format,
       .mipLevels = 1,
       .arrayLayers = 1,
       .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -125,14 +127,15 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
       .pNext = NULL,
   };
 
-  if (vkCreateImage(renderer->device, &depth_image_create_info, NULL, &renderer->depth_image) != VK_SUCCESS) {
+  if (vkCreateImage(renderer->context->device, &depth_image_create_info, NULL, &renderer->context->depth_image) !=
+      VK_SUCCESS) {
     logger_critical_format("<renderer:%p> image creation failed", renderer);
 
     renderer_vulkan_swapchain_image_views_destroy(renderer);
 
-    array_destroy(renderer->swapchain_images);
+    array_destroy(renderer->context->swapchain_images);
 
-    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+    vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
     return false;
   }
@@ -143,9 +146,10 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
 
   VkMemoryPropertyFlags depth_image_memory_properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
-  vkGetImageMemoryRequirements(renderer->device, renderer->depth_image, &depth_image_memory_requirements);
+  vkGetImageMemoryRequirements(renderer->context->device, renderer->context->depth_image,
+                               &depth_image_memory_requirements);
 
-  vkGetPhysicalDeviceMemoryProperties(renderer->physical_device, &physical_device_memory_properties);
+  vkGetPhysicalDeviceMemoryProperties(renderer->context->physical_device, &physical_device_memory_properties);
 
   u32 depth_image_memory_type_index = 0;
 
@@ -166,13 +170,13 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   if (!has_required_depth_image_memory_type) {
     logger_critical_format("<renderer:%p> desired memory type for depth image creation not found", renderer);
 
-    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+    vkDestroyImage(renderer->context->device, renderer->context->depth_image, NULL);
 
     renderer_vulkan_swapchain_image_views_destroy(renderer);
 
-    array_destroy(renderer->swapchain_images);
+    array_destroy(renderer->context->swapchain_images);
 
-    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+    vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
     return false;
   }
@@ -184,35 +188,36 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   };
 
   /* TODO: implement a memory allocator to allow more than 4096 allocations */
-  if (vkAllocateMemory(renderer->device, &depth_image_memory_allocate_info, NULL, &renderer->depth_image_memory) !=
-      VK_SUCCESS) {
+  if (vkAllocateMemory(renderer->context->device, &depth_image_memory_allocate_info, NULL,
+                       &renderer->context->depth_image_memory) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <image:%p> depth image memory allocation failed", renderer,
-                           renderer->depth_image);
+                           renderer->context->depth_image);
 
-    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+    vkDestroyImage(renderer->context->device, renderer->context->depth_image, NULL);
 
     renderer_vulkan_swapchain_image_views_destroy(renderer);
 
-    array_destroy(renderer->swapchain_images);
+    array_destroy(renderer->context->swapchain_images);
 
-    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+    vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
     return false;
   }
 
-  if (vkBindImageMemory(renderer->device, renderer->depth_image, renderer->depth_image_memory, 0) != VK_SUCCESS) {
+  if (vkBindImageMemory(renderer->context->device, renderer->context->depth_image,
+                        renderer->context->depth_image_memory, 0) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <image:%p> depth image memory binding failed", renderer,
-                           renderer->depth_image);
+                           renderer->context->depth_image);
 
-    vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+    vkFreeMemory(renderer->context->device, renderer->context->depth_image_memory, NULL);
 
-    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+    vkDestroyImage(renderer->context->device, renderer->context->depth_image, NULL);
 
     renderer_vulkan_swapchain_image_views_destroy(renderer);
 
-    array_destroy(renderer->swapchain_images);
+    array_destroy(renderer->context->swapchain_images);
 
-    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+    vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
     return false;
   }
@@ -220,13 +225,13 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   VkImageViewCreateInfo depth_image_view_create_info = (VkImageViewCreateInfo){
       .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
       .flags = (VkImageViewCreateFlags)0,
-      .image = renderer->depth_image,
+      .image = renderer->context->depth_image,
       .viewType = VK_IMAGE_VIEW_TYPE_2D,
       .format = depth_image_create_info.format,
       .subresourceRange =
           (VkImageSubresourceRange){
               .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT |
-                            (renderer->depth_image_has_stencil_support ? VK_IMAGE_ASPECT_STENCIL_BIT : 0),
+                            (renderer->context->depth_image_has_stencil_support ? VK_IMAGE_ASPECT_STENCIL_BIT : 0),
               .baseMipLevel = 0,
               .levelCount = depth_image_create_info.mipLevels,
               .baseArrayLayer = 0,
@@ -235,20 +240,20 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
       .pNext = NULL,
   };
 
-  if (vkCreateImageView(renderer->device, &depth_image_view_create_info, NULL, &renderer->depth_image_view) !=
-      VK_SUCCESS) {
+  if (vkCreateImageView(renderer->context->device, &depth_image_view_create_info, NULL,
+                        &renderer->context->depth_image_view) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <image:%p> depth image view creation failed", renderer,
-                           renderer->depth_image);
+                           renderer->context->depth_image);
 
-    vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+    vkFreeMemory(renderer->context->device, renderer->context->depth_image_memory, NULL);
 
-    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+    vkDestroyImage(renderer->context->device, renderer->context->depth_image, NULL);
 
     renderer_vulkan_swapchain_image_views_destroy(renderer);
 
-    array_destroy(renderer->swapchain_images);
+    array_destroy(renderer->context->swapchain_images);
 
-    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+    vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
     return false;
   }
@@ -256,12 +261,13 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   image_transition_info_t image_transition_info = (image_transition_info_t){
       .levels = depth_image_create_info.mipLevels,
       .layers = depth_image_create_info.arrayLayers,
-      .image = renderer->depth_image,
+      .image = renderer->context->depth_image,
       .old_layout = VK_IMAGE_LAYOUT_UNDEFINED,
-      .new_layout = renderer->depth_image_has_stencil_support ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-                                                              : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
-      .aspect_mask =
-          VK_IMAGE_ASPECT_DEPTH_BIT | (renderer->depth_image_has_stencil_support ? VK_IMAGE_ASPECT_STENCIL_BIT : 0),
+      .new_layout = renderer->context->depth_image_has_stencil_support
+                        ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                        : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
+      .aspect_mask = VK_IMAGE_ASPECT_DEPTH_BIT |
+                     (renderer->context->depth_image_has_stencil_support ? VK_IMAGE_ASPECT_STENCIL_BIT : 0),
       .source_access_mask = (VkAccessFlags2)0,
       .destination_access_mask =
           VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
@@ -270,19 +276,20 @@ b8 renderer_vulkan_swapchain_create(renderer_t *renderer, platform_window_t *win
   };
 
   if (!renderer_vulkan_image_transition_layout(renderer, image_transition_info)) {
-    logger_critical_format("<renderer:%p> <image:%p> depth image transition failed", renderer, renderer->depth_image);
+    logger_critical_format("<renderer:%p> <image:%p> depth image transition failed", renderer,
+                           renderer->context->depth_image);
 
-    vkDestroyImageView(renderer->device, renderer->depth_image_view, NULL);
+    vkDestroyImageView(renderer->context->device, renderer->context->depth_image_view, NULL);
 
-    vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+    vkFreeMemory(renderer->context->device, renderer->context->depth_image_memory, NULL);
 
-    vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+    vkDestroyImage(renderer->context->device, renderer->context->depth_image, NULL);
 
     renderer_vulkan_swapchain_image_views_destroy(renderer);
 
-    array_destroy(renderer->swapchain_images);
+    array_destroy(renderer->context->swapchain_images);
 
-    vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+    vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
     return false;
   }
@@ -307,24 +314,24 @@ b8 renderer_vulkan_swapchain_update(renderer_t *renderer, platform_window_t *win
 }
 
 b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {
-  vkDeviceWaitIdle(renderer->device);
+  vkDeviceWaitIdle(renderer->context->device);
 
-  vkDestroyImageView(renderer->device, renderer->depth_image_view, NULL);
+  vkDestroyImageView(renderer->context->device, renderer->context->depth_image_view, NULL);
 
-  vkFreeMemory(renderer->device, renderer->depth_image_memory, NULL);
+  vkFreeMemory(renderer->context->device, renderer->context->depth_image_memory, NULL);
 
-  vkDestroyImage(renderer->device, renderer->depth_image, NULL);
+  vkDestroyImage(renderer->context->device, renderer->context->depth_image, NULL);
 
   if (!renderer_vulkan_swapchain_image_views_destroy(renderer)) {
     logger_critical_format("<renderer:%p> <swapchain:%p> swapchain image views destruction failed", renderer,
-                           renderer->swapchain);
+                           renderer->context->swapchain);
 
     return false;
   }
 
-  array_destroy(renderer->swapchain_images);
+  array_destroy(renderer->context->swapchain_images);
 
-  vkDestroySwapchainKHR(renderer->device, renderer->swapchain, NULL);
+  vkDestroySwapchainKHR(renderer->context->device, renderer->context->swapchain, NULL);
 
   return true;
 }
@@ -332,13 +339,15 @@ b8 renderer_vulkan_swapchain_destroy(renderer_t *renderer) {
 b8 renderer_vulkan_swapchain_build_extent(renderer_t *renderer, platform_window_t *window) {
   platform_window_size_t window_size = platform_window_size(window);
 
-  u32 selected_width = numeric_clamp_u32((u32)window_size.width, renderer->surface_capabilities.minImageExtent.width,
-                                         renderer->surface_capabilities.maxImageExtent.width);
-  u32 selected_height = numeric_clamp_u32((u32)window_size.height, renderer->surface_capabilities.minImageExtent.height,
-                                          renderer->surface_capabilities.maxImageExtent.height);
+  u32 selected_width =
+      numeric_clamp_u32((u32)window_size.width, renderer->context->surface_capabilities.minImageExtent.width,
+                        renderer->context->surface_capabilities.maxImageExtent.width);
+  u32 selected_height =
+      numeric_clamp_u32((u32)window_size.height, renderer->context->surface_capabilities.minImageExtent.height,
+                        renderer->context->surface_capabilities.maxImageExtent.height);
   ;
 
-  renderer->swapchain_extent = (VkExtent2D){
+  renderer->context->swapchain_extent = (VkExtent2D){
       .width = selected_width,
       .height = selected_height,
   };
@@ -350,7 +359,7 @@ b8 renderer_vulkan_swapchain_image_views_create(renderer_t *renderer) {
   VkImageViewCreateInfo image_view_create_info = (VkImageViewCreateInfo){
       .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
       .viewType = VK_IMAGE_VIEW_TYPE_2D,
-      .format = renderer->surface_format.format,
+      .format = renderer->context->surface_format.format,
       .components =
           (VkComponentMapping){
               .b = VK_COMPONENT_SWIZZLE_IDENTITY,
@@ -368,41 +377,42 @@ b8 renderer_vulkan_swapchain_image_views_create(renderer_t *renderer) {
           },
   };
 
-  renderer->swapchain_image_views = array_create(renderer->swapchain_images->count, sizeof(VkImageView));
+  renderer->context->swapchain_image_views =
+      array_create(renderer->context->swapchain_images->count, sizeof(VkImageView));
 
-  for (u64 i = 0; i < renderer->swapchain_images->count; i++) {
+  for (u64 i = 0; i < renderer->context->swapchain_images->count; i++) {
     VkImage image;
     VkImageView image_view;
 
-    array_retrieve(renderer->swapchain_images, i, (void *)&image);
+    array_retrieve(renderer->context->swapchain_images, i, (void *)&image);
 
     image_view_create_info.image = image;
 
-    if (vkCreateImageView(renderer->device, &image_view_create_info, NULL, &image_view) != VK_SUCCESS) {
+    if (vkCreateImageView(renderer->context->device, &image_view_create_info, NULL, &image_view) != VK_SUCCESS) {
       logger_critical_format("<renderer:%p> <swapchain:%p> <image:%p> image views creation failed for swapchain image",
-                             renderer, renderer->swapchain, image);
+                             renderer, renderer->context->swapchain, image);
 
       renderer_vulkan_swapchain_image_views_destroy(renderer);
 
       return false;
     }
 
-    array_insert(renderer->swapchain_image_views, &image_view);
+    array_insert(renderer->context->swapchain_image_views, &image_view);
   }
 
   return true;
 }
 
 b8 renderer_vulkan_swapchain_image_views_destroy(renderer_t *renderer) {
-  for (u64 i = 0; i < renderer->swapchain_image_views->count; i++) {
+  for (u64 i = 0; i < renderer->context->swapchain_image_views->count; i++) {
     VkImageView view;
 
-    array_retrieve(renderer->swapchain_image_views, i, (void *)&view);
+    array_retrieve(renderer->context->swapchain_image_views, i, (void *)&view);
 
-    vkDestroyImageView(renderer->device, view, NULL);
+    vkDestroyImageView(renderer->context->device, view, NULL);
   }
 
-  array_destroy(renderer->swapchain_image_views);
+  array_destroy(renderer->context->swapchain_image_views);
 
   return true;
 }

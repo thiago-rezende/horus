@@ -14,29 +14,29 @@ b8 renderer_vulkan_synchronization_create(renderer_t *renderer) {
       .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
   };
 
-  renderer->render_complete_fences =
-      renderer_vulkan_fences_create(renderer->device, &fence_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+  renderer->context->render_complete_fences =
+      renderer_vulkan_fences_create(renderer->context->device, &fence_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->transfer_complete_fences =
-      renderer_vulkan_fences_create(renderer->device, &fence_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+  renderer->context->transfer_complete_fences =
+      renderer_vulkan_fences_create(renderer->context->device, &fence_create_info, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->render_complete_semaphores =
-      renderer_vulkan_semaphores_create(renderer->device, &semaphore_create_info, renderer->swapchain_images->count);
+  renderer->context->render_complete_semaphores = renderer_vulkan_semaphores_create(
+      renderer->context->device, &semaphore_create_info, renderer->context->swapchain_images->count);
 
-  renderer->present_complete_semaphores =
-      renderer_vulkan_semaphores_create(renderer->device, &semaphore_create_info, renderer->swapchain_images->count);
+  renderer->context->present_complete_semaphores = renderer_vulkan_semaphores_create(
+      renderer->context->device, &semaphore_create_info, renderer->context->swapchain_images->count);
 
   return true;
 }
 
 b8 renderer_vulkan_synchronization_destroy(renderer_t *renderer) {
-  vkDeviceWaitIdle(renderer->device);
+  vkDeviceWaitIdle(renderer->context->device);
 
-  renderer_vulkan_fences_destroy(renderer->device, renderer->render_complete_fences);
-  renderer_vulkan_fences_destroy(renderer->device, renderer->transfer_complete_fences);
+  renderer_vulkan_fences_destroy(renderer->context->device, renderer->context->render_complete_fences);
+  renderer_vulkan_fences_destroy(renderer->context->device, renderer->context->transfer_complete_fences);
 
-  renderer_vulkan_semaphores_destroy(renderer->device, renderer->render_complete_semaphores);
-  renderer_vulkan_semaphores_destroy(renderer->device, renderer->present_complete_semaphores);
+  renderer_vulkan_semaphores_destroy(renderer->context->device, renderer->context->render_complete_semaphores);
+  renderer_vulkan_semaphores_destroy(renderer->context->device, renderer->context->present_complete_semaphores);
 
   return true;
 }

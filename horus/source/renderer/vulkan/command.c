@@ -10,83 +10,83 @@ b8 renderer_vulkan_command_pools_create(renderer_t *renderer) {
       .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
   };
 
-  command_pool_create_info.queueFamilyIndex = renderer->compute_queue_family_index;
+  command_pool_create_info.queueFamilyIndex = renderer->context->compute_queue_family_index;
 
-  if (vkCreateCommandPool(renderer->device, &command_pool_create_info, NULL, &renderer->compute_command_pool) !=
-      VK_SUCCESS) {
+  if (vkCreateCommandPool(renderer->context->device, &command_pool_create_info, NULL,
+                          &renderer->context->compute_command_pool) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> compute command pool creation failed", (void *)renderer);
 
     return false;
   }
 
-  command_pool_create_info.queueFamilyIndex = renderer->present_queue_family_index;
+  command_pool_create_info.queueFamilyIndex = renderer->context->present_queue_family_index;
 
-  if (vkCreateCommandPool(renderer->device, &command_pool_create_info, NULL, &renderer->present_command_pool) !=
-      VK_SUCCESS) {
+  if (vkCreateCommandPool(renderer->context->device, &command_pool_create_info, NULL,
+                          &renderer->context->present_command_pool) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> present command pool creation failed", (void *)renderer);
 
-    vkDestroyCommandPool(renderer->device, renderer->compute_command_pool, NULL);
+    vkDestroyCommandPool(renderer->context->device, renderer->context->compute_command_pool, NULL);
 
     return false;
   }
 
-  command_pool_create_info.queueFamilyIndex = renderer->graphics_queue_family_index;
+  command_pool_create_info.queueFamilyIndex = renderer->context->graphics_queue_family_index;
 
-  if (vkCreateCommandPool(renderer->device, &command_pool_create_info, NULL, &renderer->graphics_command_pool) !=
-      VK_SUCCESS) {
+  if (vkCreateCommandPool(renderer->context->device, &command_pool_create_info, NULL,
+                          &renderer->context->graphics_command_pool) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> graphics command pool creation failed", (void *)renderer);
 
-    vkDestroyCommandPool(renderer->device, renderer->compute_command_pool, NULL);
-    vkDestroyCommandPool(renderer->device, renderer->present_command_pool, NULL);
+    vkDestroyCommandPool(renderer->context->device, renderer->context->compute_command_pool, NULL);
+    vkDestroyCommandPool(renderer->context->device, renderer->context->present_command_pool, NULL);
 
     return false;
   }
 
-  command_pool_create_info.queueFamilyIndex = renderer->transfer_queue_family_index;
+  command_pool_create_info.queueFamilyIndex = renderer->context->transfer_queue_family_index;
 
-  if (vkCreateCommandPool(renderer->device, &command_pool_create_info, NULL, &renderer->transfer_command_pool) !=
-      VK_SUCCESS) {
+  if (vkCreateCommandPool(renderer->context->device, &command_pool_create_info, NULL,
+                          &renderer->context->transfer_command_pool) != VK_SUCCESS) {
     logger_critical_format("<renderer:%p> transfer command pool creation failed", (void *)renderer);
 
-    vkDestroyCommandPool(renderer->device, renderer->compute_command_pool, NULL);
-    vkDestroyCommandPool(renderer->device, renderer->present_command_pool, NULL);
-    vkDestroyCommandPool(renderer->device, renderer->graphics_command_pool, NULL);
+    vkDestroyCommandPool(renderer->context->device, renderer->context->compute_command_pool, NULL);
+    vkDestroyCommandPool(renderer->context->device, renderer->context->present_command_pool, NULL);
+    vkDestroyCommandPool(renderer->context->device, renderer->context->graphics_command_pool, NULL);
 
     return false;
   }
 
-  renderer->compute_command_buffers = renderer_vulkan_command_buffers_create(
-      renderer->device, renderer->compute_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+  renderer->context->compute_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->context->device, renderer->context->compute_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->present_command_buffers = renderer_vulkan_command_buffers_create(
-      renderer->device, renderer->present_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+  renderer->context->present_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->context->device, renderer->context->present_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->graphics_command_buffers = renderer_vulkan_command_buffers_create(
-      renderer->device, renderer->graphics_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+  renderer->context->graphics_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->context->device, renderer->context->graphics_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
-  renderer->transfer_command_buffers = renderer_vulkan_command_buffers_create(
-      renderer->device, renderer->transfer_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
+  renderer->context->transfer_command_buffers = renderer_vulkan_command_buffers_create(
+      renderer->context->device, renderer->context->transfer_command_pool, RENDERER_VULKAN_FRAMES_IN_FLIGHT);
 
   return true;
 }
 
 b8 renderer_vulkan_command_pools_destroy(renderer_t *renderer) {
-  renderer_vulkan_command_buffers_destroy(renderer->compute_command_buffers, renderer->device,
-                                          renderer->compute_command_pool);
+  renderer_vulkan_command_buffers_destroy(renderer->context->compute_command_buffers, renderer->context->device,
+                                          renderer->context->compute_command_pool);
 
-  renderer_vulkan_command_buffers_destroy(renderer->present_command_buffers, renderer->device,
-                                          renderer->present_command_pool);
+  renderer_vulkan_command_buffers_destroy(renderer->context->present_command_buffers, renderer->context->device,
+                                          renderer->context->present_command_pool);
 
-  renderer_vulkan_command_buffers_destroy(renderer->graphics_command_buffers, renderer->device,
-                                          renderer->graphics_command_pool);
+  renderer_vulkan_command_buffers_destroy(renderer->context->graphics_command_buffers, renderer->context->device,
+                                          renderer->context->graphics_command_pool);
 
-  renderer_vulkan_command_buffers_destroy(renderer->transfer_command_buffers, renderer->device,
-                                          renderer->transfer_command_pool);
+  renderer_vulkan_command_buffers_destroy(renderer->context->transfer_command_buffers, renderer->context->device,
+                                          renderer->context->transfer_command_pool);
 
-  vkDestroyCommandPool(renderer->device, renderer->compute_command_pool, NULL);
-  vkDestroyCommandPool(renderer->device, renderer->present_command_pool, NULL);
-  vkDestroyCommandPool(renderer->device, renderer->graphics_command_pool, NULL);
-  vkDestroyCommandPool(renderer->device, renderer->transfer_command_pool, NULL);
+  vkDestroyCommandPool(renderer->context->device, renderer->context->compute_command_pool, NULL);
+  vkDestroyCommandPool(renderer->context->device, renderer->context->present_command_pool, NULL);
+  vkDestroyCommandPool(renderer->context->device, renderer->context->graphics_command_pool, NULL);
+  vkDestroyCommandPool(renderer->context->device, renderer->context->transfer_command_pool, NULL);
 
   return true;
 }

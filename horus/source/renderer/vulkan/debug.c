@@ -61,8 +61,8 @@ b8 renderer_vulkan_debug_messenger_create(renderer_t *renderer) {
       .pUserData = renderer,
   };
 
-  VkResult result =
-      vkCreateDebugUtilsMessengerEXT(renderer->instance, &debug_messenger_create_info, NULL, &renderer->messenger);
+  VkResult result = vkCreateDebugUtilsMessengerEXT(renderer->context->instance, &debug_messenger_create_info, NULL,
+                                                   &renderer->context->messenger);
 
   if (result != VK_SUCCESS) {
     return false;
@@ -72,7 +72,7 @@ b8 renderer_vulkan_debug_messenger_create(renderer_t *renderer) {
 }
 
 b8 renderer_vulkan_debug_messenger_destroy(renderer_t *renderer) {
-  vkDestroyDebugUtilsMessengerEXT(renderer->instance, renderer->messenger, NULL);
+  vkDestroyDebugUtilsMessengerEXT(renderer->context->instance, renderer->context->messenger, NULL);
 
   return true;
 }

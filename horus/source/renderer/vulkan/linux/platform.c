@@ -76,9 +76,10 @@ b8 renderer_vulkan_surface_create(renderer_t *renderer, platform_window_t *windo
       .window = context->window,
   };
 
-  if (vkCreateXcbSurfaceKHR(renderer->instance, &surface_create_info, NULL, &renderer->surface) != VK_SUCCESS) {
+  if (vkCreateXcbSurfaceKHR(renderer->context->instance, &surface_create_info, NULL, &renderer->context->surface) !=
+      VK_SUCCESS) {
     logger_critical_format("<renderer:%p> <instance:%p> surface creation failed", (void *)renderer,
-                           (void *)renderer->instance);
+                           (void *)renderer->context->instance);
 
     return false;
   }
@@ -87,7 +88,7 @@ b8 renderer_vulkan_surface_create(renderer_t *renderer, platform_window_t *windo
 }
 
 b8 renderer_vulkan_surface_destroy(renderer_t *renderer) {
-  vkDestroySurfaceKHR(renderer->instance, renderer->surface, NULL);
+  vkDestroySurfaceKHR(renderer->context->instance, renderer->context->surface, NULL);
 
   return true;
 }
