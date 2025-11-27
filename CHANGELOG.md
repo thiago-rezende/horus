@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+ - [f4e819c] build: remove currently unused material.c file from meson.build (Thiago Rezende)
+ - [586c530] refactor(renderer): move platform dependent renderer implementation to renderer_context_t and expose rendere_t as public api for future usage (Thiago Rezende)
+ - [79e858b] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [8986769] chore(shaders): remove currently unused triangle slang shader (Thiago Rezende)
  - [79b0938] chore(shaders): add initial unlit slang shader (Thiago Rezende)
  - [b03a0a5] docs(changelog): update CHANGELOG.md (Thiago Rezende)
