@@ -16,6 +16,7 @@ horus_headers = [
 
   # horus containers layer
   'horus/containers/array.h',
+  'horus/containers/common.h',
   'horus/containers/hash_map.h',
   'horus/containers/linked_list.h',
 

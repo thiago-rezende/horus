@@ -15,6 +15,7 @@
 
 /* horus containers layer */
 #include <horus/containers/array.h>
+#include <horus/containers/common.h>
 #include <horus/containers/hash_map.h>
 #include <horus/containers/linked_list.h>
 

@@ -33,6 +33,18 @@ b8 linked_list_destroy(linked_list_t *list) {
   return true;
 }
 
+b8 linked_list_destroy_with_callback(linked_list_t *list, container_callback_t callback, void *state) {
+  if (list == NULL || callback == NULL) {
+    return false;
+  }
+
+  linked_list_clear_with_callback(list, callback, state);
+
+  platform_memory_deallocate(list);
+
+  return true;
+}
+
 linked_list_node_t *linked_list_node_create(u64 stride) {
   linked_list_node_t *node = (linked_list_node_t *)platform_memory_allocate(sizeof(linked_list_node_t));
 
@@ -76,6 +88,30 @@ b8 linked_list_clear(linked_list_t *list) {
   linked_list_node_t *current = list->head;
 
   while (current != NULL) {
+    linked_list_node_t *next = current->next;
+
+    linked_list_node_destroy(current);
+
+    current = next;
+  }
+
+  list->head = NULL;
+  list->tail = NULL;
+  list->count = 0;
+
+  return true;
+}
+
+b8 linked_list_clear_with_callback(linked_list_t *list, container_callback_t callback, void *state) {
+  if (list == NULL || callback == NULL) {
+    return false;
+  }
+
+  linked_list_node_t *current = list->head;
+
+  while (current != NULL) {
+    callback(current->data, state);
+
     linked_list_node_t *next = current->next;
 
     linked_list_node_destroy(current);

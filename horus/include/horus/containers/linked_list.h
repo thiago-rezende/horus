@@ -3,6 +3,9 @@
 /* horus core layer */
 #include <horus/core/types.h>
 
+/* horus containers layer */
+#include <horus/containers/common.h>
+
 typedef b8 (*linked_list_predicate_t)(void *data, void *item);
 
 typedef struct __linked_list_node linked_list_node_t;
@@ -23,6 +26,7 @@ typedef struct __linked_list {
 
 linked_list_t *linked_list_create(u64 stride);
 b8 linked_list_destroy(linked_list_t *list);
+b8 linked_list_destroy_with_callback(linked_list_t *list, container_callback_t callback, void *state);
 
 linked_list_node_t *linked_list_node_create(u64 stride);
 b8 linked_list_node_destroy(linked_list_node_t *node);
@@ -31,5 +35,6 @@ b8 linked_list_clear(linked_list_t *list);
 b8 linked_list_insert(linked_list_t *list, u64 index, void *item);
 b8 linked_list_remove(linked_list_t *list, u64 index, void *item);
 b8 linked_list_retrieve(linked_list_t *list, u64 index, void *item);
+b8 linked_list_clear_with_callback(linked_list_t *list, container_callback_t callback, void *state);
 
 b8 linked_list_find(linked_list_t *list, linked_list_predicate_t predicate, void *data, u64 *index, void *item);
