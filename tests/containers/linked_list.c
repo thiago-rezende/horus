@@ -15,6 +15,8 @@ static b8 predicate_u64(void *data, void *item) {
 }
 
 static b8 callback_u64(void *data, void *state) {
+  (void)data; /* unused */
+
   u64 *calls = ((u64 *)state);
 
   *calls += 1;
@@ -120,11 +122,9 @@ static void test_list_insert_and_destroy_with_callback(void **state) {
   const u64 item_to_insert_2 = 102;
 
   /* default output variables */
-  u64 item_removed = 0;
   u64 callback_calls = 0;
 
   /* expected values */
-  const u64 count = 2;
   const u64 callback_calls_count = 3;
 
   /* list creation */
