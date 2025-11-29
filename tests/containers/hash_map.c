@@ -7,6 +7,16 @@
 #define HORUS_ENTRYPOINT_DISABLE
 #include <horus/horus.h>
 
+static b8 callback_u64(void *data, void *state) {
+  (void)data; /* unused */
+
+  u64 *calls = ((u64 *)state);
+
+  *calls += 1;
+
+  return true;
+}
+
 static void test_hash_map_create_and_destroy(void **state) {
   (void)state; /* unused */
 
@@ -33,6 +43,162 @@ static void test_hash_map_create_and_destroy(void **state) {
 
   /* destruction result assertion */
   assert_true(result);
+}
+
+static void test_hash_map_insert_and_clear(void **state) {
+  (void)state; /* unused */
+
+  /* default attributes */
+  const u64 size = 10;
+  const u64 stride = sizeof(u64);
+
+  /* default values */
+  u64 count = 0;
+  u64 value_to_insert = 100;
+
+  const char *key_to_insert00 = "string00";
+  const char *key_to_insert01 = "string01";
+
+  /* map creation */
+  hash_map_t *map = hash_map_create(size, stride);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count);
+  assert_int_equal(map->stride, stride);
+
+  /* map inrestion */
+  b8 insert_retult00 = hash_map_insert(map, key_to_insert00, &value_to_insert);
+  b8 insert_retult01 = hash_map_insert(map, key_to_insert01, &value_to_insert);
+
+  /* intert assertions */
+  assert_true(insert_retult00);
+  assert_true(insert_retult01);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count + 2);
+  assert_int_equal(map->stride, stride);
+
+  /* map clearing */
+  b8 clearing_result = hash_map_clear(map);
+
+  /* clearing assertions */
+  assert_true(clearing_result);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count);
+  assert_int_equal(map->stride, stride);
+
+  /* map destruction */
+  hash_map_destroy(map);
+}
+
+static void test_hash_map_insert_and_clear_with_callback(void **state) {
+  (void)state; /* unused */
+
+  /* default attributes */
+  const u64 size = 10;
+  const u64 stride = sizeof(u64);
+
+  /* default values */
+  u64 count = 0;
+  u64 value_to_insert = 100;
+
+  /* default output value */
+  u64 callback_calls = 0;
+  u64 expected_callback_calls = 2;
+
+  const char *key_to_insert00 = "string00";
+  const char *key_to_insert01 = "string01";
+
+  /* map creation */
+  hash_map_t *map = hash_map_create(size, stride);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count);
+  assert_int_equal(map->stride, stride);
+
+  /* map inrestion */
+  b8 insert_retult00 = hash_map_insert(map, key_to_insert00, &value_to_insert);
+  b8 insert_retult01 = hash_map_insert(map, key_to_insert01, &value_to_insert);
+
+  /* intert assertions */
+  assert_true(insert_retult00);
+  assert_true(insert_retult01);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count + 2);
+  assert_int_equal(map->stride, stride);
+
+  /* map clearing */
+  b8 clearing_result = hash_map_clear_with_callback(map, callback_u64, (void *)&callback_calls);
+
+  /* clearing assertions */
+  assert_true(clearing_result);
+
+  /* callback calls assertions */
+  assert_int_equal(callback_calls, expected_callback_calls);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count);
+  assert_int_equal(map->stride, stride);
+
+  /* map destruction */
+  hash_map_destroy(map);
+}
+
+static void test_hash_map_insert_and_destroy_with_callback(void **state) {
+  (void)state; /* unused */
+
+  /* default attributes */
+  const u64 size = 10;
+  const u64 stride = sizeof(u64);
+
+  /* default values */
+  u64 count = 0;
+  u64 value_to_insert = 100;
+
+  /* default output value */
+  u64 callback_calls = 0;
+  u64 expected_callback_calls = 2;
+
+  const char *key_to_insert00 = "string00";
+  const char *key_to_insert01 = "string01";
+
+  /* map creation */
+  hash_map_t *map = hash_map_create(size, stride);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count);
+  assert_int_equal(map->stride, stride);
+
+  /* map inrestion */
+  b8 insert_retult00 = hash_map_insert(map, key_to_insert00, &value_to_insert);
+  b8 insert_retult01 = hash_map_insert(map, key_to_insert01, &value_to_insert);
+
+  /* intert assertions */
+  assert_true(insert_retult00);
+  assert_true(insert_retult01);
+
+  /* map attribute assertions */
+  assert_int_equal(map->size, size);
+  assert_int_equal(map->count, count + 2);
+  assert_int_equal(map->stride, stride);
+
+  /* map destruction */
+  b8 destruction_result = hash_map_destroy_with_callback(map, callback_u64, (void *)&callback_calls);
+
+  /* destruction assertions */
+  assert_true(destruction_result);
+
+  /* callback calls assertions */
+  assert_int_equal(callback_calls, expected_callback_calls);
 }
 
 static void test_hash_map_insert_and_remove(void **state) {
@@ -73,7 +239,7 @@ static void test_hash_map_insert_and_remove(void **state) {
   /* map removal */
   b8 removal_result = hash_map_remove(map, key_to_insert, &value_to_remove);
 
-  /* intert assertions */
+  /* removal assertions */
   assert_true(removal_result);
 
   assert_int_equal(value_to_insert, value_to_remove);
@@ -141,9 +307,12 @@ static void test_hash_map_insert_and_retrieve(void **state) {
 
 int main(void) {
   const struct CMUnitTest tests[] = {
+      cmocka_unit_test(test_hash_map_insert_and_clear),
       cmocka_unit_test(test_hash_map_insert_and_remove),
       cmocka_unit_test(test_hash_map_create_and_destroy),
       cmocka_unit_test(test_hash_map_insert_and_retrieve),
+      cmocka_unit_test(test_hash_map_insert_and_clear_with_callback),
+      cmocka_unit_test(test_hash_map_insert_and_destroy_with_callback),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);
