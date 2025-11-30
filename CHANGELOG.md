@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+ - [d1958e2] test(containers): add hash_map_t clear and destroy with callback unit tests (Thiago Rezende)
+ - [20eb44d] feat(cnotainers): add clear and destroy with callback procedures to hash_map_t (Thiago Rezende)
+ - [d95dc8a] test(containers): add liked_list_t destroy and clear with callback unit test (Thiago Rezende)
+ - [ce1714b] feat(conatiners): add common container callback function type and implement destroy and clear with callback for linked_list_t (Thiago Rezende)
+ - [3386648] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [f4e819c] build: remove currently unused material.c file from meson.build (Thiago Rezende)
  - [586c530] refactor(renderer): move platform dependent renderer implementation to renderer_context_t and expose rendere_t as public api for future usage (Thiago Rezende)
  - [79e858b] docs(changelog): update CHANGELOG.md (Thiago Rezende)
