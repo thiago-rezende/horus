@@ -287,7 +287,7 @@ queue_family_indices_t renderer_vulkan_physical_device_get_queue_family_indices(
 
 surface_information_t renderer_vulkan_physical_device_get_surface_information(VkPhysicalDevice device,
                                                                               VkSurfaceKHR surface) {
-  VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
+  VkPresentModeKHR present_mode = VK_PRESENT_MODE_IMMEDIATE_KHR;
   VkSurfaceFormatKHR format;
   VkSurfaceCapabilitiesKHR capabilities;
 
@@ -335,7 +335,7 @@ surface_information_t renderer_vulkan_physical_device_get_surface_information(Vk
 
     array_retrieve(present_modes, i, (void *)&current);
 
-    if (current == VK_PRESENT_MODE_MAILBOX_KHR) {
+    if (current == VK_PRESENT_MODE_FIFO_KHR) {
       present_mode = current;
 
       has_desired_present_mode = true;

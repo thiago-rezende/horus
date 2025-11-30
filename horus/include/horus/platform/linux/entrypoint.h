@@ -117,14 +117,6 @@ int main(int argc, char **argv, char **envp) {
 
       renderer_submit_commands(renderer);
     }
-
-    f64 target_frame_time = (1.0 / (f64)configuration->framerate);
-    f64 current_elapsed_time = current_absolute_time - platform_absolute_time();
-    f64 remaining_frame_time = target_frame_time - current_elapsed_time;
-
-    if (configuration->framerate && remaining_frame_time > 0) {
-      platform_sleep((u64)(remaining_frame_time * 1000) - 1);
-    }
   }
 
   if (application->on_destroy) {

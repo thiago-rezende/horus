@@ -135,7 +135,6 @@ application_t *application_create(void) {
 
   application->configuration = (configuration_t){
       .fullscreen = false,
-      .framerate = 60,
       .resolution =
           (resolution_t){
               .width = 1280,
