@@ -36,6 +36,7 @@ horus_sources = [
 
   # horus renderer layer
   'source/renderer/texture.c',
+  'source/renderer/material.c',
   'source/renderer/renderer.c',
 ]
 

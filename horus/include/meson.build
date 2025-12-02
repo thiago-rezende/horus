@@ -65,6 +65,7 @@ horus_headers = [
   # horus renderer layer
   'horus/renderer/shader.h',
   'horus/renderer/texture.h',
+  'horus/renderer/material.h',
   'horus/renderer/pipeline.h',
   'horus/renderer/renderer.h',
 
