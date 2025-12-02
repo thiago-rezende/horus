@@ -1,37 +1,17 @@
 {
-  "editor.formatOnSave": true,
+  /* editor settings */
   "editor.rulers": [
     120
   ],
-  "files.insertFinalNewline": true,
-  "files.trimFinalNewlines": true,
+  "editor.formatOnSave": true,
+  /* meson settings */
   "mesonbuild.buildFolder": "build",
   "mesonbuild.configureOptions": [
     "--buildtype=debug",
   ],
+  /* C/C++ settings */
   "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
-  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
-  "terminal.integrated.profiles.windows": {
-    "CLANG64": {
-      "path": "C:/msys64/usr/bin/bash.exe",
-      "args": [
-        "--login",
-        "-i"
-      ],
-      "env": {
-        "MSYSTEM": "CLANG64",
-        "CHERE_INVOKING": "1",
-        "MSYS2_PATH_TYPE": "inherit",
-        "VK_LAYER_PATH": "C:/msys64/clang64/bin"
-      },
-      "overrideName": true,
-    }
-  },
-  "terminal.integrated.defaultProfile.windows": "CLANG64",
-  "terminal.integrated.env.windows": {
-    "MSYSTEM": "CLANG64",
-    "CHERE_INVOKING": "1",
-    "MSYS2_PATH_TYPE": "inherit",
-    "VK_LAYER_PATH": "C:/msys64/clang64/bin"
-  }
+  "C_Cpp.default.compileCommands": "c:\\Users\\horus\\Projects\\c\\horus\\build/compile_commands.json",
+  /* CMake settings */
+  "cmake.ignoreCMakeListsMissing": true,
 }

@@ -5,60 +5,55 @@
       "label": "Meson | Setup",
       "type": "shell",
       "command": "meson",
-      "args": [
-        "setup",
-        "build",
-        "--buildtype",
-        "debug",
-      ],
-      "windows": {
-        "options": {
-          "shell": {
-            "executable": "C:/msys64/usr/bin/bash.exe",
-            "args": [
-              "--login",
-              "-i",
-              "-c",
-            ],
-          },
-          "env": {
-            "MSYSTEM": "CLANG64",
-            "CHERE_INVOKING": "1",
-            "MSYS2_PATH_TYPE": "inherit",
-          }
-        }
+      "linux": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--native-file",
+          "meson/linux.txt",
+          "--reconfigure"
+        ],
       },
-      "problemMatcher": []
+      "windows": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--native-file",
+          "meson/windows.txt",
+          "--reconfigure"
+        ],
+      }
     },
     {
       "label": "Meson | Reconfigure",
       "type": "shell",
       "command": "meson",
-      "args": [
-        "setup",
-        "build",
-        "--buildtype",
-        "debug",
-        "--reconfigure"
-      ],
-      "windows": {
-        "options": {
-          "shell": {
-            "executable": "C:/msys64/usr/bin/bash.exe",
-            "args": [
-              "--login",
-              "-i",
-              "-c",
-            ],
-          },
-          "env": {
-            "MSYSTEM": "CLANG64",
-            "CHERE_INVOKING": "1",
-            "MSYS2_PATH_TYPE": "inherit",
-          }
-        }
+      "linux": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--reconfigure",
+          "--native-file",
+          "meson/linux.txt",
+        ],
       },
-      "problemMatcher": []
+      "windows": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--reconfigure",
+          "--native-file",
+          "meson/windows.txt",
+        ],
+      }
     },
     {
       "label": "Meson | Build",
@@ -69,27 +64,9 @@
         "-C",
         "build",
       ],
-      "windows": {
-        "options": {
-          "shell": {
-            "executable": "C:/msys64/usr/bin/bash.exe",
-            "args": [
-              "--login",
-              "-i",
-              "-c",
-            ],
-          },
-          "env": {
-            "MSYSTEM": "CLANG64",
-            "CHERE_INVOKING": "1",
-            "MSYS2_PATH_TYPE": "inherit",
-          }
-        }
-      },
-      "problemMatcher": [],
       "dependsOn": [
-        "Meson | Setup"
-      ]
+        "Meson | Setup",
+      ],
     }
   ]
 }

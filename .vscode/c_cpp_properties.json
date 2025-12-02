@@ -22,7 +22,7 @@
         /* "UNICODE", */
         /* "_UNICODE" */
       ],
-      "compilerPath": "C:/msys64/clang64/bin/clang",
+      "compilerPath": "clang-cl",
       "cStandard": "c11",
       "intelliSenseMode": "windows-clang-x64",
       "compileCommands": "${workspaceFolder}/build/compile_commands.json"

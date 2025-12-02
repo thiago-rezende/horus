@@ -18,30 +18,6 @@ project_version_patch = project_version_parts[2].to_int()
 
 project_description = 'A simple closs-platform application development framework'
 
-# global defaults
-default_c_args = [
-  # language standard
-  '-std=c11',
-  # warnings
-  '-Wall',
-  '-Wextra',
-  '-pedantic',
-  # math optimizations
-  '-ffast-math',
-  '-march=native',
-  '-mtune=native',
-  '-fno-math-errno',
-  '-ftree-vectorize',
-  '-freciprocal-math',
-  # loop optimizations
-  '-funroll-loops',
-]
-
-default_override_options = [
-  'c_std=c11',
-  'warning_level=3',
-]
-
 # horus target
 subdir('horus')
 

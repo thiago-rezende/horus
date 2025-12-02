@@ -10,12 +10,6 @@ tests_dependencies = [
   cmocka_dep,
 ]
 
-# default test compiler options
-tests_c_args = default_c_args
-
-# default override options
-tests_override_options = default_override_options
-
 # core layer tests
 subdir('core')
 

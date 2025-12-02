@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug | Sandbox",
+      "name": "Linux - Debug | Sandbox",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/sandbox/sandbox",
@@ -12,6 +12,7 @@
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
@@ -25,15 +26,18 @@
         },
       ],
       "preLaunchTask": "Meson | Build",
-      "windows": {
-        "miDebuggerPath": "C:/msys64/clang64/bin/gdb.exe",
-        "environment": [
-          {
-            "name": "VK_LAYER_PATH",
-            "value": "C:/msys64/clang64/bin"
-          }
-        ]
-      },
+    },
+    {
+      "name": "Windows - Debug | Sandbox",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/sandbox/sandbox",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "integratedTerminal",
+      "preLaunchTask": "Meson | Build",
     }
   ]
 }
