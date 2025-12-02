@@ -10,7 +10,7 @@ set_description('cross-platform application development framework')
 set_version('0.1.0', { build = '%Y%m%d%H%M' })
 
 -- default rules
-add_rules('mode.debug', 'mode.check', 'mode.releasedbg', 'mode.release')
+add_rules('mode.debug', 'mode.releasedbg', 'mode.release')
 
 -- default toolchains
 if is_plat('linux') then
@@ -21,11 +21,19 @@ if is_plat('windows') then
   set_toolchains('clang-cl')
 end
 
+-- default options
+option("tests", {default = true, description = "build tests"})
+option("sandbox", {default = true, description = "build sandbox"})
+
 -- horus target
 includes('horus')
 
 -- sandbox target
-includes('sandbox')
+if has_config("sandbox") then
+  includes('sandbox')
+end
 
 -- test targets
-includes('tests')
+if has_config("tests") then
+  includes('tests')
+end
