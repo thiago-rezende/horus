@@ -4,14 +4,10 @@
     120
   ],
   "editor.formatOnSave": true,
-  /* meson settings */
-  "mesonbuild.buildFolder": "build",
-  "mesonbuild.configureOptions": [
-    "--buildtype=debug",
+  /* clangd settings */
+  "clangd.arguments": [
+    "--compile-commands-dir=.vscode",
   ],
-  /* C/C++ settings */
-  "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
-  "C_Cpp.default.compileCommands": "c:\\Users\\horus\\Projects\\c\\horus\\build/compile_commands.json",
-  /* CMake settings */
-  "cmake.ignoreCMakeListsMissing": true,
+  /* xmake settings */
+  "xmake.debugConfigType": "codelldb",
 }

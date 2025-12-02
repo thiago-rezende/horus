@@ -1,5 +1,3 @@
-#include <config.h>
-
 /* horus base layer */
 #include <horus/definitions.h>
 
@@ -33,44 +31,4 @@ unsigned int horus_project_version_patch(void) {
 
 const char *horus_platform(void) {
   return HORUS_PLATFORM;
-}
-
-const char *horus_gettext_package(void) {
-  return HORUS_GETTEXT_PACKAGE;
-}
-
-const char *horus_bindir(void) {
-  return HORUS_BINDIR;
-}
-
-const char *horus_libdir(void) {
-  return HORUS_LIBDIR;
-}
-
-const char *horus_datadir(void) {
-  return HORUS_DATADIR;
-}
-
-const char *horus_includedir(void) {
-  return HORUS_INCLUDEDIR;
-}
-
-const char *horus_localedir(void) {
-  return HORUS_LOCALEDIR;
-}
-
-const char *horus_localstatedir(void) {
-  return HORUS_LOCALSTATEDIR;
-}
-
-const char *horus_mandir(void) {
-  return HORUS_MANDIR;
-}
-
-const char *horus_sysconfdir(void) {
-  return HORUS_SYSCONFDIR;
-}
-
-const char *horus_prefix(void) {
-  return HORUS_PREFIX;
 }

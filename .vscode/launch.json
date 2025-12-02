@@ -2,42 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Linux - Debug | Sandbox",
-      "type": "cppdbg",
+      "name": "Sandbox | Windows x64",
+      "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/sandbox/sandbox",
+      "program": "${workspaceFolder}/build/windows/x64/debug/sandbox.exe",
       "args": [],
-      "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true,
-        },
-        {
-          "description": "Set Disassembly Flavor to Intel",
-          "text": "-gdb-set disassembly-flavor intel",
-          "ignoreFailures": true,
-        },
-      ],
-      "preLaunchTask": "Meson | Build",
     },
     {
-      "name": "Windows - Debug | Sandbox",
-      "type": "cppvsdbg",
+      "name": "Sandbox | Linux x64",
+      "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/sandbox/sandbox",
+      "program": "${workspaceFolder}/build/linux/x64/debug/sandbox.exe",
       "args": [],
-      "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
-      "environment": [],
-      "console": "integratedTerminal",
-      "preLaunchTask": "Meson | Build",
-    }
+    },
   ]
 }

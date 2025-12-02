@@ -1,7 +1,11 @@
 {
   "recommendations": [
-    "ms-vscode.cpptools",
-    "mesonbuild.mesonbuild",
-    "EditorConfig.EditorConfig"
+    "eamodio.gitlens",
+    "tboox.xmake-vscode",
+    "vadimcn.vscode-lldb",
+    "qcz.text-power-tools",
+    "EditorConfig.EditorConfig",
+    "llvm-vs-code-extensions.vscode-clangd",
+    "shader-slang.slang-language-extension",
   ]
 }
