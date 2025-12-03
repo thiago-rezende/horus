@@ -2,7 +2,7 @@ name: Linux
 
 on:
   push:
-    branches: ["main", "build/xmake"]
+    # branches: ["main"]
     paths:
       # files to watch
       - "xmake.lua"
@@ -17,7 +17,7 @@ on:
       - "!horus/include/horus/platform/windows/**"
 
   pull_request:
-    branches: ["main", "build/xmake"]
+    # branches: ["main"]
     paths:
       # files to watch
       - "xmake.lua"
