@@ -1,12 +1,12 @@
 -- containers tests
-for _, file in ipairs(os.files('*.c')) do
-  local name = path.basename(file)
+for _, sourcefile in ipairs(os.files('*.c')) do
+  local sourcename = path.basename(sourcefile)
 
-  target('containers/' .. name)
+  target('tests/containers/' .. sourcename)
     set_kind('binary')
     set_default(false)
 
-    add_files(file)
+    add_files(sourcefile)
     add_tests('default')
 
     add_deps('horus')

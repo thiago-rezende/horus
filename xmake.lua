@@ -19,21 +19,27 @@ end
 
 if is_plat('windows') then
   set_toolchains('clang-cl')
+
+  -- default msvc runtime
+  set_runtimes('MD')
 end
 
 -- default options
-option("tests", {default = true, description = "build tests"})
-option("sandbox", {default = true, description = "build sandbox"})
+option('tests', {default = true, description = 'build tests'})
+option('sandbox', {default = true, description = 'build sandbox'})
+
+-- assets target
+includes('assets')
 
 -- horus target
 includes('horus')
 
 -- sandbox target
-if has_config("sandbox") then
+if has_config('sandbox') then
   includes('sandbox')
 end
 
 -- test targets
-if has_config("tests") then
+if has_config('tests') then
   includes('tests')
 end

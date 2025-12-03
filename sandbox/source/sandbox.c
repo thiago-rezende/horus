@@ -7,13 +7,13 @@
 #define CUBE_INSTANCES_COUNT 2
 
 /* shader modules global variables */
-const char *default_shader_module_path = "assets/shaders/build/default.spv";
+const char *default_shader_module_path = "assets/shaders/default.spv";
 
 shader_module_t *default_shader_module = NULL;
 
 /* textures global variables */
-const char *checker_dark_texture_path = "assets/textures/build/checker-dark.ktx2";
-const char *checker_light_texture_path = "assets/textures/build/checker-light.ktx2";
+const char *checker_dark_texture_path = "assets/textures/checker-dark.ktx2";
+const char *checker_light_texture_path = "assets/textures/checker-light.ktx2";
 
 texture_t *current_texture = NULL;
 texture_t *checker_dark_texture = NULL;

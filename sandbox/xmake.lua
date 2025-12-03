@@ -6,9 +6,6 @@ target('sandbox')
     -- languages
     set_languages('c11')
 
-    -- working directory
-    set_rundir('$(projectdir)')
-
     -- windows subsystem
     if is_plat('windows') then
       add_rules('win.sdk.application')
