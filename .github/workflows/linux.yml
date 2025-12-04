@@ -2,7 +2,7 @@ name: Linux
 
 on:
   push:
-    # branches: ["main"]
+    branches: ["main"]
     paths:
       # files to watch
       - "xmake.lua"
@@ -17,7 +17,7 @@ on:
       - "!horus/include/horus/platform/windows/**"
 
   pull_request:
-    # branches: ["main"]
+    branches: ["main"]
     paths:
       # files to watch
       - "xmake.lua"
@@ -82,9 +82,6 @@ jobs:
 
       - name: Setup Project
         run: xmake config --toolchain=clang --mode=release --plat=linux -y
-
-      - name: Compile Project
-        run: xmake build horus -y
 
       - name: Execute Tests
         run: xmake test -y

@@ -2,220 +2,78 @@ name: Windows
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
     paths:
       # files to watch
-      - 'meson.build'
-      - 'meson_options.txt'
+      - "xmake.lua"
       # directories to watch
-      - 'horus/**'
-      - 'tests/**'
-      - 'sandbox/**'
-      - 'subprojects/**'
+      - "horus/**"
+      - "tests/**"
+      - "sandbox/**"
+      - "subprojects/**"
       # directories to ignore
-      - '!horus/source/platform/linux/**'
-      - '!horus/source/renderer/vulkan/linux/**'
-      - '!horus/include/horus/platform/linux/**'
+      - "!horus/source/platform/linux/**"
+      - "!horus/source/renderer/vulkan/linux/**"
+      - "!horus/include/horus/platform/linux/**"
 
   pull_request:
-    branches: ['main']
+    branches: ["main"]
     paths:
       # files to watch
-      - 'meson.build'
-      - 'meson_options.txt'
+      - "xmake.lua"
       # directories to watch
-      - 'horus/**'
-      - 'tests/**'
-      - 'sandbox/**'
-      - 'subprojects/**'
+      - "horus/**"
+      - "tests/**"
+      - "sandbox/**"
+      - "subprojects/**"
       # directories to ignore
-      - '!horus/source/platform/linux/**'
-      - '!horus/source/renderer/vulkan/linux/**'
-      - '!horus/include/horus/platform/linux/**'
+      - "!horus/source/platform/linux/**"
+      - "!horus/source/renderer/vulkan/linux/**"
+      - "!horus/include/horus/platform/linux/**"
 
 jobs:
   build:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
 
     steps:
       - name: Setup Repository
         uses: actions/checkout@v3
 
-      - name: Cache Build Directory
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-build-directory
+      - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          path: build
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-
-            ${{ runner.os }}-
-
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: clang64
-          update: false
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
-
-      - name: Update CA Certificates
-        run: update-ca-trust
+          xmake-version: "3.0.0"
+          actions-cache-key: ${{ runner.os }}-xmake
+          package-cache: true
+          package-cache-key: ${{ runner.os }}-packages
+          build-cache: true
+          build-cache-key: ${{ runner.os }}-build-${{ hashFiles('**/xmake.lua') }}
 
       - name: Setup Project
-        run: meson setup build --reconfigure
-        env:
-          CC: clang
+        run: xmake config --toolchain=clang --mode=release --plat=windows --runtimes=MD -y
 
       - name: Compile Project
-        run: meson compile -C build
+        run: xmake build horus -y
 
   test:
     needs: build
 
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
 
     steps:
       - name: Setup Repository
         uses: actions/checkout@v3
 
-      - name: Cache Build Directory
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-build-directory
+      - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          path: build
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-
-            ${{ runner.os }}-
-
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: clang64
-          update: false
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
-
-      - name: Update CA Certificates
-        run: update-ca-trust
+          xmake-version: "3.0.0"
+          actions-cache-key: ${{ runner.os }}-xmake
+          package-cache: true
+          package-cache-key: ${{ runner.os }}-packages
+          build-cache: true
+          build-cache-key: ${{ runner.os }}-build-${{ hashFiles('**/xmake.lua') }}
 
       - name: Setup Project
-        run: meson setup build --reconfigure
-        env:
-          CC: clang
+        run: xmake config --toolchain=clang --mode=release --plat=windows --runtimes=MD -y
 
       - name: Execute Tests
-        run: meson test -C build -v
-
-  analysis:
-    needs: test
-
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
-
-    steps:
-      - name: Setup Repository
-        uses: actions/checkout@v3
-
-      - name: Cache Build Directory
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-build-directory
-        with:
-          path: build
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-
-            ${{ runner.os }}-
-
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: clang64
-          update: false
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
-
-      - name: Update CA Certificates
-        run: update-ca-trust
-
-      - name: Setup Project
-        run: meson setup build --reconfigure
-        env:
-          CC: clang
-
-      - name: Code Analysis
-        run: scan-build ninja -C build
-
-  lint:
-    needs: analysis
-
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
-
-    steps:
-      - name: Setup Repository
-        uses: actions/checkout@v3
-
-      - name: Cache Build Directory
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-build-directory
-        with:
-          path: build
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-
-            ${{ runner.os }}-
-
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: clang64
-          update: false
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
-            clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
-
-      - name: Update CA Certificates
-        run: update-ca-trust
-
-      - name: Setup Project
-        run: meson setup build --reconfigure
-        env:
-          CC: clang
-
-      - name: Lint Check
-        run: ninja -C build clang-format-check
+        run: xmake test -y
