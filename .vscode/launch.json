@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/windows/x64/debug/sandbox.exe",
       "args": [],
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/build/windows/x64/debug",
     },
     {
       "name": "Sandbox | Linux x64",
@@ -15,7 +15,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/linux/x64/debug/sandbox.exe",
       "args": [],
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/build/windows/x64/debug",
     },
   ]
 }
