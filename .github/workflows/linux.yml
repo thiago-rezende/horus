@@ -56,7 +56,7 @@ jobs:
         run: xmake config --toolchain=clang --mode=release --plat=linux -y
 
       - name: Compile Project
-        run: xmake build horus -y
+        run: xmake build horus
 
   test:
     needs: build
@@ -84,4 +84,4 @@ jobs:
         run: xmake config --toolchain=clang --mode=release --plat=linux -y
 
       - name: Execute Tests
-        run: xmake test -y
+        run: xmake test
