@@ -49,7 +49,7 @@ jobs:
           build-cache-key: ${{ runner.os }}-build-${{ hashFiles('**/xmake.lua') }}
 
       - name: Setup Project
-        run: xmake config --toolchain=clang --mode=release --plat=windows --runtimes=MD -y
+        run: xmake config --toolchain=clang-cl --mode=release --plat=windows --runtimes=MD -y
 
       - name: Compile Project
         run: xmake build horus -y
@@ -73,7 +73,7 @@ jobs:
           build-cache-key: ${{ runner.os }}-build-${{ hashFiles('**/xmake.lua') }}
 
       - name: Setup Project
-        run: xmake config --toolchain=clang --mode=release --plat=windows --runtimes=MD -y
+        run: xmake config --toolchain=clang-cl --mode=release --plat=windows --runtimes=MD -y
 
       - name: Execute Tests
         run: xmake test -y
