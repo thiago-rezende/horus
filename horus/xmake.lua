@@ -21,6 +21,8 @@ target('horus')
     if is_plat('linux') then
       add_packages('ktx')
       add_packages('vulkansdk')
+
+      add_links('xcb', 'xcb-xkb', 'xcb-keysyms')
     end
 
     if is_plat('windows') then
