@@ -109,6 +109,8 @@ quaternionf32_t cube_instance_rotation = {{0.0f, 0.0f, 0.0f, 1.0f}};
 camera_t *camera = NULL;
 
 f32 camera_speed = 1.0f;
+f32 camera_speed_multiplier = 3.0f;
+
 f32 camera_rotation_angle = 45.0f;
 
 vector3f32_t camera_target = {0};
@@ -448,28 +450,32 @@ b8 on_update(f64 timestep) {
     camera_rotate_euler(camera, (vector3f32_t){{-1.0f * camera_rotation_angle * timestep, 0.0f, 0.0f}});
   }
 
+  f32 current_camera_speed = input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_SHIFT)
+                                 ? camera_speed * camera_speed_multiplier
+                                 : camera_speed;
+
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_W)) {
-    camera_move_forward(camera, camera_speed * timestep);
+    camera_move_forward(camera, current_camera_speed * timestep);
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_A)) {
-    camera_move_left(camera, camera_speed * timestep);
+    camera_move_left(camera, current_camera_speed * timestep);
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_S)) {
-    camera_move_backward(camera, camera_speed * timestep);
+    camera_move_backward(camera, current_camera_speed * timestep);
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_D)) {
-    camera_move_right(camera, camera_speed * timestep);
+    camera_move_right(camera, current_camera_speed * timestep);
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_SPACE)) {
-    camera_move_up(camera, camera_speed * timestep);
+    camera_move_up(camera, current_camera_speed * timestep);
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_LEFT_CONTROL)) {
-    camera_move_down(camera, camera_speed * timestep);
+    camera_move_down(camera, current_camera_speed * timestep);
   }
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_E)) {
