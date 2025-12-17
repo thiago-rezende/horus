@@ -36,4 +36,4 @@ This project is being developed to be the simplest and yet complete cross-platfo
 [license-badge]: https://img.shields.io/badge/license-BSD_3_Clause-yellowgreen.svg?style=flat-square
 [c-badge]: https://img.shields.io/badge/C-11-blue.svg?style=flat-square
 [opengl-badge]: https://img.shields.io/badge/OpenGL-4.6-5586A5.svg?style=flat-square
-[xmake-badge]: https://img.shields.io/badge/xmake-3.0-42B883.svg?style=flat-square
+[xmake-badge]: https://img.shields.io/badge/Xmake-3.0-42B883.svg?style=flat-square
