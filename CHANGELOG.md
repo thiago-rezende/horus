@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+ - [0a609e0] feat(sandbox): add camera speed multiplier while shift is pressed (Thiago Rezende)
+ - [5d10569] build(linux): add xcb xcb-xkb and xck-keysyms dependencies (Thiago Rezende)
+ - [d1275ff] chore(clangd): update .clangd config file to point to .vscode for compilation_database.json discovery since Xmake vscode extension uses this path as output (Thiago Rezende)
+ - [1f7a93e] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [85ca8ed] chore(vscode): update default cwd of launch options for CodeLLDB debugging (Thiago Rezende)
  - [b538b46] fix(filesystem|linux): use defualt libc error handling instead of the extensions provided on windows (Thiago Rezende)
  - [0a6f414] ci: add Vulkan SDK setup procedure (Thiago Rezende)
