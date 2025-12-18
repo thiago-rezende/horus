@@ -1,12 +1,10 @@
 -- horus dependencies
 if is_plat('linux') then
   add_requires('ktx')
-  add_requires('vulkansdk')
 end
 
 if is_plat('windows') then
   add_requires('ktx')
-  add_requires('vulkansdk')
 end
 
 -- horus target
@@ -20,14 +18,12 @@ target('horus')
     -- dependencies
     if is_plat('linux') then
       add_packages('ktx')
-      add_packages('vulkansdk')
 
       add_links('xcb', 'xcb-xkb', 'xcb-keysyms')
     end
 
     if is_plat('windows') then
       add_packages('ktx')
-      add_packages('vulkansdk')
 
       add_links('gdi32', 'user32', 'shell32', 'kernel32', 'dwmapi', 'uxtheme')
     end
@@ -96,19 +92,19 @@ target('horus')
 
     if is_plat('linux', 'windows') then
       -- platform renderer layer
-      add_files('source/renderer/vulkan/*.c')
+      add_files('source/renderer/opengl/*.c')
 
       -- platform renderer buffers layer
-      add_files('source/renderer/vulkan/buffers/*.c')
+      add_files('source/renderer/opengl/buffers/*.c')
 
       if is_plat('linux') then
         -- platform renderer layer [ linux ]
-        add_files('source/renderer/vulkan/linux/*.c')
+        add_files('source/renderer/opengl/linux/*.c')
       end
 
       if is_plat('windows') then
         -- platform renderer layer [ windows ]
-        add_files('source/renderer/vulkan/windows/*.c')
+        add_files('source/renderer/opengl/windows/*.c')
       end
     end
 

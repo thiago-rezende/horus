@@ -9,7 +9,7 @@
 
 const char *renderer_implementation_strings[RENDERER_IMPLEMENTATION_COUNT] = {
     [RENDERER_IMPLEMENTATION_NONE] = "none",
-    [RENDERER_IMPLEMENTATION_VULKAN] = "vulkan",
+    [RENDERER_IMPLEMENTATION_OPENGL] = "opengl",
 };
 
 renderer_t *renderer_create(renderer_context_create_info_t info, platform_window_t *window) {
