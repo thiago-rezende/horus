@@ -19,7 +19,7 @@ if is_plat('windows') then
     spec = 'gl,wgl',
     api = 'gl=4.6,wgl=1.0',
     profile = 'core',
-    extensions = 'WGL_ARB_create_context,WGL_ARB_create_context_profile,WGL_ARB_extensions_string,WGL_EXT_extensions_string,WGL_EXT_swap_control'
+    extensions = 'WGL_ARB_create_context,WGL_ARB_create_context_profile,WGL_EXT_swap_control'
   }})
 
   add_requires('opengl')
