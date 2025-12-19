@@ -2,18 +2,14 @@
 if is_plat('linux') then
   add_requires('ktx')
 
-  add_requires('glad', {alias = 'glad-gl', configs = {spec = 'gl', api = 'gl=4.6', profile = 'core'}})
-  add_requires('glad', {alias = 'glad-glx', configs = {spec = 'glx', api = 'glx=1.4'}})
-
+  add_requires('glad', {configs = {spec = 'gl,glx', api = 'gl=4.6,glx=1.4', profile = 'core'}})
   add_requires('opengl')
 end
 
 if is_plat('windows') then
   add_requires('ktx')
 
-  add_requires('glad', {alias = 'glad-gl', configs = {spec = 'gl', api = 'gl=4.6', profile = 'core'}})
-  add_requires('glad', {alias = 'glad-wgl', configs = {spec = 'wgl', api = 'wgl=1.0'}})
-
+  add_requires('glad', {configs = {spec = 'gl,wgl', api = 'gl=4.6,wgl=1.0', profile = 'core'}})
   add_requires('opengl')
 end
 
@@ -29,9 +25,7 @@ target('horus')
     if is_plat('linux') then
       add_packages('ktx')
 
-      add_packages('glad-gl')
-      add_packages('glad-glx')
-
+      add_packages('glad')
       add_packages('opengl')
 
       add_links('xcb', 'xcb-xkb', 'xcb-keysyms')
@@ -40,9 +34,7 @@ target('horus')
     if is_plat('windows') then
       add_packages('ktx')
 
-      add_packages('glad-gl')
-      add_packages('glad-wgl')
-
+      add_packages('glad')
       add_packages('opengl')
 
       add_links('gdi32', 'user32', 'shell32', 'kernel32', 'dwmapi', 'uxtheme')
