@@ -2,14 +2,26 @@
 if is_plat('linux') then
   add_requires('ktx')
 
-  add_requires('glad', {configs = {spec = 'gl,glx', api = 'gl=4.6,glx=1.4', profile = 'core'}})
+  add_requires('glad', {configs = {
+    spec = 'gl,glx',
+    api = 'gl=4.6,glx=1.4',
+    profile = 'core',
+    extensions = ''
+  }})
+
   add_requires('opengl')
 end
 
 if is_plat('windows') then
   add_requires('ktx')
 
-  add_requires('glad', {configs = {spec = 'gl,wgl', api = 'gl=4.6,wgl=1.0', profile = 'core'}})
+  add_requires('glad', {configs = {
+    spec = 'gl,wgl',
+    api = 'gl=4.6,wgl=1.0',
+    profile = 'core',
+    extensions = 'WGL_ARB_create_context,WGL_ARB_create_context_profile,WGL_ARB_extensions_string,WGL_EXT_extensions_string,WGL_EXT_swap_control'
+  }})
+
   add_requires('opengl')
 end
 
@@ -23,21 +35,23 @@ target('horus')
 
     -- dependencies
     if is_plat('linux') then
-      add_packages('ktx')
+      add_packages('ktx', {public = true})
 
-      add_packages('glad')
-      add_packages('opengl')
+      add_packages('glad', {public = true})
 
-      add_links('xcb', 'xcb-xkb', 'xcb-keysyms')
+      add_packages('opengl', {public = true})
+
+      add_links('xcb', 'xcb-xkb', 'xcb-keysyms', {public = true})
     end
 
     if is_plat('windows') then
-      add_packages('ktx')
+      add_packages('ktx', {public = true})
 
-      add_packages('glad')
-      add_packages('opengl')
+      add_packages('glad', {public = true})
 
-      add_links('gdi32', 'user32', 'shell32', 'kernel32', 'dwmapi', 'uxtheme')
+      add_packages('opengl', {public = true})
+
+      add_links('gdi32', 'user32', 'shell32', 'kernel32', 'dwmapi', 'uxtheme', {public = true})
     end
 
     -- definitions
