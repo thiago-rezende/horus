@@ -135,6 +135,8 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
 
   glEnable(GL_DEPTH_TEST);
 
+  wglSwapIntervalEXT(true);
+
   renderer->context->platform_context = platform_memory_allocate(sizeof(platform_renderer_context_t));
 
   *renderer->context->platform_context = (platform_renderer_context_t){
