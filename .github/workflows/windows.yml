@@ -2,36 +2,36 @@ name: Windows
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
     paths:
       # files to watch
-      - 'meson.build'
-      - 'meson_options.txt'
+      - "meson.build"
+      - "meson_options.txt"
       # directories to watch
-      - 'horus/**'
-      - 'tests/**'
-      - 'sandbox/**'
-      - 'subprojects/**'
+      - "horus/**"
+      - "tests/**"
+      - "sandbox/**"
+      - "subprojects/**"
       # directories to ignore
-      - '!horus/source/platform/linux/**'
-      - '!horus/source/renderer/vulkan/linux/**'
-      - '!horus/include/horus/platform/linux/**'
+      - "!horus/source/platform/linux/**"
+      - "!horus/source/renderer/opengl/linux/**"
+      - "!horus/include/horus/platform/linux/**"
 
   pull_request:
-    branches: ['main']
+    branches: ["main"]
     paths:
       # files to watch
-      - 'meson.build'
-      - 'meson_options.txt'
+      - "meson.build"
+      - "meson_options.txt"
       # directories to watch
-      - 'horus/**'
-      - 'tests/**'
-      - 'sandbox/**'
-      - 'subprojects/**'
+      - "horus/**"
+      - "tests/**"
+      - "sandbox/**"
+      - "subprojects/**"
       # directories to ignore
-      - '!horus/source/platform/linux/**'
-      - '!horus/source/renderer/vulkan/linux/**'
-      - '!horus/include/horus/platform/linux/**'
+      - "!horus/source/platform/linux/**"
+      - "!horus/source/renderer/opengl/linux/**"
+      - "!horus/include/horus/platform/linux/**"
 
 jobs:
   build:
@@ -63,10 +63,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
         run: update-ca-trust
@@ -110,10 +107,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
         run: update-ca-trust
@@ -157,10 +151,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
         run: update-ca-trust
@@ -204,10 +195,7 @@ jobs:
             clang64/mingw-w64-clang-x86_64-meson
             clang64/mingw-w64-clang-x86_64-toolchain
             clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-vulkan-loader
-            clang64/mingw-w64-clang-x86_64-vulkan-headers
             clang64/mingw-w64-clang-x86_64-ca-certificates
-            clang64/mingw-w64-clang-x86_64-vulkan-validation-layers
 
       - name: Update CA Certificates
         run: update-ca-trust
