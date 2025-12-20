@@ -1,5 +1,5 @@
-#include <glad/glad.h>
-#include <glad/glad_wgl.h>
+#include <horus/renderer/opengl/glad/gl.h>
+#include <horus/renderer/opengl/glad/wgl.h>
 
 /* horus logger layer */
 #include <horus/logger/logger.h>
@@ -89,8 +89,8 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
 
   wglMakeCurrent(device_context_handle, opengl_rendering_context_handle);
 
-  if (!gladLoadWGL(device_context_handle)) {
-    logger_critical_format("<renderer:%p> <window:%p> gladLoadWGL failed", renderer, window);
+  if (!gladLoaderLoadWGL(device_context_handle)) {
+    logger_critical_format("<renderer:%p> <window:%p> gladLoaderLoadWGL failed", renderer, window);
 
     wglDeleteContext(opengl_rendering_context_handle);
 
@@ -122,8 +122,8 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
 
   wglMakeCurrent(device_context_handle, opengl_rendering_context_handle_modern);
 
-  if (!gladLoadGL()) {
-    logger_critical_format("<renderer:%p> <window:%p> gladLoadGL failed", renderer, window);
+  if (!gladLoaderLoadGL()) {
+    logger_critical_format("<renderer:%p> <window:%p> gladLoaderLoadGL failed", renderer, window);
 
     wglDeleteContext(opengl_rendering_context_handle);
     wglDeleteContext(opengl_rendering_context_handle_modern);
