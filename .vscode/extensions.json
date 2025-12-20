@@ -1,7 +1,8 @@
 {
   "recommendations": [
-    "ms-vscode.cpptools",
+    "vadimcn.vscode-lldb",
     "mesonbuild.mesonbuild",
-    "EditorConfig.EditorConfig"
+    "EditorConfig.EditorConfig",
+    "llvm-vs-code-extensions.vscode-clangd",
   ]
 }
