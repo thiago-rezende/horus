@@ -14,7 +14,7 @@ package('glad')
     add_versions('v2.0.8', '44f06f9195427c7017f5028d0894f57eb216b0a8f7c4eda7ce883732aeb2d0fc')
 
     -- package patches
-    add_patches('v2.0.8', 'patches/v2.0.8/CMakeLists.patch', '1dc178c44c41b982b72f788dec926795cee95362a30cb3530ceb70a86219ea31')
+    add_patches('v2.0.8', 'patches/v2.0.8/CMakeLists.patch', 'f3e880834f77b9e3e70b6f81587f5ea8f174ef5b52775af43440295225dfdf7b')
 
     -- package default configs
     add_configs('api', {description = 'Apis to include in the generated glad library', default = '', type = 'string'})
@@ -28,7 +28,7 @@ package('glad')
     -- package load porcedure
     on_load(function (package)
       if not package.is_built or package:is_built() then
-        package:add('deps', 'cmake', 'python 3.x', {kind = 'binary'})
+        package:add('deps', 'cmake', {kind = 'binary'})
       end
     end)
 
@@ -43,8 +43,8 @@ package('glad')
         table.insert(configs, '-DUSE_MSVC_RUNTIME_LIBRARY_DLL=' .. (package:runtimes():startswith('MT') and 'OFF' or 'ON'))
       end
 
-      table.insert(configs, '-DGLAD_API=' .. package:config('api'))
-      table.insert(configs, '-DGLAD_EXTENSIONS=' .. package:config('extensions'))
+      table.insert(configs, '-DHORUS_GLAD_API=' .. package:config('api'))
+      table.insert(configs, '-DHORUS_GLAD_EXTENSIONS=' .. package:config('extensions'))
 
       import('package.tools.cmake').install(package, configs)
     end)

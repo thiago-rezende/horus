@@ -10,7 +10,7 @@ index 0000000..5e45fdf
 +
 +add_subdirectory("cmake")
 +
-+glad_add_library(glad STATIC REPRODUCIBLE LOADER API ${GLAD_API} EXTENSIONS ${GLAD_EXTENSIONS})
++glad_add_library(glad STATIC REPRODUCIBLE LOADER API ${HORUS_GLAD_API} EXTENSIONS ${HORUS_GLAD_EXTENSIONS})
 +
 +target_include_directories(glad PUBLIC
 +    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gladsources/glad/include>
