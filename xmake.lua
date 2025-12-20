@@ -28,6 +28,9 @@ end
 option('tests', {default = true, description = 'build tests'})
 option('sandbox', {default = true, description = 'build sandbox'})
 
+-- custom configurations
+includes('xmake')
+
 -- assets target
 includes('assets')
 

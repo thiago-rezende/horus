@@ -2,10 +2,8 @@
 if is_plat('linux') then
   add_requires('ktx')
 
-  add_requires('glad', {configs = {
-    spec = 'gl,glx',
-    api = 'gl=4.6,glx=1.4',
-    profile = 'core',
+  add_requires('glad v2.0.8', {configs = {
+    api = 'gl:core=4.6,egl=1.5',
     extensions = ''
   }})
 
@@ -15,10 +13,8 @@ end
 if is_plat('windows') then
   add_requires('ktx')
 
-  add_requires('glad', {configs = {
-    spec = 'gl,wgl',
-    api = 'gl=4.6,wgl=1.0',
-    profile = 'core',
+  add_requires('glad v2.0.8', {configs = {
+    api = 'gl:core=4.6,wgl=1.0',
     extensions = 'WGL_ARB_create_context,WGL_ARB_create_context_profile,WGL_EXT_swap_control'
   }})
 

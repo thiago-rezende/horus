@@ -1,0 +1,30 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..5e45fdf
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,24 @@
++cmake_minimum_required(VERSION 3.10)
++
++project(glad C)
++
++add_subdirectory("cmake")
++
++glad_add_library(glad STATIC REPRODUCIBLE LOADER API ${GLAD_API} EXTENSIONS ${GLAD_EXTENSIONS})
++
++target_include_directories(glad PUBLIC
++    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gladsources/glad/include>
++    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
++)
++
++include(GNUInstallDirs)
++
++install(TARGETS glad
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++)
++
++install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/gladsources/glad/include/"
++    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
++)
