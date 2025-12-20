@@ -40,27 +40,21 @@ horus_sources = [
   'source/renderer/renderer.c',
 ]
 
-horus_renderer_vulkan_sources = [
-  # horus renderer layer [ vulkan ]
-  'source/renderer/vulkan/debug.c',
-  'source/renderer/vulkan/image.c',
-  'source/renderer/vulkan/device.c',
-  'source/renderer/vulkan/loader.c',
-  'source/renderer/vulkan/shader.c',
-  'source/renderer/vulkan/command.c',
-  'source/renderer/vulkan/texture.c',
-  'source/renderer/vulkan/instance.c',
-  'source/renderer/vulkan/pipeline.c',
-  'source/renderer/vulkan/renderer.c',
-  'source/renderer/vulkan/swapchain.c',
-  'source/renderer/vulkan/descriptors.c',
-  'source/renderer/vulkan/synchronization.c',
+horus_renderer_opengl_sources = [
+  # horus renderer layer [ opengl ]
+  'source/renderer/opengl/shader.c',
+  'source/renderer/opengl/texture.c',
+  'source/renderer/opengl/pipeline.c',
+  'source/renderer/opengl/renderer.c',
 
-  # horus renderer buffers layer [ vulkan ]
-  'source/renderer/vulkan/buffers/index.c',
-  'source/renderer/vulkan/buffers/vertex.c',
-  'source/renderer/vulkan/buffers/uniform.c',
-  'source/renderer/vulkan/buffers/instance.c',
+  # horus renderer loader layer [ opengl ]
+  'source/renderer/opengl/glad/gl.c',
+
+  # horus renderer buffers layer [ opengl ]
+  'source/renderer/opengl/buffers/index.c',
+  'source/renderer/opengl/buffers/vertex.c',
+  'source/renderer/opengl/buffers/uniform.c',
+  'source/renderer/opengl/buffers/instance.c',
 ]
 
 # horus source files [ linux ]
@@ -77,11 +71,14 @@ if host_machine.system() == 'linux'
     'source/platform/linux/input/mouse.c',
     'source/platform/linux/input/keyboard.c',
 
-    # horus renderer layer [ vulkan ]
-    'source/renderer/vulkan/linux/platform.c',
+    # horus renderer layer [ opengl ]
+    'source/renderer/opengl/linux/platform.c',
+
+    # horus renderer loader layer [ opengl ]
+    'source/renderer/opengl/glad/egl.c',
   ]
 
-  horus_sources += horus_renderer_vulkan_sources
+  horus_sources += horus_renderer_opengl_sources
 endif
 
 # horus source files [ windows ]
@@ -98,11 +95,14 @@ if host_machine.system() == 'windows'
     'source/platform/windows/input/mouse.c',
     'source/platform/windows/input/keyboard.c',
 
-    # horus renderer layer [ vulkan ]
-    'source/renderer/vulkan/windows/platform.c',
+    # horus renderer layer [ opengl ]
+    'source/renderer/opengl/windows/platform.c',
+
+    # horus renderer loader layer [ opengl ]
+    'source/renderer/opengl/glad/wgl.c',
   ]
 
-  horus_sources += horus_renderer_vulkan_sources
+  horus_sources += horus_renderer_opengl_sources
 endif
 
 # horus include directories
@@ -128,7 +128,7 @@ if host_machine.system() == 'linux'
   xcb_keysyms_dep = dependency('xcb-keysyms')
 
   # horus renderer dependencies [ linux ]
-  vulkan_dep = dependency('vulkan')
+  opengl_dep = dependency('gl')
 
   # horus renderer textures dependencies [ linux ]
   ktx_dep = cc.find_library('ktx', required: true)
@@ -143,7 +143,7 @@ if host_machine.system() == 'linux'
     xcb_keysyms_dep,
 
     # horus renderer dependencies [ linux ]
-    vulkan_dep,
+    opengl_dep,
 
     # horus renderer textures dependencies [ linux ]
     ktx_dep,
@@ -159,7 +159,7 @@ if host_machine.system() == 'windows'
   uxtheme_dep = cc.find_library('uxtheme', required: true)
 
   # horus renderer dependencies [ windows ]
-  vulkan_dep = dependency('vulkan')
+  opengl_dep = dependency('gl')
 
   # horus renderer textures dependencies [ windows ]
   ktx_dep = cc.find_library('ktx', required: true)
@@ -170,7 +170,7 @@ if host_machine.system() == 'windows'
     uxtheme_dep,
 
     # horus renderer dependencies [ windows ]
-    vulkan_dep,
+    opengl_dep,
 
     # horus renderer textures dependencies [ windows ]
     ktx_dep,

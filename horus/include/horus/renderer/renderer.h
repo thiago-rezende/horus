@@ -11,7 +11,7 @@
 
 typedef enum __renderer_implementation {
   RENDERER_IMPLEMENTATION_NONE = 0,
-  RENDERER_IMPLEMENTATION_VULKAN,
+  RENDERER_IMPLEMENTATION_OPENGL,
   RENDERER_IMPLEMENTATION_COUNT
 } renderer_implementation_t;
 

@@ -77,28 +77,22 @@ horus_headers = [
 
 ]
 
-horus_renderer_vulkan_headers = [
-  # horus renderer layer [ vulkan ]
-  'horus/renderer/vulkan/debug.h',
-  'horus/renderer/vulkan/image.h',
-  'horus/renderer/vulkan/device.h',
-  'horus/renderer/vulkan/loader.h',
-  'horus/renderer/vulkan/shader.h',
-  'horus/renderer/vulkan/command.h',
-  'horus/renderer/vulkan/texture.h',
-  'horus/renderer/vulkan/instance.h',
-  'horus/renderer/vulkan/renderer.h',
-  'horus/renderer/vulkan/pipeline.h',
-  'horus/renderer/vulkan/platform.h',
-  'horus/renderer/vulkan/swapchain.h',
-  'horus/renderer/vulkan/descriptors.h',
-  'horus/renderer/vulkan/synchronization.h',
+horus_renderer_opengl_headers = [
+  # horus renderer layer [ opengl ]
+  'horus/renderer/opengl/shader.h',
+  'horus/renderer/opengl/texture.h',
+  'horus/renderer/opengl/renderer.h',
+  'horus/renderer/opengl/pipeline.h',
+  'horus/renderer/opengl/platform.h',
 
-  # horus renderer buffers layer [ vulkan ]
-  'horus/renderer/vulkan/buffers/index.h',
-  'horus/renderer/vulkan/buffers/vertex.h',
-  'horus/renderer/vulkan/buffers/uniform.h',
-  'horus/renderer/vulkan/buffers/instance.h',
+  # horus renderer loader layer [ opengl ]
+  'horus/renderer/opengl/glad/gl.h',
+
+  # horus renderer buffers layer [ opengl ]
+  'horus/renderer/opengl/buffers/index.h',
+  'horus/renderer/opengl/buffers/vertex.h',
+  'horus/renderer/opengl/buffers/uniform.h',
+  'horus/renderer/opengl/buffers/instance.h',
 ]
 
 # horus header files [ linux ]
@@ -111,9 +105,12 @@ if host_machine.system() == 'linux'
     # horus input layer [ linux ]
     'horus/platform/linux/input/mouse.h',
     'horus/platform/linux/input/keyboard.h',
+
+    # horus renderer loader layer [ opengl ]
+    'horus/renderer/opengl/glad/egl.h',
   ]
 
-  horus_headers += horus_renderer_vulkan_headers
+  horus_headers += horus_renderer_opengl_headers
 endif
 
 # horus header files [ windows ]
@@ -127,9 +124,12 @@ if host_machine.system() == 'windows'
     # horus input layer [ windows ]
     'horus/platform/windows/input/mouse.h',
     'horus/platform/windows/input/keyboard.h',
+
+    # horus renderer loader layer [ opengl ]
+    'horus/renderer/opengl/glad/wgl.h',
   ]
 
-  horus_headers += horus_renderer_vulkan_headers
+  horus_headers += horus_renderer_opengl_headers
 endif
 
 # horus headers installation
