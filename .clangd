@@ -1,2 +1,2 @@
 CompileFlags:
-  CompilationDatabase: .vscode
+  CompilationDatabase: build

@@ -1,10 +1,12 @@
-# xmake
-.xmake
-
-# build
+# Meson
 build
+builddir
 
-# editor
+subprojects/*
+!subprojects/*.wrap
+!subprojects/.wraplock
+
+# VS Code
 .vscode/*
 !.vscode/c_cpp_properties.json
 !.vscode/settings.json

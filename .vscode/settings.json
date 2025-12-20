@@ -6,8 +6,11 @@
   "editor.formatOnSave": true,
   /* clangd settings */
   "clangd.arguments": [
-    "--compile-commands-dir=.vscode",
+    "--compile-commands-dir=build",
   ],
-  /* xmake settings */
-  "xmake.debugConfigType": "codelldb",
+  /* meson settings */
+  "mesonbuild.buildFolder": "build",
+  "mesonbuild.configureOptions": [
+    "--buildtype=debug",
+  ],
 }

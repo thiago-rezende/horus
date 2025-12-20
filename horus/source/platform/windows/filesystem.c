@@ -23,7 +23,7 @@ platform_file_t *platform_file_open(char *path) {
   if (file->handle == NULL) {
     char buffer[FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE] = {0};
 
-    (void)strerror_s(buffer, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE, error);
+    strerror_s(buffer, error, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE);
 
     logger_critical_format("<path:%s> <code:%d> file opening failed", path, error);
     logger_critical_format("|- [ error ] %s", buffer);
@@ -37,7 +37,7 @@ platform_file_t *platform_file_open(char *path) {
 }
 
 b8 platform_file_close(platform_file_t *file) {
-  (void)fclose(file->handle);
+  fclose(file->handle);
 
   platform_memory_deallocate(file);
 
@@ -48,7 +48,7 @@ u64 platform_file_size(platform_file_t *file) {
   if (fseek(file->handle, 0, SEEK_END) != 0) {
     char buffer[FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE] = {0};
 
-    (void)strerror_s(buffer, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE, errno);
+    strerror_s(buffer, errno, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE);
 
     logger_critical_format("<file:%p> <handle:%p> <code:%d> file seeking failed", file, file->handle, errno);
     logger_critical_format("|- [ error ] %s", buffer);
@@ -61,7 +61,7 @@ u64 platform_file_size(platform_file_t *file) {
   if (size_in_bytes == -1L && errno != 0) {
     char buffer[FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE] = {0};
 
-    (void)strerror_s(buffer, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE, errno);
+    strerror_s(buffer, errno, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE);
 
     logger_critical_format("<file:%p> <handle:%p> <code:%d> file size retrieval failed", file, file->handle, errno);
     logger_critical_format("|- [ error ] %s", buffer);
@@ -72,7 +72,7 @@ u64 platform_file_size(platform_file_t *file) {
   if (fseek(file->handle, 0, SEEK_SET) != 0) {
     char buffer[FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE] = {0};
 
-    (void)strerror_s(buffer, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE, errno);
+    strerror_s(buffer, errno, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE);
 
     logger_critical_format("<file:%p> <handle:%p> <code:%d> file seeking failed", file, file->handle, errno);
     logger_critical_format("|- [ error ] %s", buffer);
@@ -89,7 +89,7 @@ u64 platform_file_read(platform_file_t *file, u8 *buffer, u64 size) {
   if (bytes_read != size) {
     char buffer[FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE] = {0};
 
-    (void)strerror_s(buffer, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE, errno);
+    strerror_s(buffer, errno, FILESYSTEM_ERROR_MESSAGE_BUFFER_SIZE);
 
     logger_critical_format("<file:%p> <handle:%p> <code:%d> file reading failed", file, file->handle, errno);
     logger_critical_format("|- [ error ] %s", buffer);

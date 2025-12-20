@@ -1,0 +1,72 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Meson | Setup",
+      "type": "shell",
+      "command": "meson",
+      "linux": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--native-file",
+          "meson/linux.txt",
+          "--reconfigure"
+        ],
+      },
+      "windows": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--native-file",
+          "meson/windows.txt",
+          "--reconfigure"
+        ],
+      }
+    },
+    {
+      "label": "Meson | Reconfigure",
+      "type": "shell",
+      "command": "meson",
+      "linux": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--reconfigure",
+          "--native-file",
+          "meson/linux.txt",
+        ],
+      },
+      "windows": {
+        "args": [
+          "setup",
+          "build",
+          "--buildtype",
+          "debug",
+          "--reconfigure",
+          "--native-file",
+          "meson/windows.txt",
+        ],
+      }
+    },
+    {
+      "label": "Meson | Build",
+      "type": "shell",
+      "command": "meson",
+      "args": [
+        "compile",
+        "-C",
+        "build",
+      ],
+      "dependsOn": [
+        "Meson | Setup",
+      ],
+    }
+  ]
+}

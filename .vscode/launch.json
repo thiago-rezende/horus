@@ -2,20 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Sandbox | Windows x64",
+      "name": "Sandbox",
       "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/windows/x64/debug/sandbox.exe",
+      "program": "${workspaceFolder}/build/sandbox/sandbox",
       "args": [],
-      "cwd": "${workspaceFolder}/build/windows/x64/debug",
-    },
-    {
-      "name": "Sandbox | Linux x64",
-      "type": "lldb",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/linux/x86_64/debug/sandbox",
-      "args": [],
-      "cwd": "${workspaceFolder}/build/linux/x86_64/debug",
+      "cwd": "${workspaceFolder}",
     },
   ]
 }

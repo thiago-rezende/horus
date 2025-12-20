@@ -2,34 +2,36 @@ name: Linux
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
     paths:
       # files to watch
-      - "xmake.lua"
+      - 'meson.build'
+      - 'meson_options.txt'
       # directories to watch
-      - "horus/**"
-      - "tests/**"
-      - "sandbox/**"
-      - "subprojects/**"
+      - 'horus/**'
+      - 'tests/**'
+      - 'sandbox/**'
+      - 'subprojects/**'
       # directories to ignore
-      - "!horus/source/platform/windows/**"
-      - "!horus/source/renderer/vulkan/windows/**"
-      - "!horus/include/horus/platform/windows/**"
+      - '!horus/source/platform/windows/**'
+      - '!horus/source/renderer/vulkan/windows/**'
+      - '!horus/include/horus/platform/windows/**'
 
   pull_request:
-    branches: ["main"]
+    branches: ['main']
     paths:
       # files to watch
-      - "xmake.lua"
+      - 'meson.build'
+      - 'meson_options.txt'
       # directories to watch
-      - "horus/**"
-      - "tests/**"
-      - "sandbox/**"
-      - "subprojects/**"
+      - 'horus/**'
+      - 'tests/**'
+      - 'sandbox/**'
+      - 'subprojects/**'
       # directories to ignore
-      - "!horus/source/platform/windows/**"
-      - "!horus/source/renderer/vulkan/windows/**"
-      - "!horus/include/horus/platform/windows/**"
+      - '!horus/source/platform/windows/**'
+      - '!horus/source/renderer/vulkan/windows/**'
+      - '!horus/include/horus/platform/windows/**'
 
 jobs:
   build:
@@ -39,32 +41,38 @@ jobs:
       - name: Setup Repository
         uses: actions/checkout@v3
 
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
       - name: Setup System Dependencies
         run: |
-          sudo apt install curl libxcb1-dev libxcb-xkb-dev libxcb-keysyms1-dev
+          sudo apt install curl libxcb1-dev libxcb-xkb-dev libxcb-keysyms1-dev libvulkan-dev vulkan-validationlayers
+          curl -LO https://github.com/KhronosGroup/KTX-Software/releases/download/v4.4.2/KTX-Software-4.4.2-Linux-x86_64.deb
+          sudo dpkg -i KTX-Software-4.4.2-Linux-x86_64.deb
 
-      - name: Setup Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@v1.2.1
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          vulkan-query-version: 1.4.328.1
-          vulkan-components: Vulkan-Headers, Vulkan-Loader
-          vulkan-use-cache: true
+          python-version: '3.10'
 
-      - name: Setup XMake
-        uses: xmake-io/github-action-setup-xmake@v1
-        with:
-          xmake-version: "3.0.0"
-          actions-cache-key: ${{ runner.os }}-xmake
-          package-cache: true
-          package-cache-key: ${{ runner.os }}-packages
-          build-cache: true
-          build-cache-key: ${{ runner.os }}-build-${{ hashFiles('**/xmake.lua') }}
+      - name: Setup Meson
+        run: pip install meson ninja
 
       - name: Setup Project
-        run: xmake config --toolchain=clang --mode=release --plat=linux -y
+        run: meson setup build --reconfigure
+        env:
+          CC: clang
 
       - name: Compile Project
-        run: xmake build horus
+        run: meson compile -C build
 
   test:
     needs: build
@@ -75,29 +83,119 @@ jobs:
       - name: Setup Repository
         uses: actions/checkout@v3
 
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
       - name: Setup System Dependencies
         run: |
-          sudo apt install curl libxcb1-dev libxcb-xkb-dev libxcb-keysyms1-dev
+          sudo apt install curl libxcb1-dev libxcb-xkb-dev libxcb-keysyms1-dev libvulkan-dev vulkan-validationlayers
+          curl -LO https://github.com/KhronosGroup/KTX-Software/releases/download/v4.4.2/KTX-Software-4.4.2-Linux-x86_64.deb
+          sudo dpkg -i KTX-Software-4.4.2-Linux-x86_64.deb
 
-      - name: Setup Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@v1.2.1
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          vulkan-query-version: 1.4.328.1
-          vulkan-components: Vulkan-Headers, Vulkan-Loader
-          vulkan-use-cache: true
+          python-version: '3.10'
 
-      - name: Setup XMake
-        uses: xmake-io/github-action-setup-xmake@v1
-        with:
-          xmake-version: "3.0.0"
-          actions-cache-key: ${{ runner.os }}-xmake
-          package-cache: true
-          package-cache-key: ${{ runner.os }}-packages
-          build-cache: true
-          build-cache-key: ${{ runner.os }}-build-${{ hashFiles('**/xmake.lua') }}
+      - name: Setup Meson
+        run: pip install meson ninja
 
       - name: Setup Project
-        run: xmake config --toolchain=clang --mode=release --plat=linux -y
+        run: meson setup build --reconfigure
+        env:
+          CC: clang
 
       - name: Execute Tests
-        run: xmake test
+        run: meson test -C build -v
+
+  analysis:
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - name: Setup System Dependencies
+        run: |
+          sudo apt install curl libxcb1-dev libxcb-xkb-dev libxcb-keysyms1-dev libvulkan-dev vulkan-validationlayers
+          curl -LO https://github.com/KhronosGroup/KTX-Software/releases/download/v4.4.2/KTX-Software-4.4.2-Linux-x86_64.deb
+          sudo dpkg -i KTX-Software-4.4.2-Linux-x86_64.deb
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Meson
+        run: pip install meson ninja
+
+      - name: Setup Project
+        run: meson setup build --reconfigure
+        env:
+          CC: clang
+
+      - name: Code Analysis
+        run: ninja -C build scan-build
+
+  lint:
+    needs: analysis
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Repository
+        uses: actions/checkout@v3
+
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build-directory
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+            ${{ runner.os }}-
+
+      - name: Setup System Dependencies
+        run: |
+          sudo apt install curl libxcb1-dev libxcb-xkb-dev libxcb-keysyms1-dev libvulkan-dev vulkan-validationlayers
+          curl -LO https://github.com/KhronosGroup/KTX-Software/releases/download/v4.4.2/KTX-Software-4.4.2-Linux-x86_64.deb
+          sudo dpkg -i KTX-Software-4.4.2-Linux-x86_64.deb
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Meson
+        run: pip install meson ninja
+
+      - name: Setup Project
+        run: meson setup build --reconfigure
+        env:
+          CC: clang
+
+      - name: Lint Check
+        run: ninja -C build clang-format-check
