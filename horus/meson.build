@@ -42,6 +42,7 @@ horus_sources = [
 
 horus_renderer_opengl_sources = [
   # horus renderer layer [ opengl ]
+  'source/renderer/opengl/debug.c',
   'source/renderer/opengl/shader.c',
   'source/renderer/opengl/texture.c',
   'source/renderer/opengl/pipeline.c',

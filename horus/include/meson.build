@@ -79,6 +79,7 @@ horus_headers = [
 
 horus_renderer_opengl_headers = [
   # horus renderer layer [ opengl ]
+  'horus/renderer/opengl/debug.h',
   'horus/renderer/opengl/shader.h',
   'horus/renderer/opengl/texture.h',
   'horus/renderer/opengl/renderer.h',

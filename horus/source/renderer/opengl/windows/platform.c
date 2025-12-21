@@ -10,6 +10,7 @@
 #include <horus/platform/windows/windows.h>
 
 /* horus renderer layer [ opengl ] */
+#include <horus/renderer/opengl/debug.h>
 #include <horus/renderer/opengl/renderer.h>
 #include <horus/renderer/opengl/platform.h>
 
@@ -111,7 +112,7 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
     return false;
   }
 
-  /* TODO: setup debug message callback */
+  glDebugMessageCallback(renderer_opengl_debug_callback, renderer);
 
   glEnable(GL_DEPTH_TEST);
 
