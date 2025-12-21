@@ -134,7 +134,7 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
     EGL_CONTEXT_MAJOR_VERSION, 4,
     EGL_CONTEXT_MINOR_VERSION, 6,
     EGL_CONTEXT_OPENGL_PROFILE_MASK, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
-    EGL_CONTEXT_OPENGL_DEBUG, EGL_TRUE, /* TODO: disable on release builds */
+    EGL_CONTEXT_OPENGL_DEBUG, EGL_TRUE,
     EGL_NONE
   };
   /* clang-format on */
