@@ -4,6 +4,23 @@
     120
   ],
   "editor.formatOnSave": true,
+  /* editor terminal settings */
+  "terminal.integrated.profiles.windows": {
+    "CLANG64": {
+      "path": "C:\\msys64\\usr\\bin\\bash.exe",
+      "args": [
+        "--login",
+        "-i"
+      ],
+      "env": {
+        "MSYSTEM": "CLANG64",
+        "CHERE_INVOKING": "1",
+        "MSYS2_PATH_TYPE": "inherit"
+      },
+      "icon": "terminal-bash"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "CLANG64",
   /* clangd settings */
   "clangd.arguments": [
     "--compile-commands-dir=build",
