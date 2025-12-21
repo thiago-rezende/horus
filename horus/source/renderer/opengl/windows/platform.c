@@ -68,11 +68,9 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
   }
   /* clang-format on */
 
-  if (SetPixelFormat(device_context_handle, wgl_pixel_format, NULL) == FALSE) {
-    DWORD error = GetLastError();
-
-    logger_critical_format("<renderer:%p> <window:%p> <format:%d> <error:%d> SetPixelFormat failed", renderer, window,
-                           wgl_pixel_format, error);
+  if (!SetPixelFormat(device_context_handle, wgl_pixel_format, NULL)) {
+    logger_critical_format("<renderer:%p> <window:%p> <format:%d> SetPixelFormat failed", renderer, window,
+                           wgl_pixel_format);
 
     ReleaseDC(window_context->window, device_context_handle);
 
@@ -183,7 +181,16 @@ b8 __renderer_opengl_create_placeholder_context_and_load_wgl(renderer_t *rendere
   int placeholder_pixel_format =
       ChoosePixelFormat(placeholder_device_context_handle, &placeholder_pixel_format_descriptor);
 
-  SetPixelFormat(placeholder_device_context_handle, placeholder_pixel_format, &placeholder_pixel_format_descriptor);
+  /* clang-format off */
+  if (!SetPixelFormat(placeholder_device_context_handle, placeholder_pixel_format, &placeholder_pixel_format_descriptor)) {
+    logger_critical_format("<renderer:%p> <placeholder_window:%p> <format:%d> SetPixelFormat failed", renderer,
+                           placeholder_window, placeholder_pixel_format);
+
+    ReleaseDC(window_context->window, device_context_handle);
+
+    return false;
+  }
+  /* clang-format no */
 
   HGLRC placeholder_context = wglCreateContext(placeholder_device_context_handle);
 
@@ -193,6 +200,8 @@ b8 __renderer_opengl_create_placeholder_context_and_load_wgl(renderer_t *rendere
     logger_critical_format("<renderer:%p> <window:%p> gladLoaderLoadWGL failed", renderer);
 
     ReleaseDC(placeholder_window, placeholder_device_context_handle);
+
+    DestroyWindow(placeholder_window);
 
     return false;
   }
