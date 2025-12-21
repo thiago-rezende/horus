@@ -17,83 +17,61 @@
 #include <horus/renderer/opengl/glad/gl.h>
 #include <horus/renderer/opengl/glad/wgl.h>
 
+b8 __renderer_opengl_create_placeholder_context_and_load_wgl(renderer_t *renderer);
+
 struct __platform_renderer_context {
   HDC device_context_handle;
 
   HGLRC opengl_rendering_context_handle;
-  HGLRC opengl_rendering_context_handle_modern;
 };
 
 /* TODO: imporve for multiple windows support */
 b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *window) {
+  if (!__renderer_opengl_create_placeholder_context_and_load_wgl(renderer)) {
+    return false;
+  }
+
   platform_window_context_t *window_context = platform_window_context(window);
 
   HDC device_context_handle = GetDC(window_context->window);
 
-  PIXELFORMATDESCRIPTOR pixel_format_descriptor = {
-      .nSize = sizeof(PIXELFORMATDESCRIPTOR),
-      .nVersion = 1,
-      .dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-      .iPixelType = PFD_TYPE_RGBA,
-      .cColorBits = 32,
-      .cRedBits = 8,
-      .cRedShift = 0,
-      .cGreenBits = 8,
-      .cGreenShift = 0,
-      .cBlueBits = 8,
-      .cBlueShift = 0,
-      .cAlphaBits = 8,
-      .cAlphaShift = 0,
-      .cAccumBits = 0,
-      .cAccumRedBits = 0,
-      .cAccumGreenBits = 0,
-      .cAccumBlueBits = 0,
-      .cAccumAlphaBits = 0,
-      .cDepthBits = 24,
-      .cStencilBits = 8,
-      .cAuxBuffers = 0,
-      .iLayerType = PFD_MAIN_PLANE,
-      .bReserved = 0,
-      .dwLayerMask = 0,
-      .dwVisibleMask = 0,
-      .dwDamageMask = 0,
+  /* clang-format off */
+  int wgl_pixel_format_attributes[] = {
+    WGL_DRAW_TO_WINDOW_ARB,    GL_TRUE,
+    WGL_SUPPORT_OPENGL_ARB,    GL_TRUE,
+    WGL_DOUBLE_BUFFER_ARB,     GL_TRUE,
+    /* multisample                      */
+    /* WGL_SAMPLE_BUFFERS_ARB, GL_TRUE, */
+    /* WGL_SAMPLES_ARB,        4,       */
+    WGL_ACCELERATION_ARB,      WGL_FULL_ACCELERATION_ARB,
+    WGL_PIXEL_TYPE_ARB,        WGL_TYPE_RGBA_ARB,
+    WGL_COLOR_BITS_ARB,        32,
+    WGL_RED_BITS_ARB,          8,
+    WGL_GREEN_BITS_ARB,        8,
+    WGL_BLUE_BITS_ARB,         8,
+    WGL_DEPTH_BITS_ARB,        24,
+    WGL_STENCIL_BITS_ARB,      8,
+    0,
   };
+  /* clang-format on */
 
-  int pixel_format = ChoosePixelFormat(device_context_handle, &pixel_format_descriptor);
+  int wgl_pixel_format = 0;
 
-  if (pixel_format == 0) {
-    logger_critical_format("<renderer:%p> <window:%p> ChoosePixelFormat failed", renderer, window);
+  unsigned int wgl_pixel_format_count = 0;
 
-    ReleaseDC(window_context->window, device_context_handle);
-
-    return false;
-  }
-
-  if (SetPixelFormat(device_context_handle, pixel_format, &pixel_format_descriptor) == FALSE) {
-    logger_critical_format("<renderer:%p> <window:%p> <format:%d> SetPixelFormat failed", renderer, window,
-                           pixel_format);
+  /* clang-format off */
+  if (!wglChoosePixelFormatARB(device_context_handle, wgl_pixel_format_attributes, NULL, 1, &wgl_pixel_format, &wgl_pixel_format_count) || wgl_pixel_format_count != 1) {
+    logger_critical_format("<renderer:%p> <window:%p> wglChoosePixelFormatARB failed", renderer, window);
 
     ReleaseDC(window_context->window, device_context_handle);
-
-    return false;
   }
+  /* clang-format on */
 
-  HGLRC opengl_rendering_context_handle = wglCreateContext(device_context_handle);
+  if (SetPixelFormat(device_context_handle, wgl_pixel_format, NULL) == FALSE) {
+    DWORD error = GetLastError();
 
-  if (opengl_rendering_context_handle == NULL) {
-    logger_critical_format("<renderer:%p> <window:%p> wglCreateContext failed", renderer, window);
-
-    ReleaseDC(window_context->window, device_context_handle);
-
-    return false;
-  }
-
-  wglMakeCurrent(device_context_handle, opengl_rendering_context_handle);
-
-  if (!gladLoaderLoadWGL(device_context_handle)) {
-    logger_critical_format("<renderer:%p> <window:%p> gladLoaderLoadWGL failed", renderer, window);
-
-    wglDeleteContext(opengl_rendering_context_handle);
+    logger_critical_format("<renderer:%p> <window:%p> <format:%d> <error:%d> SetPixelFormat failed", renderer, window,
+                           wgl_pixel_format, error);
 
     ReleaseDC(window_context->window, device_context_handle);
 
@@ -108,12 +86,12 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
     WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | WGL_CONTEXT_DEBUG_BIT_ARB,
     0,
   };
-  /* clang-format off */
+  /* clang-format on */
 
-  HGLRC opengl_rendering_context_handle_modern =
+  HGLRC opengl_rendering_context_handle =
       wglCreateContextAttribsARB(device_context_handle, 0, opengl_context_attrubutes);
 
-  if (opengl_rendering_context_handle_modern == NULL) {
+  if (opengl_rendering_context_handle == NULL) {
     logger_critical_format("<renderer:%p> <window:%p> wglCreateContext failed", renderer, window);
 
     ReleaseDC(window_context->window, device_context_handle);
@@ -121,13 +99,12 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
     return false;
   }
 
-  wglMakeCurrent(device_context_handle, opengl_rendering_context_handle_modern);
+  wglMakeCurrent(device_context_handle, opengl_rendering_context_handle);
 
   if (!gladLoaderLoadGL()) {
     logger_critical_format("<renderer:%p> <window:%p> gladLoaderLoadGL failed", renderer, window);
 
     wglDeleteContext(opengl_rendering_context_handle);
-    wglDeleteContext(opengl_rendering_context_handle_modern);
 
     ReleaseDC(window_context->window, device_context_handle);
 
@@ -145,7 +122,6 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
   *renderer->context->platform_context = (platform_renderer_context_t){
       .device_context_handle = device_context_handle,
       .opengl_rendering_context_handle = opengl_rendering_context_handle,
-      .opengl_rendering_context_handle_modern = opengl_rendering_context_handle_modern,
   };
 
   return true;
@@ -158,12 +134,10 @@ b8 renderer_opengl_context_destroy(renderer_t *renderer) {
 
   platform_renderer_context_t *platform_renderer_context = renderer->context->platform_context;
 
-  /* TODO: investigate unresolved external symbol */
-  /* gladUnloadWGL(); */
-
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext(platform_renderer_context->opengl_rendering_context_handle);
-  wglDeleteContext(platform_renderer_context->opengl_rendering_context_handle_modern);
+
+  gladLoaderUnloadGL();
 
   ReleaseDC(window_context->window, platform_renderer_context->device_context_handle);
 
@@ -176,7 +150,7 @@ b8 renderer_opengl_context_make_current(renderer_t *renderer) {
   platform_renderer_context_t *platform_renderer_context = renderer->context->platform_context;
 
   wglMakeCurrent(platform_renderer_context->device_context_handle,
-                 platform_renderer_context->opengl_rendering_context_handle_modern);
+                 platform_renderer_context->opengl_rendering_context_handle);
 
   return true;
 }
@@ -184,6 +158,44 @@ b8 renderer_opengl_context_swap_buffers(renderer_t *renderer) {
   platform_renderer_context_t *platform_renderer_context = renderer->context->platform_context;
 
   SwapBuffers(platform_renderer_context->device_context_handle);
+
+  return true;
+}
+
+b8 __renderer_opengl_create_placeholder_context_and_load_wgl(renderer_t *renderer) {
+  HWND placeholder_window = CreateWindowExA(0, "horus_placeholder_window_class", "placeholder_window",
+                                            WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, GetModuleHandle(NULL), NULL);
+
+  HDC placeholder_device_context_handle = GetDC(placeholder_window);
+
+  PIXELFORMATDESCRIPTOR placeholder_pixel_format_descriptor = {
+      .nSize = sizeof(PIXELFORMATDESCRIPTOR),
+      .nVersion = 1,
+      .dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+      .iPixelType = PFD_TYPE_RGBA,
+      .cColorBits = 32,
+  };
+
+  int placeholder_pixel_format =
+      ChoosePixelFormat(placeholder_device_context_handle, &placeholder_pixel_format_descriptor);
+
+  SetPixelFormat(placeholder_device_context_handle, placeholder_pixel_format, &placeholder_pixel_format_descriptor);
+
+  HGLRC placeholder_context = wglCreateContext(placeholder_device_context_handle);
+
+  wglMakeCurrent(placeholder_device_context_handle, placeholder_context);
+
+  if (!gladLoaderLoadWGL(placeholder_device_context_handle)) {
+    logger_critical_format("<renderer:%p> <window:%p> gladLoaderLoadWGL failed", renderer);
+
+    ReleaseDC(placeholder_window, placeholder_device_context_handle);
+
+    return false;
+  }
+
+  ReleaseDC(placeholder_window, placeholder_device_context_handle);
+
+  DestroyWindow(placeholder_window);
 
   return true;
 }
