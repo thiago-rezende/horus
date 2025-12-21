@@ -186,7 +186,7 @@ b8 __renderer_opengl_create_placeholder_context_and_load_wgl(renderer_t *rendere
     logger_critical_format("<renderer:%p> <placeholder_window:%p> <format:%d> SetPixelFormat failed", renderer,
                            placeholder_window, placeholder_pixel_format);
 
-    ReleaseDC(window_context->window, device_context_handle);
+    ReleaseDC(placeholder_window, placeholder_device_context_handle);
 
     DestroyWindow(placeholder_window);
 
