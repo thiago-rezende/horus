@@ -188,6 +188,8 @@ b8 __renderer_opengl_create_placeholder_context_and_load_wgl(renderer_t *rendere
 
     ReleaseDC(window_context->window, device_context_handle);
 
+    DestroyWindow(placeholder_window);
+
     return false;
   }
   /* clang-format no */
