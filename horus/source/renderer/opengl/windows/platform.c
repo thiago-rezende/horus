@@ -1,6 +1,3 @@
-#include <horus/renderer/opengl/glad/gl.h>
-#include <horus/renderer/opengl/glad/wgl.h>
-
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
@@ -15,6 +12,10 @@
 /* horus renderer layer [ opengl ] */
 #include <horus/renderer/opengl/renderer.h>
 #include <horus/renderer/opengl/platform.h>
+
+/* horus renderer loader layer [ opengl ] */
+#include <horus/renderer/opengl/glad/gl.h>
+#include <horus/renderer/opengl/glad/wgl.h>
 
 struct __platform_renderer_context {
   HDC device_context_handle;
@@ -99,15 +100,15 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
     return false;
   }
 
-  int opengl_context_attrubutes[] = {WGL_CONTEXT_MAJOR_VERSION_ARB,
-                                     4,
-                                     WGL_CONTEXT_MINOR_VERSION_ARB,
-                                     6,
-                                     WGL_CONTEXT_PROFILE_MASK_ARB,
-                                     WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-                                     WGL_CONTEXT_FLAGS_ARB,
-                                     WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | WGL_CONTEXT_DEBUG_BIT_ARB,
-                                     0};
+  /* clang-format off */
+  int opengl_context_attrubutes[] = {
+    WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+    WGL_CONTEXT_MINOR_VERSION_ARB, 6,
+    WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+    WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | WGL_CONTEXT_DEBUG_BIT_ARB,
+    0,
+  };
+  /* clang-format off */
 
   HGLRC opengl_rendering_context_handle_modern =
       wglCreateContextAttribsARB(device_context_handle, 0, opengl_context_attrubutes);
@@ -132,6 +133,8 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
 
     return false;
   }
+
+  /* TODO: setup debug message callback */
 
   glEnable(GL_DEPTH_TEST);
 
