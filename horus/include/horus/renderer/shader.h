@@ -3,7 +3,9 @@
 /* horus renderer layer */
 #include <horus/renderer/renderer.h>
 
-#define SHADER_MODULE_MAXIMUM_STAGE_COUNT 3
+#define RENDERER_DEFAULT_SHADER_MODULE_VERTEX_STAGE_ENTRYPOINT "vertex_entrypoint"
+#define RENDERER_DEFAULT_SHADER_MODULE_COMPUTE_STAGE_ENTRYPOINT "compute_entrypoint"
+#define RENDERER_DEFAULT_SHADER_MODULE_FRAGMENT_STAGE_ENTRYPOINT "fragment_entrypoint"
 
 typedef u8 shader_stage_flags_t;
 
