@@ -6,4 +6,9 @@
 /* horus renderer buffers layer */
 #include <horus/renderer/buffers/index.h>
 
-struct __index_buffer {};
+/* horus renderer loader layer [ opengl ] */
+#include <horus/renderer/opengl/glad/gl.h>
+
+struct __index_buffer {
+  GLuint element_buffer;
+};
