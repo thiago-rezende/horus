@@ -14,6 +14,8 @@
 /* horus renderer loader layer [ opengl ] */
 #include <horus/renderer/opengl/glad/gl.h>
 
+GLuint global_vertex_array_object = 0;
+
 b8 renderer_context_create(renderer_t *renderer, renderer_context_create_info_t info, platform_window_t *window) {
   (void)info;   /* unused */
   (void)window; /* unused */
@@ -32,10 +34,15 @@ b8 renderer_context_create(renderer_t *renderer, renderer_context_create_info_t 
     return false;
   }
 
+  glGenVertexArrays(1, &global_vertex_array_object);
+  glBindVertexArray(global_vertex_array_object);
+
   return true;
 }
 
 b8 renderer_context_destroy(renderer_t *renderer) {
+  glDeleteVertexArrays(1, &global_vertex_array_object);
+
   if (!renderer_opengl_context_destroy(renderer)) {
     logger_critical_format("<renderer:%p> renderer_opengl_context_destroy failed", renderer);
 
@@ -77,18 +84,18 @@ b8 renderer_context_submit_commands(renderer_t *renderer) {
 
 /* TODO: improve for multiple window support */
 b8 renderer_context_draw(renderer_t *renderer, u32 vertices, u32 instances) {
-  (void)renderer;  /* unused */
-  (void)vertices;  /* unused */
-  (void)instances; /* unused */
+  (void)renderer; /* unused */
+
+  glDrawArraysInstanced(GL_TRIANGLES, 0, vertices, instances);
 
   return true;
 }
 
 /* TODO: improve for multiple window support */
 b8 renderer_context_draw_indexed(renderer_t *renderer, u32 indices, u32 instances) {
-  (void)indices;   /* unused */
-  (void)renderer;  /* unused */
-  (void)instances; /* unused */
+  (void)renderer; /* unused */
+
+  glDrawElementsInstanced(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0, instances);
 
   return true;
 }
