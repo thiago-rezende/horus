@@ -13,13 +13,13 @@
 #include <horus/renderer/opengl/glad/gl.h>
 
 struct __shader_module {
-  GLuint shader_program;
+  GLuint program;
 
-  GLuint vertex_shader;
-  GLuint compute_shader;
-  GLuint fragment_shader;
+  GLuint vertex;
+  GLuint compute;
+  GLuint fragment;
 
-  b8 has_vertex_shader;
-  b8 has_compute_shader;
-  b8 has_fragment_shader;
+  b8 has_vertex;
+  b8 has_compute;
+  b8 has_fragment;
 };

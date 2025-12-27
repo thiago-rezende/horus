@@ -182,6 +182,7 @@ shaders__spir_v() {
     -target $default_spir_v_target \
     -profile $default_spir_v_profile \
     -emit-spirv-directly \
+    -fvk-use-gl-layout \
     -fvk-use-entrypoint-name \
     -entry $default_vertex_shader_entrypoint \
     -entry $default_fragment_shader_entrypoint \
