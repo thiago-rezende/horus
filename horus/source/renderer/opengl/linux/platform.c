@@ -1,3 +1,5 @@
+#include <ktx.h>
+
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
@@ -184,6 +186,12 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
   glEnable(GL_DEPTH_TEST);
 
   eglSwapInterval(display, true);
+
+  ktx_error_code_e ktx_load_opengl_result = ktxLoadOpenGL((PFNGLGETPROCADDRESS)eglGetProcAddress);
+
+  if (ktx_load_opengl_result != KTX_SUCCESS) {
+    logger_warning_format("<ktx> <eglGetProcAddress:%p> OpenGL functions loading failed", eglGetProcAddress);
+  }
 
   renderer->context->platform_context = platform_memory_allocate(sizeof(platform_renderer_context_t));
 
