@@ -248,8 +248,9 @@ static void test_matrix4f32_perspective(void **state) {
 
   /* expected result */
   const f32 expected_x_scale = field_of_view_factor / aspect_ratio;
-  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility */
-  const f32 expected_y_scale = field_of_view_factor * -1.0f;
+  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility [ vulkan ] */
+  /* const f32 expected_y_scale = field_of_view_factor * -1.0f; */
+  const f32 expected_y_scale = field_of_view_factor;
   const f32 expected_z_scale = far_clip * near_minus_far_inverse;
   const f32 expected_z_offset = far_clip * near_clip * near_minus_far_inverse;
 
@@ -302,8 +303,9 @@ static void test_matrix4f32_orthographic(void **state) {
   f32 near_minus_far_inverse = 1.0f / (near_clip - far_clip);
 
   const f32 expected_x_scale = 2.0f * inverse_dx;
-  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility */
-  const f32 expected_y_scale = 2.0f * inverse_dy * -1.0f;
+  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility [ vulkan ] */
+  /* const f32 expected_y_scale = 2.0f * inverse_dy * -1.0f; */
+  const f32 expected_y_scale = 2.0f * inverse_dy;
   const f32 expected_x_translate = -(right + left) * inverse_dx;
   const f32 expected_y_translate = -(top + bottom) * inverse_dy;
   const f32 expected_z_scale = near_minus_far_inverse;
