@@ -130,8 +130,8 @@ matrix4f32_t matrix4f32_perspective(f32 aspect_ratio, f32 field_of_view, f32 nea
   result.column2 = (__v4f32){0.0f, 0.0f, z_scale, -1.0f};
   result.column3 = (__v4f32){0.0f, 0.0f, z_offset, 0.0f};
 
-  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility */
-  result.column1[1] *= -1.0f;
+  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility [ vulkan ] */
+  /* result.column1[1] *= -1.0f; */
 
   return result;
 }
@@ -158,8 +158,8 @@ matrix4f32_t matrix4f32_orthographic(f32 left, f32 right, f32 bottom, f32 top, f
   result.column2 = (__v4f32){0.0f, 0.0f, z_scale, 0.0f};
   result.column3 = (__v4f32){0.0f, 0.0f, z_translate, 1.0f};
 
-  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility */
-  result.column1[1] *= -1.0f;
+  /* Y-axis flip for Normalized Device Coordinates (NDC) compatibility [ vulkan ] */
+  /* result.column1[1] *= -1.0f; */
 
   return result;
 }
