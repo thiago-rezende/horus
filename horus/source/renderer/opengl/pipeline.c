@@ -32,7 +32,7 @@ b8 graphics_pipeline_destroy(graphics_pipeline_t *pipeline) {
 b8 graphics_pipeline_bind(graphics_pipeline_t *pipeline, renderer_t *renderer) {
   (void)renderer; /* unused */
 
-  glUseProgram(pipeline->module->shader_program);
+  glUseProgram(pipeline->module->program);
 
   return true;
 }
