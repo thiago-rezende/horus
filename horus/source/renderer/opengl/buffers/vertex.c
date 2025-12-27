@@ -38,6 +38,16 @@ vertex_buffer_t *vertex_buffer_create(renderer_t *renderer, vertex_t *vertices, 
     return NULL;
   }
 
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void *)offsetof(vertex_t, position));
+  glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex_t), (void *)offsetof(vertex_t, color));
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void *)offsetof(vertex_t, normal));
+  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void *)offsetof(vertex_t, coordinates));
+
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glEnableVertexAttribArray(3);
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   vertex_buffer_t *buffer = platform_memory_allocate(sizeof(vertex_buffer_t));
