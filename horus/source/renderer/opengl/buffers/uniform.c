@@ -30,7 +30,7 @@ uniform_buffer_t *uniform_buffer_create(renderer_t *renderer, uniform_buffer_obj
   glBindBuffer(GL_UNIFORM_BUFFER, uniform_buffer);
   glBindBufferBase(GL_UNIFORM_BUFFER, RENDERER_DEFAULT_UNIFORM_BUFFER_OBJECT_BINDING, uniform_buffer);
 
-  glBufferData(GL_UNIFORM_BUFFER, sizeof(uniform_buffer_object_t), NULL, GL_STATIC_DRAW);
+  glBufferData(GL_UNIFORM_BUFFER, sizeof(uniform_buffer_object_t), NULL, GL_DYNAMIC_DRAW);
 
   GLenum error = glGetError();
 

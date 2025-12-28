@@ -37,6 +37,11 @@ b8 renderer_context_create(renderer_t *renderer, renderer_context_create_info_t 
   glGenVertexArrays(1, &global_vertex_array_object);
   glBindVertexArray(global_vertex_array_object);
 
+  const GLubyte *opengl_renderer_string = glGetString(GL_RENDERER);
+  const GLubyte *opengl_version_string = glGetString(GL_VERSION);
+
+  logger_debug_format("<renderer:%p> %s - %s", renderer, opengl_renderer_string, opengl_version_string);
+
   return true;
 }
 
