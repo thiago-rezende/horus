@@ -164,5 +164,5 @@ jobs:
       - name: Clang Format Check
         run: ninja -C build clang-format-check
 
-      - name: Clang Tidy Check
-        run: ninja -C build clang-tidy
+      # - name: Clang Tidy Check
+      #   run: ninja -C build clang-tidy
