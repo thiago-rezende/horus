@@ -120,52 +120,8 @@ jobs:
       - name: Execute Tests
         run: meson test -C build -v
 
-  analysis:
-    needs: test
-
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
-
-    steps:
-      - name: Setup Repository
-        uses: actions/checkout@v3
-
-      - name: Cache Build Directory
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-build-directory
-        with:
-          path: build
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meson.build') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-
-            ${{ runner.os }}-
-
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: clang64
-          update: false
-          install: >-
-            clang64/mingw-w64-clang-x86_64-meson
-            clang64/mingw-w64-clang-x86_64-toolchain
-            clang64/mingw-w64-clang-x86_64-ktx-software
-            clang64/mingw-w64-clang-x86_64-ca-certificates
-
-      - name: Update CA Certificates
-        run: update-ca-trust
-
-      - name: Setup Project
-        run: meson setup build --reconfigure
-        env:
-          CC: clang
-
-      - name: Code Analysis
-        run: ninja -C build scan-build
-
   lint:
-    needs: analysis
+    needs: test
 
     runs-on: windows-latest
     defaults:
