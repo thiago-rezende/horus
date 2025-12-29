@@ -65,7 +65,7 @@ texture_context_t *texture_context_create(renderer_t *renderer, texture_role_t r
   glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   /* texture mipmap bias */
-  /* glTextureParameterf(texture, GL_TEXTURE_LOD_BIAS, -0.5f); */
+  glTextureParameterf(texture, GL_TEXTURE_LOD_BIAS, -0.5f);
 
   if (GLAD_GL_ARB_texture_filter_anisotropic) {
     GLfloat max_anisotropy = 0.0f;
