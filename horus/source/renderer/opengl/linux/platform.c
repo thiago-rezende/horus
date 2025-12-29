@@ -178,6 +178,8 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
     return false;
   }
 
+  glEnable(GL_FRAMEBUFFER_SRGB);
+
   glEnable(GL_DEBUG_OUTPUT);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
   glDebugMessageCallback(renderer_opengl_debug_callback, renderer);

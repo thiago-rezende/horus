@@ -12,12 +12,10 @@ const char *default_shader_module_path = "assets/shaders/build/default.spv";
 shader_module_t *default_shader_module = NULL;
 
 /* textures global variables */
-const char *checker_dark_texture_path = "assets/textures/build/checker-dark.ktx2";
-const char *checker_light_texture_path = "assets/textures/build/checker-light.ktx2";
+const char *checker_texture_path = "assets/textures/build/checker.ktx2";
 
 texture_t *current_texture = NULL;
-texture_t *checker_dark_texture = NULL;
-texture_t *checker_light_texture = NULL;
+texture_t *checker_texture = NULL;
 
 /* graphics pipelines global variables */
 graphics_pipeline_t *default_graphics_pipeline = NULL;
@@ -172,19 +170,13 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
                      default_shader_module_path);
 
   /* TODO: proper error handling */
-  checker_dark_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)checker_dark_texture_path);
+  checker_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)checker_texture_path);
 
-  logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_dark_texture,
-                     checker_dark_texture_path);
-
-  /* TODO: proper error handling */
-  checker_light_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)checker_light_texture_path);
-
-  logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_light_texture,
-                     checker_light_texture_path);
+  logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)checker_texture,
+                     checker_texture_path);
 
   /* ! default texture to be bound */
-  current_texture = checker_light_texture;
+  current_texture = checker_texture;
 
   /* TODO: proper error handling */
   default_graphics_pipeline = graphics_pipeline_create(renderer, default_shader_module);
@@ -254,13 +246,9 @@ b8 on_destroy(application_t *application, platform_window_t *window, renderer_t 
 
   logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)default_graphics_pipeline);
 
-  texture_destroy(checker_dark_texture);
+  texture_destroy(checker_texture);
 
-  logger_info_format("<renderer:%p> <texture:%p> destroyed", (void *)renderer, (void *)checker_dark_texture);
-
-  texture_destroy(checker_light_texture);
-
-  logger_info_format("<renderer:%p> <texture:%p> destroyed", (void *)renderer, (void *)checker_light_texture);
+  logger_info_format("<renderer:%p> <texture:%p> destroyed", (void *)renderer, (void *)checker_texture);
 
   shader_module_destroy(default_shader_module);
 
@@ -478,10 +466,6 @@ b8 on_update(f64 timestep) {
 
   if (input_keyboard_keycode_is_pressed(KEYBOARD_KEYCODE_Q)) {
     camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, camera_rotation_angle * timestep}});
-  }
-
-  if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_T)) {
-    current_texture = current_texture == checker_dark_texture ? checker_light_texture : checker_dark_texture;
   }
 
   cube_instance_rotation = quaternionf32_rotate_euler(

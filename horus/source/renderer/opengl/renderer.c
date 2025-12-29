@@ -74,7 +74,7 @@ b8 renderer_context_record_commands(renderer_t *renderer) {
 
   glViewport(0, 0, window_size.width, window_size.height);
 
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   return true;

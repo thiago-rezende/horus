@@ -44,7 +44,7 @@ ConstantBuffer<uniform_buffer_t> uniform_buffer_object : register(b0);
 StructuredBuffer<instance_buffer_t> instance_buffer_object : register(t1);
 
 /* albedo texture sampler */
-/* Sampler2D albedo_texture_sampler : register(t2) : register(s2); */
+Sampler2D albedo_texture_sampler : register(t2) : register(s2);
 
 /* vertex shader entrypoint */
 [shader("vertex")]
@@ -96,11 +96,10 @@ float4 fragment_entrypoint(vertex_output_t vertex) : SV_Target {
   float shading_factor = clamp(ambient_strength + diffuse_factor, 0.0, 1.0);
 
   /* albedo sampled color */
-  /* float4 albedo_sampled = albedo_texture_sampler.Sample(vertex.coordinates); */
+  float4 albedo_sampled = albedo_texture_sampler.Sample(vertex.coordinates);
 
   /* fragment color */
-  /* float4 color = vertex.color * albedo_sampled * shading_factor; */
-  float4 color = vertex.color * shading_factor;
+  float4 color = vertex.color * albedo_sampled * shading_factor;
 
   return color;
 }

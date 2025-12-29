@@ -7,6 +7,8 @@
 #include <horus/renderer/pipeline.h>
 #include <horus/renderer/renderer.h>
 
+#define RENDERER_DEFAULT_ALBEDO_TEXTURE_SAMPLER_BINDING 2
+
 /* TODO: implement texture types */
 
 typedef enum __texture_role {
