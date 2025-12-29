@@ -29,7 +29,7 @@ default_vertex_shader_entrypoint='vertex_entrypoint'
 default_fragment_shader_entrypoint='fragment_entrypoint'
 
 default_spir_v_target='spirv'
-default_spir_v_profile='spirv_1_4'
+default_spir_v_profile='spirv_1_3'
 
 # textures global variables
 default_ktx_format='R8G8B8A8_SRGB'
