@@ -23,8 +23,6 @@ typedef struct __material {
 
   array_t *textures;
 
-  shader_module_t *shader;
-
   graphics_pipeline_t *pipeline;
 } material_t;
 
