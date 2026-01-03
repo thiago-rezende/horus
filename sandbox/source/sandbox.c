@@ -7,17 +7,25 @@
 #define CUBE_INSTANCES_COUNT 2
 
 /* shader modules global variables */
+const char *unlit_shader_module_path = "assets/shaders/build/unlit.spv";
 const char *default_shader_module_path = "assets/shaders/build/default.spv";
 
+shader_module_t *unlit_shader_module = NULL;
 shader_module_t *default_shader_module = NULL;
 
 /* textures global variables */
+const char *white_texture_path = "assets/textures/build/default/white.ktx2";
 const char *checker_texture_path = "assets/textures/build/checker.ktx2";
 
 texture_t *current_texture = NULL;
+
+texture_t *white_texture = NULL;
 texture_t *checker_texture = NULL;
 
 /* graphics pipelines global variables */
+graphics_pipeline_t *current_graphics_pipeline = NULL;
+
+graphics_pipeline_t *unlit_graphics_pipeline = NULL;
 graphics_pipeline_t *default_graphics_pipeline = NULL;
 
 /* uniform buffer global variables */
@@ -163,11 +171,24 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
   (void)application; /* unused */
 
   /* TODO: proper error handling */
+  unlit_shader_module = shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT,
+                                                         (char *)unlit_shader_module_path);
+
+  logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)unlit_shader_module,
+                     unlit_shader_module_path);
+
+  /* TODO: proper error handling */
   default_shader_module = shader_module_create_from_binary(renderer, SHADER_STAGE_VERTEX | SHADER_STAGE_FRAGMENT,
                                                            (char *)default_shader_module_path);
 
   logger_info_format("<renderer:%p> <module:%p> <path:%s> created", (void *)renderer, (void *)default_shader_module,
                      default_shader_module_path);
+
+  /* TODO: proper error handling */
+  white_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)white_texture_path);
+
+  logger_info_format("<renderer:%p> <texture:%p> <path:%s> created", (void *)renderer, (void *)white_texture,
+                     white_texture_path);
 
   /* TODO: proper error handling */
   checker_texture = texture_create_from_binary(renderer, TEXTURE_ROLE_ALBEDO, (char *)checker_texture_path);
@@ -179,9 +200,16 @@ b8 on_create(application_t *application, platform_window_t *window, renderer_t *
   current_texture = checker_texture;
 
   /* TODO: proper error handling */
+  unlit_graphics_pipeline = graphics_pipeline_create(renderer, unlit_shader_module);
+
+  logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)unlit_graphics_pipeline);
+
+  /* TODO: proper error handling */
   default_graphics_pipeline = graphics_pipeline_create(renderer, default_shader_module);
 
   logger_info_format("<renderer:%p> <pipeline:%p> created", (void *)renderer, (void *)default_graphics_pipeline);
+
+  current_graphics_pipeline = default_graphics_pipeline;
 
   /* TODO: proper error handling */
   uniform_buffer = uniform_buffer_create(renderer, &uniform_buffer_object);
@@ -246,6 +274,14 @@ b8 on_destroy(application_t *application, platform_window_t *window, renderer_t 
 
   logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)default_graphics_pipeline);
 
+  graphics_pipeline_destroy(unlit_graphics_pipeline);
+
+  logger_info_format("<renderer:%p> <pipeline:%p> destroyed", (void *)renderer, (void *)unlit_graphics_pipeline);
+
+  texture_destroy(white_texture);
+
+  logger_info_format("<renderer:%p> <texture:%p> destroyed", (void *)renderer, (void *)white_texture);
+
   texture_destroy(checker_texture);
 
   logger_info_format("<renderer:%p> <texture:%p> destroyed", (void *)renderer, (void *)checker_texture);
@@ -253,6 +289,10 @@ b8 on_destroy(application_t *application, platform_window_t *window, renderer_t 
   shader_module_destroy(default_shader_module);
 
   logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)default_shader_module);
+
+  shader_module_destroy(unlit_shader_module);
+
+  logger_info_format("<renderer:%p> <module:%p> destroyed", (void *)renderer, (void *)unlit_shader_module);
 
   return true;
 }
@@ -468,6 +508,15 @@ b8 on_update(f64 timestep) {
     camera_rotate_euler(camera, (vector3f32_t){{0.0f, 0.0f, camera_rotation_angle * timestep}});
   }
 
+  if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_M)) {
+    current_graphics_pipeline =
+        current_graphics_pipeline == default_graphics_pipeline ? unlit_graphics_pipeline : default_graphics_pipeline;
+  }
+
+  if (input_keyboard_keycode_is_released(KEYBOARD_KEYCODE_T)) {
+    current_texture = current_texture == checker_texture ? white_texture : checker_texture;
+  }
+
   cube_instance_rotation = quaternionf32_rotate_euler(
       cube_instance_rotation, (vector3f32_t){{-1.0f * cube_rotation_angle * timestep, 0.0f, 0.0f}});
 
@@ -512,16 +561,16 @@ b8 on_render(renderer_t *renderer) {
   instance_buffer_update(cube_instance_buffer, cube_instance_buffer_objects, CUBE_INSTANCES_COUNT);
 
   /* graphics pipeline setup */
-  if (!graphics_pipeline_bind(default_graphics_pipeline, renderer)) {
-    logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, default_graphics_pipeline);
+  if (!graphics_pipeline_bind(current_graphics_pipeline, renderer)) {
+    logger_critical_format("<renderer:%p> <pipeline:%p> pipeline binding failed", renderer, current_graphics_pipeline);
 
     return false;
   }
 
   /* uniform buffer object setup */
-  if (!uniform_buffer_bind(uniform_buffer, default_graphics_pipeline, renderer)) {
+  if (!uniform_buffer_bind(uniform_buffer, current_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <uniform_buffer:%p> index buffer binding failed", renderer,
-                           default_graphics_pipeline, uniform_buffer);
+                           current_graphics_pipeline, uniform_buffer);
 
     return false;
   }
@@ -529,7 +578,7 @@ b8 on_render(renderer_t *renderer) {
   /* geometry indices setup */
   if (!index_buffer_bind(cube_index_buffer, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <index_buffer:%p> index buffer binding failed", renderer,
-                           default_graphics_pipeline, cube_index_buffer);
+                           current_graphics_pipeline, cube_index_buffer);
 
     return false;
   }
@@ -537,23 +586,23 @@ b8 on_render(renderer_t *renderer) {
   /* geometry vertices setup */
   if (!vertex_buffer_bind(cube_vertex_buffer, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <vertex_buffer:%p> vertex buffer binding failed", renderer,
-                           default_graphics_pipeline, cube_vertex_buffer);
+                           current_graphics_pipeline, cube_vertex_buffer);
 
     return false;
   }
 
   /* geometry instances setup */
-  if (!instance_buffer_bind(cube_instance_buffer, default_graphics_pipeline, renderer)) {
+  if (!instance_buffer_bind(cube_instance_buffer, current_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <instance_buffer:%p> instance buffer binding failed", renderer,
-                           default_graphics_pipeline, cube_instance_buffer);
+                           current_graphics_pipeline, cube_instance_buffer);
 
     return false;
   }
 
   /* textures setup */
-  if (!texture_bind(current_texture, default_graphics_pipeline, renderer)) {
+  if (!texture_bind(current_texture, current_graphics_pipeline, renderer)) {
     logger_critical_format("<renderer:%p> <pipeline:%p> <texture:%p> texture binding failed", renderer,
-                           default_graphics_pipeline, current_texture);
+                           current_graphics_pipeline, current_texture);
 
     return false;
   }
