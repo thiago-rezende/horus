@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+ - [493aa46] chore(sandbox): add default white texture loading and unlit shader loading for showcase (Thiago Rezende)
+ - [282c101] refactor(renderer): remove shader_module_t reference on material_t since the graphics_pipleline_t already have it (Thiago Rezende)
+ - [f2e2ffa] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [c7902e9] chore(renderer|opengl): update OpenGL device and version log level to info (Thiago Rezende)
  - [c4253ea] ci(windows): disable clang-tidy check for now since some header files are missing during the analysis (Thiago Rezende)
  - [fe12fde] ci(windows): remove analysis job from windows workflow for now since scan-build is not available on MSYS2 (Thiago Rezende)
