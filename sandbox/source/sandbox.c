@@ -129,6 +129,7 @@ f32 projection_field_of_view = 60.0f;
 
 application_t *application_create(void) {
   application_t *application = platform_memory_allocate(sizeof(application_t));
+
   platform_memory_clear(application, sizeof(application_t));
 
   application->name = "Sandbox Application";

@@ -23,7 +23,14 @@ struct __application {
 
   version_t version;
 
+  renderer_t *renderer;
+
   configuration_t configuration;
+
+  /* TODO: improve for multiple windows support */
+  platform_window_t *window;
+
+  b8 running;
 
   b8 (*on_create)(application_t *application, platform_window_t *window, renderer_t *renderer);
   b8 (*on_destroy)(application_t *application, platform_window_t *window, renderer_t *renderer);
