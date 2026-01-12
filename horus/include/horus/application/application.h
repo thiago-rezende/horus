@@ -40,6 +40,10 @@ struct __application {
   b8 (*on_update)(f64 timestep);
 };
 
+b8 application_run(application_t *application);
+b8 application_setup(application_t *application);
+b8 application_teardown(application_t *application);
+
 application_t *application_get_global_instance(void);
 
 b8 __application_set_global_instance(application_t *application);
