@@ -2,7 +2,7 @@
 
 application_t *__application = NULL;
 
-application_t *application(void) {
+application_t *application_get_global_instance(void) {
   return __application;
 }
 
