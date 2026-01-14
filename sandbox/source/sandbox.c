@@ -359,7 +359,7 @@ b8 on_event(event_t *event) {
 }
 
 b8 on_update(f64 timestep) {
-  platform_window_t *window = platform_window();
+  platform_window_t *window = platform_window_get_global_instance();
 
   if (platform_window_has_resized(window)) {
     platform_window_size_t size = platform_window_size(window);

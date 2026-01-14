@@ -142,7 +142,7 @@ b8 renderer_opengl_context_create(renderer_t *renderer, platform_window_t *windo
 
 /* TODO: imporve for multiple windows support */
 b8 renderer_opengl_context_destroy(renderer_t *renderer) {
-  platform_window_t *window = platform_window();
+  platform_window_t *window = platform_window_get_global_instance();
   platform_window_context_t *window_context = platform_window_context(window);
 
   platform_renderer_context_t *platform_renderer_context = renderer->context->platform_context;

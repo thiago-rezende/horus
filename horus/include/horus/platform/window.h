@@ -44,7 +44,7 @@ b8 platform_window_set_event_callback(platform_window_t *window, platform_window
 
 platform_window_context_t *platform_window_context(platform_window_t *window);
 
-platform_window_t *platform_window(void);
+platform_window_t *platform_window_get_global_instance(void);
 
 b8 __platform_window_set_global_instance(platform_window_t *window);
 

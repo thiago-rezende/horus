@@ -451,7 +451,7 @@ platform_window_context_t *platform_window_context(platform_window_t *window) {
   return &window->context;
 }
 
-platform_window_t *platform_window(void) {
+platform_window_t *platform_window_get_global_instance(void) {
   return __window;
 }
 

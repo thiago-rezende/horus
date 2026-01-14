@@ -62,7 +62,7 @@ b8 renderer_context_destroy(renderer_t *renderer) {
 /* TODO: improve for multiple windows support */
 b8 renderer_context_record_commands(renderer_t *renderer) {
   /* TODO: improve window retrieval for multiple windows support */
-  platform_window_t *window = platform_window();
+  platform_window_t *window = platform_window_get_global_instance();
   platform_window_size_t window_size = platform_window_size(window);
 
   if (window_size.width == 0 || window_size.height == 0) {
