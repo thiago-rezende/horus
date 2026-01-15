@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+ - [949e641] feat(application): add initial setup and teardown implementations (Thiago Rezende)
+ - [70b20e0] feat(application): add placeholders for setup run and teardown procedures (Thiago Rezende)
+ - [882510c] refactor(application): update global application instance retrieval function name (Thiago Rezende)
+ - [a808b69] feat(application): add running state variable with renderer and window reference pointers to application_t (Thiago Rezende)
+ - [85745da] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [493aa46] chore(sandbox): add default white texture loading and unlit shader loading for showcase (Thiago Rezende)
  - [282c101] refactor(renderer): remove shader_module_t reference on material_t since the graphics_pipleline_t already have it (Thiago Rezende)
  - [f2e2ffa] docs(changelog): update CHANGELOG.md (Thiago Rezende)
