@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+ - [69f6e7f] refactor(entrypoint|windows): update entrypoint to use setup and teardown functions from application_t (Thiago Rezende)
+ - [21a9079] docs(changelog): update CHANGELOG.md (Thiago Rezende)
  - [949e641] feat(application): add initial setup and teardown implementations (Thiago Rezende)
  - [70b20e0] feat(application): add placeholders for setup run and teardown procedures (Thiago Rezende)
  - [882510c] refactor(application): update global application instance retrieval function name (Thiago Rezende)
