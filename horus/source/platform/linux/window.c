@@ -542,7 +542,7 @@ b8 platform_window_set_event_callback(platform_window_t *window, platform_window
   return true;
 }
 
-platform_window_t *platform_window(void) {
+platform_window_t *platform_window_get_global_instance(void) {
   return __window;
 }
 
