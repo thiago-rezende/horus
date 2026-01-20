@@ -40,98 +40,27 @@ int main(int argc, char **argv, char **envp) {
     return 1;
   }
 
-  __application_set_global_instance(application);
-
   logger_info_format("<application:%p> <name:%s> created", (void *)application, application->name);
 
-  configuration_t *configuration = &application->configuration;
-  resolution_t *resolution = &configuration->resolution;
+  if (!application_setup(application)) {
+    logger_critical_format("<application:%p> setup failed", (void *)application);
 
-  platform_window_size_t window_size = (platform_window_size_t){
-      .width = resolution->width,
-      .height = resolution->height,
-  };
+    application_destroy(application);
 
-  platform_window_t *window = platform_window_create(application->name, window_size, configuration->fullscreen);
-
-  __platform_window_set_global_instance(window);
-
-  logger_info_format("<window:%p> <title:%s> <width:%u> <height:%u> <fullscreen:%u> created", (void *)window,
-                     application->name, resolution->width, resolution->height, configuration->fullscreen);
-
-  renderer_context_create_info_t renderer_context_create_info = (renderer_context_create_info_t){
-      .name = application->name,
-      .version = application->version,
-  };
-
-  renderer_t *renderer = renderer_create(renderer_context_create_info, window);
-
-  logger_info_format("<renderer:%p> <implementation:%s> created", (void *)renderer,
-                     renderer_implementation_string(renderer->implementation));
-
-  if (application->on_event) {
-    if (!platform_window_set_event_callback(window, application->on_event)) {
-      logger_error_format("<application:%p> <on_event> failed", (void *)application);
-    }
+    return 1;
   }
 
-  if (application->on_create) {
-    if (!application->on_create(application, window, renderer)) {
-      logger_error_format("<application:%p> <on_create> failed", (void *)application);
-    }
+  if (!application_run(application)) {
+    logger_critical_format("<application:%p> execution failed", (void *)application);
   }
 
-  f64 timestep = 0;
-  f64 current_absolute_time = platform_absolute_time();
-  f64 previous_absolute_time = platform_absolute_time();
+  if (!application_teardown(application)) {
+    logger_critical_format("<application:%p> teardown failed", (void *)application);
 
-  input_mouse_clear_state();
-  input_keyboard_clear_state();
+    application_destroy(application);
 
-  while (!platform_window_should_close(window)) {
-    platform_window_process_events(window);
-
-    /* check window state before proceeding to prevent renderer problems */
-    if (platform_window_should_close(window)) {
-      break;
-    }
-
-    previous_absolute_time = current_absolute_time;
-    current_absolute_time = platform_absolute_time();
-
-    timestep = current_absolute_time - previous_absolute_time;
-
-    if (application->on_update) {
-      if (!application->on_update(timestep)) {
-        logger_error_format("<application:%p> <on_update> failed", (void *)application);
-      }
-    }
-
-    /* TODO: improve for multiple windows support */
-    if (renderer_record_commands(renderer)) {
-      if (application->on_render) {
-        if (!application->on_render(renderer)) {
-          logger_error_format("<application:%p> <on_render> failed", (void *)application);
-        }
-      }
-
-      renderer_submit_commands(renderer);
-    }
+    return 1;
   }
-
-  if (application->on_destroy) {
-    if (!application->on_destroy(application, window, renderer)) {
-      logger_error_format("<application:%p> <on_destroy> failed", (void *)application);
-    }
-  }
-
-  renderer_destroy(renderer);
-
-  logger_info_format("<renderer:%p> destroyed", (void *)renderer);
-
-  platform_window_destroy(window);
-
-  logger_info_format("<window:%p> destroyed", (void *)window);
 
   if (!application_destroy(application)) {
     logger_critical_format("<application:%p> destruction failed", (void *)application);
