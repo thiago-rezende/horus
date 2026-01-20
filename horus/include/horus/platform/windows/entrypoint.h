@@ -65,42 +65,8 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
     return 1;
   }
 
-  f64 timestep = 0;
-  f64 current_absolute_time = platform_absolute_time();
-  f64 previous_absolute_time = platform_absolute_time();
-
-  input_mouse_clear_state();
-  input_keyboard_clear_state();
-
-  while (!platform_window_should_close(application->window)) {
-    platform_window_process_events(application->window);
-
-    /* check window state before proceeding to prevent renderer problems */
-    if (platform_window_should_close(application->window)) {
-      break;
-    }
-
-    previous_absolute_time = current_absolute_time;
-    current_absolute_time = platform_absolute_time();
-
-    timestep = current_absolute_time - previous_absolute_time;
-
-    if (application->on_update) {
-      if (!application->on_update(timestep)) {
-        logger_error_format("<application:%p> <on_update> failed", (void *)application);
-      }
-    }
-
-    /* TODO: improve for multiple windows support */
-    if (renderer_record_commands(application->renderer)) {
-      if (application->on_render) {
-        if (!application->on_render(application->renderer)) {
-          logger_error_format("<application:%p> <on_render> failed", (void *)application);
-        }
-      }
-
-      renderer_submit_commands(application->renderer);
-    }
+  if (!application_run(application)) {
+    logger_critical_format("<application:%p> execution failed", (void *)application);
   }
 
   if (!application_teardown(application)) {

@@ -1,16 +1,60 @@
 /* horus logger layer */
 #include <horus/logger/logger.h>
 
+/* horus platform layer */
+#include <horus/platform/time.h>
+
+/* horus input layer */
+#include <horus/input/mouse.h>
+#include <horus/input/keyboard.h>
+
 /* horus application layer */
 #include <horus/application/application.h>
-#include "horus/platform/window.h"
 
 application_t *__application = NULL;
 
 b8 application_run(application_t *application) {
-  logger_warning_format("<application:%p> application_run() not implemented", (void *)application);
+  f64 timestep = 0;
+  f64 current_absolute_time = platform_absolute_time();
+  f64 previous_absolute_time = platform_absolute_time();
 
-  return false;
+  input_mouse_clear_state();
+  input_keyboard_clear_state();
+
+  while (application->running) {
+    platform_window_process_events(application->window);
+
+    /* TODO: improve the 'running' state handling to allow headless applications */
+    if (platform_window_should_close(application->window)) {
+      application->running = false;
+
+      break;
+    }
+
+    previous_absolute_time = current_absolute_time;
+    current_absolute_time = platform_absolute_time();
+
+    timestep = current_absolute_time - previous_absolute_time;
+
+    if (application->on_update) {
+      if (!application->on_update(timestep)) {
+        logger_error_format("<application:%p> <on_update> failed", (void *)application);
+      }
+    }
+
+    /* TODO: improve for multiple windows support */
+    if (renderer_record_commands(application->renderer)) {
+      if (application->on_render) {
+        if (!application->on_render(application->renderer)) {
+          logger_error_format("<application:%p> <on_render> failed", (void *)application);
+        }
+      }
+
+      renderer_submit_commands(application->renderer);
+    }
+  }
+
+  return true;
 }
 
 b8 application_setup(application_t *application) {
